@@ -99,7 +99,10 @@
                         }
                     }
                 ]
-            }
+            },
+            "dependsOn": [
+                "[variables('dataFactoryName')]"
+            ]
         },
         {
             "apiVersion": "2017-05-10",
@@ -128,7 +131,10 @@
                         "value": true
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "[variables('dataFactoryName')]"
+            ]
         }
     ]
 }
