@@ -47,8 +47,6 @@
             "type": "Microsoft.DataFactory/factories",
             "identity": {
                 "type": "SystemAssigned"
-            },
-            "properties": {
             }
         },
         {
