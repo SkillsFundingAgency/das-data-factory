@@ -11,12 +11,6 @@
         "logAnalytiecsWorkspace": {
             "type": "string"
         },
-        "backupManagementServiceObjectId": {
-            "type": "string"
-        },
-        "diskEncryptionAppRegistrationObjectId": {
-            "type": "string"
-        },
         "keyVaultAccessObjectIds": {
             "type": "array"
         }
@@ -27,36 +21,6 @@
         "dataFactoryName": "[concat(variables('resourceNamePrefix'), '-df')]",
         "keyVaultName": "[concat(variables('resourceNamePrefix'), '-kv')]",
         "location": "[resourceGroup().location]",
-        "keyVaultAccessPolicies": [
-            {
-                "objectId": "[parameters('backupManagementServiceObjectId')]",
-                "tenantId": "[subscription().tenantId]",
-                "permissions": {
-                    "keys": [
-                        "Get",
-                        "List",
-                        "Backup"
-                    ],
-                    "secrets": [
-                        "Get",
-                        "List",
-                        "Backup"
-                    ]
-                }
-            },
-            {
-                "objectId": "[parameters('diskEncryptionAppRegistrationObjectId')]",
-                "tenantId": "[subscription().tenantId]",
-                "permissions": {
-                    "keys": [
-                        "WrapKey"
-                    ],
-                    "secrets": [
-                        "Set"
-                    ]
-                }
-            }
-        ],
         "copy": [
             {
                 "name": "parameterKeyVaultAccessPolicies",
@@ -152,13 +116,13 @@
                         "value": "[variables('keyVaultName')]"
                     },
                     "keyVaultAccessPolicies": {
-                        "value": "[concat(variables('KeyVaultAccessPolicies'), variables('parameterKeyVaultSecretAccessPolicies'))]"
+                        "value": "[concat(reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId, variables('parameterKeyVaultSecretAccessPolicies'))]"
                     },
                     "enabledForDiskEncryption": {
-                        "value": true
+                        "value": false
                     },
                     "enabledForTemplateDeployment": {
-                        "value": true
+                        "value": false
                     },
                     "enableSoftDelete": {
                         "value": true
