@@ -114,7 +114,7 @@
                         "value": "[variables('keyVaultName')]"
                     },
                     "keyVaultAccessPolicies": {
-                        "value": "[concat(reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId, variables('parameterKeyVaultSecretAccessPolicies'))]"
+                        "value": "[concat(reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId, variables('parameterKeyVaultAccessPolicies'))]"
                     },
                     "enableSoftDelete": {
                         "value": true
