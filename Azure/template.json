@@ -119,12 +119,6 @@
                     "keyVaultAccessPolicies": {
                         "value": "[concat(reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId, variables('parameterKeyVaultSecretAccessPolicies'))]"
                     },
-                    "enabledForDiskEncryption": {
-                        "value": false
-                    },
-                    "enabledForTemplateDeployment": {
-                        "value": false
-                    },
                     "enableSoftDelete": {
                         "value": true
                     }
