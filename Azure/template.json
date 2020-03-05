@@ -21,6 +21,19 @@
         "dataFactoryName": "[concat(variables('resourceNamePrefix'), '-df')]",
         "keyVaultName": "[concat(variables('resourceNamePrefix'), '-kv')]",
         "location": "[resourceGroup().location]",
+        "KeyVaultAccessPolicies": [
+            {
+                "objectId": "[concat('Microsoft.DataFactory/factories/', variables('dataFactoryName'), '2018-06-01', 'Full').identity.principalId]",
+                "tenantId": "[subscription().tenantId]",
+                "permissions": {
+                    "secrets": [
+                        "Get",
+                        "List",
+                        "Set"
+                    ]
+                }
+            }
+        ],
         "copy": [
             {
                 "name": "parameterKeyVaultAccessPolicies",
@@ -114,7 +127,7 @@
                         "value": "[variables('keyVaultName')]"
                     },
                     "keyVaultAccessPolicies": {
-                        "value": "[concat(reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId, variables('parameterKeyVaultAccessPolicies'))]"
+                        "value": "[concat(variables('KeyVaultAccessPolicies'), variables('parameterKeyVaultAccessPolicies'))]"
                     },
                     "enableSoftDelete": {
                         "value": true
