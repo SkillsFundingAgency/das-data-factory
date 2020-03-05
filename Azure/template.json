@@ -52,7 +52,7 @@
                 },
                 "parameters": {
                     "dataFactoryName": {
-                        "value": "[variables('keyVaultName')]"
+                        "value": "[variables('dataFactoryName')]"
                     },
                     "location": {
                         "value": "[variables('location')]"
