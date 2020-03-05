@@ -1,0 +1,129 @@
+  {
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceEnvironmentName": {
+            "type": "string"
+        },
+        "serviceName": {
+            "type": "string"
+        },
+        "logAnalytiecsWorkspace": {
+            "type": "string"
+        },
+        "keyVaultAccessObjectIds": {
+            "type": "array"
+        }
+    },
+    "variables": {
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "dataFactoryName": "[concat(variables('resourceNamePrefix'), '-df')]",
+        "keyVaultName": "[concat(variables('resourceNamePrefix'), '-kv')]",
+        "location": "[resourceGroup().location]",
+        "copy": [
+            {
+                "name": "parameterKeyVaultAccessPolicies",
+                "count": "[length(parameters('keyVaultAccessObjectIds'))]",
+                "input": {
+                    "objectId": "[parameters('keyVaultAccessObjectIds')[copyIndex('parameterKeyVaultAccessPolicies')]]",
+                    "tenantId": "[subscription().tenantId]",
+                    "permissions": {
+                        "secrets": [
+                            "Get",
+                            "List",
+                            "Set"
+                        ]
+                    }
+                }
+            }
+        ]
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-06-01",
+            "name": "[variables('dataFactoryName')]",
+            "location": "[variables('location')]",
+            "type": "Microsoft.DataFactory/factories",
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        },
+        {
+            "type": "microsoft.datafactory/factories/providers/diagnosticsettings",
+            "name": "[concat(variables('dataFactoryName'),'/Microsoft.Insights/diagnostics')]",
+            "location": "West Europe",
+            "apiVersion": "2017-05-01-preview",
+            "properties": {
+                "name": "diagnostics",
+                "workspaceId": "[parameters('logAnalytiecsWorkspace')]",
+                "logs": [
+                    {
+                        "category": "PipelineRuns",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    },
+                    {
+                        "category": "TriggerRuns",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    },
+                    {
+                        "category": "ActivityRuns",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    }
+                ],
+                "metrics": [
+                    {
+                        "category": "AllMetrics",
+                        "timeGrain": "PT1M",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[variables('dataFactoryName')]"
+            ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "key-vault",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'keyvault.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[variables('keyVaultName')]"
+                    },
+                    "keyVaultAccessPolicies": {
+                        "value": "[concat(reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId, variables('parameterKeyVaultSecretAccessPolicies'))]"
+                    },
+                    "enableSoftDelete": {
+                        "value": true
+                    }
+                }
+            },
+            "dependsOn": [
+                "[variables('dataFactoryName')]"
+            ]
+        }
+    ]
+}
