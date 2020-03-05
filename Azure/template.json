@@ -56,9 +56,6 @@
             "apiVersion": "2017-05-01-preview",
             "properties": {
                 "name": "diagnostics",
-                "storageAccountId": null,
-                "eventHubAuthorizationRuleId": null,
-                "eventHubName": null,
                 "workspaceId": "[parameters('logAnalytiecsWorkspace')]",
                 "logs": [
                     {
