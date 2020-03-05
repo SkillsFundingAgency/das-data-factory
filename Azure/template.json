@@ -21,19 +21,6 @@
         "dataFactoryName": "[concat(variables('resourceNamePrefix'), '-df')]",
         "keyVaultName": "[concat(variables('resourceNamePrefix'), '-kv')]",
         "location": "[resourceGroup().location]",
-        "KeyVaultAccessPolicies": [
-            {
-                "objectId": "[concat('Microsoft.DataFactory/factories/', variables('dataFactoryName'), '2018-06-01', 'Full').identity.principalId]",
-                "tenantId": "[subscription().tenantId]",
-                "permissions": {
-                    "secrets": [
-                        "Get",
-                        "List",
-                        "Set"
-                    ]
-                }
-            }
-        ],
         "copy": [
             {
                 "name": "parameterKeyVaultAccessPolicies",
@@ -54,18 +41,29 @@
     },
     "resources": [
         {
-            "apiVersion": "2018-06-01",
-            "name": "[variables('dataFactoryName')]",
-            "location": "[variables('location')]",
-            "type": "Microsoft.DataFactory/factories",
-            "identity": {
-                "type": "SystemAssigned"
+            "apiVersion": "2017-05-10",
+            "name": "data-factory",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'data-factory.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "dataFactoryName": {
+                        "value": "[variables('keyVaultName')]"
+                    },
+                    "location": {
+                        "value": "[variables('location')]"
+                    }
+                }
             }
         },
         {
             "type": "microsoft.datafactory/factories/providers/diagnosticsettings",
             "name": "[concat(variables('dataFactoryName'),'/Microsoft.Insights/diagnostics')]",
-            "location": "West Europe",
+            "location": "[variables('location')]",
             "apiVersion": "2017-05-01-preview",
             "properties": {
                 "name": "diagnostics",
@@ -109,7 +107,7 @@
                 ]
             },
             "dependsOn": [
-                "[variables('dataFactoryName')]"
+                "data-factory"
             ]
         },
         {
@@ -127,7 +125,7 @@
                         "value": "[variables('keyVaultName')]"
                     },
                     "keyVaultAccessPolicies": {
-                        "value": "[concat(variables('KeyVaultAccessPolicies'), variables('parameterKeyVaultAccessPolicies'))]"
+                        "value": "[concat(reference('data-factory').outputs.datafactoryKeyVaultAccessPolicy.value, variables('parameterKeyVaultAccessPolicies'))]"
                     },
                     "enableSoftDelete": {
                         "value": true
@@ -135,7 +133,7 @@
                 }
             },
             "dependsOn": [
-                "[variables('dataFactoryName')]"
+                "data-factory"
             ]
         }
     ]
