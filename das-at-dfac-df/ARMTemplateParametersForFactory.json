@@ -7,6 +7,12 @@
 		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://das-at-dfac-kv.vault.azure.net/"
+		},
+		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
+			"value": "faaCdbConnectionString"
+		},
+		"faaCdbSecret_properties_typeProperties_database": {
+			"value": "findapprenticeship"
 		}
 	}
 }

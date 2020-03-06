@@ -10,6 +10,14 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
+		},
+		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "faaCdbConnectionString"
+		},
+		"faaCdbSecret_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "findapprenticeship"
 		}
 	},
 	"variables": {
@@ -28,6 +36,29 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/faaCdbSecret')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDbMongoDbApi",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('faaCdbSecret_properties_typeProperties_connectionString_secretName')]"
+					},
+					"database": "[parameters('faaCdbSecret_properties_typeProperties_database')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
 		}
 	]
 }
