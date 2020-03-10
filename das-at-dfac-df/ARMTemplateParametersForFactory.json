@@ -19,6 +19,9 @@
 		},
 		"raaCdbSecret_properties_typeProperties_database": {
 			"value": "recruit"
+		},
+		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+			"value": "dasDataMAnagementConnectionString"
 		}
 	}
 }

@@ -26,6 +26,10 @@
 		"raaCdbSecret_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "recruit"
+		},
+		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "dasDataMAnagementConnectionString"
 		}
 	},
 	"variables": {
@@ -85,6 +89,28 @@
 						"secretName": "[parameters('raaCdbSecret_properties_typeProperties_connectionString_secretName')]"
 					},
 					"database": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/datamartSqlSecret')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
+					}
 				}
 			},
 			"dependsOn": [

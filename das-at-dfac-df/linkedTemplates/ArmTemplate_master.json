@@ -27,6 +27,10 @@
 			"type": "string",
 			"defaultValue": "recruit"
 		},
+		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "dasDataMAnagementConnectionString"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -68,6 +72,9 @@
 					},
 					"raaCdbSecret_properties_typeProperties_database": {
 						"value": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
+					},
+					"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
