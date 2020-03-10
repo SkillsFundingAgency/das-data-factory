@@ -19,6 +19,14 @@
 			"type": "string",
 			"defaultValue": "findapprenticeship"
 		},
+		"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "raaCdbConnectionString"
+		},
+		"raaCdbSecret_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "recruit"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -54,6 +62,12 @@
 					},
 					"faaCdbSecret_properties_typeProperties_database": {
 						"value": "[parameters('faaCdbSecret_properties_typeProperties_database')]"
+					},
+					"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('raaCdbSecret_properties_typeProperties_connectionString_secretName')]"
+					},
+					"raaCdbSecret_properties_typeProperties_database": {
+						"value": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
 					}
 				}
 			},

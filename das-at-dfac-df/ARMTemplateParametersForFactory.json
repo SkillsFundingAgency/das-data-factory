@@ -13,6 +13,12 @@
 		},
 		"faaCdbSecret_properties_typeProperties_database": {
 			"value": "findapprenticeship"
+		},
+		"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
+			"value": "raaCdbConnectionString"
+		},
+		"raaCdbSecret_properties_typeProperties_database": {
+			"value": "recruit"
 		}
 	}
 }
