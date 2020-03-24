@@ -1,0 +1,32 @@
+{
+	"name": "DataMartLogTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "datamartSqlSecret",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "RunId",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "StartDateTime",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "EndDateTime",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "Mgmt",
+			"table": "Log_RunId"
+		}
+	}
+}
