@@ -1,5 +1,5 @@
 {
-	"name": "DataMartLogTable",
+	"name": "DataMart",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "datamartSqlSecret",

@@ -21,7 +21,7 @@
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
-						"referenceName": "DataMartLogTable",
+						"referenceName": "DataMart",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -47,8 +47,28 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"tableOption": "autoCreate"
+					},
 					"enableStaging": false
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "RAA",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DataMart",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
