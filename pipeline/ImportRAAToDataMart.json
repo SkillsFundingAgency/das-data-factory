@@ -52,8 +52,7 @@
 						"batchSize": 100
 					},
 					"sink": {
-						"type": "AzureSqlSink",
-						"tableOption": "autoCreate"
+						"type": "AzureSqlSink"
 					},
 					"enableStaging": false
 				},
