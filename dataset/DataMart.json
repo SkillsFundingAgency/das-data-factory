@@ -5,6 +5,11 @@
 			"referenceName": "datamartSqlSecret",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"DestTableName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
@@ -25,8 +30,11 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "Mgmt",
-			"table": "Log_RunId"
+			"schema": "",
+			"table": {
+				"value": "@dataset().DestTableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
