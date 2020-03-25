@@ -66,10 +66,7 @@
 				"outputs": [
 					{
 						"referenceName": "DataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"DestTableName": "RAA_Users"
-						}
+						"type": "DatasetReference"
 					}
 				]
 			}
