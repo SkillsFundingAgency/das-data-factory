@@ -25,8 +25,8 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "Mgmt",
-			"table": "Log_Execution_Results"
+			"schema": "dbo",
+			"table": "RAA_Users"
 		}
 	}
 }

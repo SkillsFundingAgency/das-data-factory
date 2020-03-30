@@ -32,7 +32,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "GetRunId",
+						"activity": "SetRunId",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -52,9 +52,106 @@
 						"batchSize": 100
 					},
 					"sink": {
-						"type": "AzureSqlSink"
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE dbo.RAA_Users",
+						"disableMetricsCollection": false
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['idamsUserId']"
+								},
+								"sink": {
+									"name": "IdamUserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['userType']"
+								},
+								"sink": {
+									"name": "UserType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['name']"
+								},
+								"sink": {
+									"name": "UserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['email']"
+								},
+								"sink": {
+									"name": "UserEmail",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdDate']['$date']"
+								},
+								"sink": {
+									"name": "UserCreatedDate",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastSignedInDate']['$date']"
+								},
+								"sink": {
+									"name": "lastSignedInDate",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountIds']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['ukprn']"
+								},
+								"sink": {
+									"name": "Ukprn",
+									"type": "String"
+								}
+							}
+						]
+					}
 				},
 				"inputs": [
 					{
@@ -68,8 +165,34 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@activity('GetRunId').output.value",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"RunId": {
+				"type": "String",
+				"defaultValue": "1"
+			}
+		},
 		"annotations": []
 	}
 }
