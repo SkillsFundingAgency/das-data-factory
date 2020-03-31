@@ -53,7 +53,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM dbo.RAA_Users",
+						"preCopyScript": {
+							"value": "DELETE FROM dbo.RAA_Users\n\nDECLARE @RunId Int\n\nSelect @RunId= @variables('RunId')\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t  )\n  SELECT \n       @RunId",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
