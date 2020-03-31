@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[dbo].[GenerateRunId]",
+						"sqlReaderQuery": "EXEC [dbo].[GenerateRunId]\n\nSELECT MAX(RunId) from Mgmt.Log_RunId",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
@@ -53,7 +53,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE dbo.RAA_Users",
+						"preCopyScript": "DELETE FROM dbo.RAA_Users",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -150,7 +150,8 @@
 									"type": "String"
 								}
 							}
-						]
+						],
+						"mapComplexValuesToString": true
 					}
 				},
 				"inputs": [
@@ -189,8 +190,11 @@
 		],
 		"variables": {
 			"RunId": {
-				"type": "String",
-				"defaultValue": "1"
+				"type": "Array",
+				"defaultValue": [
+					"1",
+					"2"
+				]
 			}
 		},
 		"annotations": []
