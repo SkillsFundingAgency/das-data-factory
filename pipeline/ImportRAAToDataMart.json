@@ -60,7 +60,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "INSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
+						"preCopyScript": "DELETE FROM dbo.RAA_Users\n\nINSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
