@@ -1,5 +1,5 @@
 {
-	"name": "RAA_Users",
+	"name": "SrcRAAUsers",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "raaCdbSecret",

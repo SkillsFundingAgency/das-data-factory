@@ -28,7 +28,7 @@
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
-						"referenceName": "DataMart",
+						"referenceName": "DestDataMartRAAUsers",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": true
@@ -161,18 +161,19 @@
 								}
 							}
 						],
+						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
 				},
 				"inputs": [
 					{
-						"referenceName": "RAA_Users",
+						"referenceName": "SrcRAAUsers",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DataMart",
+						"referenceName": "DestDataMartRAAUsers",
 						"type": "DatasetReference"
 					}
 				]
