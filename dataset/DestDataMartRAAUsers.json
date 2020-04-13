@@ -9,23 +9,71 @@
 		"type": "AzureSqlTable",
 		"schema": [
 			{
+				"name": "SourseSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BinaryId",
+				"type": "varchar"
+			},
+			{
+				"name": "TypeCode",
+				"type": "varchar"
+			},
+			{
+				"name": "IdamUserId",
+				"type": "varchar"
+			},
+			{
+				"name": "UserType",
+				"type": "varchar"
+			},
+			{
+				"name": "UserName",
+				"type": "varchar"
+			},
+			{
+				"name": "UserEmail",
+				"type": "varchar"
+			},
+			{
+				"name": "UserCreatedTimeStamp",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LastSignedInTimeStamp",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "EmployerAccountId",
+				"type": "varchar"
+			},
+			{
+				"name": "Ukprn",
+				"type": "int",
+				"precision": 10
+			},
+			{
 				"name": "RunId",
 				"type": "bigint",
 				"precision": 19
 			},
 			{
-				"name": "StartDateTime",
+				"name": "AsDm_CreatedDate",
 				"type": "datetime2",
 				"scale": 7
 			},
 			{
-				"name": "EndDateTime",
+				"name": "AsDm_UpdatedDate",
 				"type": "datetime2",
 				"scale": 7
 			}
 		],
 		"typeProperties": {
-			"schema": "dbo",
+			"schema": "ASData_PL",
 			"table": "RAA_Users"
 		}
 	}

@@ -61,7 +61,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM dbo.RAA_Users\n\nINSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
+							"value": "DELETE FROM AsData_PL.RAA_Users\n\nINSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
 							"type": "Expression"
 						},
 						"disableMetricsCollection": false
@@ -129,8 +129,8 @@
 									"path": "$['createdDate']['$date']"
 								},
 								"sink": {
-									"name": "UserCreatedDate",
-									"type": "String"
+									"name": "UserCreatedTimeStamp",
+									"type": "Int64"
 								}
 							},
 							{
@@ -138,8 +138,8 @@
 									"path": "$['lastSignedInDate']['$date']"
 								},
 								"sink": {
-									"name": "lastSignedInDate",
-									"type": "String"
+									"name": "LastSignedInTimeStamp",
+									"type": "Int64"
 								}
 							},
 							{
@@ -157,7 +157,16 @@
 								},
 								"sink": {
 									"name": "Ukprn",
-									"type": "String"
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['@variables(\\'RunId\\')']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
 								}
 							}
 						],
