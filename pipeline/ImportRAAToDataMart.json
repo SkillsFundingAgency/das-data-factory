@@ -239,7 +239,14 @@
 			{
 				"name": "ImportRAAUsersStgToLive",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "ImportRAAUsers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -310,29 +317,6 @@
 				"linkedServiceName": {
 					"referenceName": "datamartSqlSecret",
 					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "ImportRAA",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "ImportRAAUsers",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"enableStaging": false
 				}
 			}
 		],
