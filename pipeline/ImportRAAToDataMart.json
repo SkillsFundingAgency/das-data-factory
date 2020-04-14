@@ -70,7 +70,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM AsData_PL.RAA_Users\n\nINSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
+							"value": "DELETE FROM Stg.RAA_Users\n\nINSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
 							"type": "Expression"
 						},
 						"disableMetricsCollection": false
