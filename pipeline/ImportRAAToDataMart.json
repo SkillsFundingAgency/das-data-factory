@@ -56,6 +56,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100
 					},
 					"sink": {
@@ -153,20 +162,20 @@
 							},
 							{
 								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
 									"path": "$['ukprn']"
 								},
 								"sink": {
 									"name": "Ukprn",
 									"type": "Int32"
-								}
-							},
-							{
-								"source": {
-									"path": "$['@variables(\\'RunId\\')']"
-								},
-								"sink": {
-									"name": "RunId",
-									"type": "Int64"
 								}
 							}
 						],
