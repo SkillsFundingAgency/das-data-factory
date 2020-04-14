@@ -139,7 +139,7 @@
 								},
 								"sink": {
 									"name": "UserCreatedTimeStamp",
-									"type": "Int64"
+									"type": "String"
 								}
 							},
 							{
@@ -148,7 +148,7 @@
 								},
 								"sink": {
 									"name": "LastSignedInTimeStamp",
-									"type": "Int64"
+									"type": "String"
 								}
 							},
 							{
@@ -175,7 +175,7 @@
 								},
 								"sink": {
 									"name": "Ukprn",
-									"type": "Int32"
+									"type": "String"
 								}
 							}
 						],
@@ -230,6 +230,42 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": "[dbo].[GenerateRunId]"
+				},
+				"linkedServiceName": {
+					"referenceName": "datamartSqlSecret",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ImportRAAUsersStgToLive",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAUsers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[ImportRAAUsersStgToLive]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "datamartSqlSecret",

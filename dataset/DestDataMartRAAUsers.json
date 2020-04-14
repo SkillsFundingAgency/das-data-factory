@@ -39,13 +39,11 @@
 			},
 			{
 				"name": "UserCreatedTimeStamp",
-				"type": "bigint",
-				"precision": 19
+				"type": "varchar"
 			},
 			{
 				"name": "LastSignedInTimeStamp",
-				"type": "bigint",
-				"precision": 19
+				"type": "varchar"
 			},
 			{
 				"name": "EmployerAccountId",
@@ -53,8 +51,7 @@
 			},
 			{
 				"name": "Ukprn",
-				"type": "int",
-				"precision": 10
+				"type": "varchar"
 			},
 			{
 				"name": "RunId",
@@ -73,7 +70,7 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "ASData_PL",
+			"schema": "Stg",
 			"table": "RAA_Users"
 		}
 	}
