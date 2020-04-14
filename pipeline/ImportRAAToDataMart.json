@@ -70,7 +70,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM Stg.RAA_Users\n\nINSERT INTO mgmt.log_execution_results\n(RunId,StoredProcedureName,Execution_Status)\nSELECT  @{variables('RunId')}\n            ,'ADF_RAA_Users_Import'\n            ,0",
+							"value": "DELETE FROM Stg.RAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"disableMetricsCollection": false
@@ -309,7 +309,7 @@
 							"type": "Int32"
 						},
 						"TaskType": {
-							"value": "ImportRAAUsersToStg-CopyActivity",
+							"value": "ImportRAAUsersToDM",
 							"type": "String"
 						}
 					}
