@@ -35,7 +35,7 @@
 				}
 			},
 			{
-				"name": "ImportRAAUsers",
+				"name": "ImportRAAUsersAndStartLogging",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -277,7 +277,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAUsers",
+						"activity": "ImportRAAUsersAndStartLogging",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -324,7 +324,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAUsers",
+						"activity": "ImportRAAUsersAndStartLogging",
 						"dependencyConditions": [
 							"Succeeded"
 						]
