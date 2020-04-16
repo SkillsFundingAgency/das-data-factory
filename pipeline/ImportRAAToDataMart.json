@@ -186,13 +186,20 @@
 				"inputs": [
 					{
 						"referenceName": "SrcRAAUsers",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "Users"
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "DestDataMartRAAUsers",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_Users",
+							"SchemaName": "Stg"
+						}
 					}
 				]
 			},
@@ -352,6 +359,55 @@
 						"type": "DatasetReference"
 					}
 				}
+			},
+			{
+				"name": "ImportRAAVacancies",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAUsers",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAAUsers",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "Vacancies"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMartRAAUsers",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_Vacancies",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"variables": {
