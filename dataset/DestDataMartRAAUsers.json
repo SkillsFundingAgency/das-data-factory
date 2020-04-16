@@ -1,0 +1,77 @@
+{
+	"name": "DestDataMartRAAUsers",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "datamartSqlSecret",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "SourseSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BinaryId",
+				"type": "varchar"
+			},
+			{
+				"name": "TypeCode",
+				"type": "varchar"
+			},
+			{
+				"name": "IdamUserId",
+				"type": "varchar"
+			},
+			{
+				"name": "UserType",
+				"type": "varchar"
+			},
+			{
+				"name": "UserName",
+				"type": "varchar"
+			},
+			{
+				"name": "UserEmail",
+				"type": "varchar"
+			},
+			{
+				"name": "UserCreatedTimeStamp",
+				"type": "varchar"
+			},
+			{
+				"name": "LastSignedInTimeStamp",
+				"type": "varchar"
+			},
+			{
+				"name": "EmployerAccountId",
+				"type": "varchar"
+			},
+			{
+				"name": "Ukprn",
+				"type": "varchar"
+			},
+			{
+				"name": "RunId",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "AsDm_CreatedDate",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "AsDm_UpdatedDate",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "Stg",
+			"table": "RAA_Users"
+		}
+	}
+}
