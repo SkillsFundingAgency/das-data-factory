@@ -11,6 +11,10 @@
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "dasDataMAnagementConnectionString"
+		},
 		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "faaCdbConnectionString"
@@ -26,16 +30,490 @@
 		"raaCdbSecret_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "recruit"
-		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "dasDataMAnagementConnectionString"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ImportRAAToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetRunId",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "GenerateRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DestDataMartRAAUsers",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "ImportRAAUsers",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SetRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.RAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['idamsUserId']"
+										},
+										"sink": {
+											"name": "IdamUserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['userType']"
+										},
+										"sink": {
+											"name": "UserType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['name']"
+										},
+										"sink": {
+											"name": "UserName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['email']"
+										},
+										"sink": {
+											"name": "UserEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['createdDate']['$date']"
+										},
+										"sink": {
+											"name": "UserCreatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastSignedInDate']['$date']"
+										},
+										"sink": {
+											"name": "LastSignedInTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerAccountIds']"
+										},
+										"sink": {
+											"name": "EmployerAccountId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['ukprn']"
+										},
+										"sink": {
+											"name": "Ukprn",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAAUsers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMartRAAUsers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "SetRunId",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RunId",
+							"value": {
+								"value": "@activity('GetRunId').output.firstRow.RunId",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GenerateRunId",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[GenerateRunId]"
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportRAAUsersStgToLive",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "LogSuccessfulExecution",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[ImportRAAUsersStgToLive]",
+							"storedProcedureParameters": {
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogRAAUserImportErrorDetails",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAUsers",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAUsers').output",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAUsersToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogSuccessfulExecution",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAUsers",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DestDataMartRAAUsers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"variables": {
+					"RunId": {
+						"type": "String",
+						"defaultValue": "\"1\""
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DestDataMartRAAUsers')]",
+				"[concat(variables('factoryId'), '/datasets/SrcRAAUsers')]",
+				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestDataMartRAAUsers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "datamartSqlSecret",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SourseSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BinaryId",
+						"type": "varchar"
+					},
+					{
+						"name": "TypeCode",
+						"type": "varchar"
+					},
+					{
+						"name": "IdamUserId",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "UserEmail",
+						"type": "varchar"
+					},
+					{
+						"name": "UserCreatedTimeStamp",
+						"type": "varchar"
+					},
+					{
+						"name": "LastSignedInTimeStamp",
+						"type": "varchar"
+					},
+					{
+						"name": "EmployerAccountId",
+						"type": "varchar"
+					},
+					{
+						"name": "Ukprn",
+						"type": "varchar"
+					},
+					{
+						"name": "RunId",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "AsDm_CreatedDate",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "AsDm_UpdatedDate",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "Stg",
+					"table": "RAA_Users"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SrcRAAUsers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "raaCdbSecret",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbMongoDbApiCollection",
+				"schema": [],
+				"typeProperties": {
+					"collection": "users"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/raaCdbSecret')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -48,6 +526,28 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/datamartSqlSecret')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/faaCdbSecret')]",
@@ -96,25 +596,41 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/datamartSqlSecret')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/ImportRAAToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ImportRAAToDataMart",
+							"type": "PipelineReference"
 						},
-						"secretName": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2020-04-14T10:08:00.000Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								1
+							]
+						}
 					}
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+				"[concat(variables('factoryId'), '/pipelines/ImportRAAToDataMart')]"
 			]
 		}
 	]

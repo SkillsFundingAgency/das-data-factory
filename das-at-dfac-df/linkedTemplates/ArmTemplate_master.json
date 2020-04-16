@@ -11,6 +11,10 @@
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "dasDataMAnagementConnectionString"
+		},
 		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "faaCdbConnectionString"
@@ -26,10 +30,6 @@
 		"raaCdbSecret_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "recruit"
-		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "dasDataMAnagementConnectionString"
 		},
 		"containerUri": {
 			"type": "string",
@@ -61,6 +61,9 @@
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
+					"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
+					},
 					"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('faaCdbSecret_properties_typeProperties_connectionString_secretName')]"
 					},
@@ -72,9 +75,6 @@
 					},
 					"raaCdbSecret_properties_typeProperties_database": {
 						"value": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
-					},
-					"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},

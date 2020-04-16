@@ -8,6 +8,9 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+			"value": "dasDataMAnagementConnectionString"
+		},
 		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
 			"value": "faaCdbConnectionString"
 		},
@@ -19,9 +22,6 @@
 		},
 		"raaCdbSecret_properties_typeProperties_database": {
 			"value": "recruit"
-		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-			"value": "dasDataMAnagementConnectionString"
 		},
 		"containerUri": {
 			"value": ""
