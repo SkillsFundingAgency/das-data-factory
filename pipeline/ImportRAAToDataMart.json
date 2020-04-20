@@ -28,7 +28,7 @@
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
-						"referenceName": "DestDataMartRAAUsers",
+						"referenceName": "DestDataMart",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": true
@@ -185,16 +185,16 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRAAUsers",
+						"referenceName": "SrcRAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "Users"
+							"CollectionName": "users"
 						}
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DestDataMartRAAUsers",
+						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
 							"TableName": "RAA_Users",
@@ -355,7 +355,7 @@
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
-						"referenceName": "DestDataMartRAAUsers",
+						"referenceName": "DestDataMart",
 						"type": "DatasetReference"
 					}
 				}
@@ -391,7 +391,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRAAUsers",
+						"referenceName": "SrcRAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
 							"CollectionName": "Vacancies"
@@ -400,7 +400,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DestDataMartRAAUsers",
+						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
 							"TableName": "RAA_Vacancies",

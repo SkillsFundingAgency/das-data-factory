@@ -1,5 +1,5 @@
 {
-	"name": "SrcRAAUsers",
+	"name": "SrcRAACosmos",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "raaCdbSecret",

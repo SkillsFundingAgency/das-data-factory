@@ -1,5 +1,5 @@
 {
-	"name": "DestDataMartRAAUsers",
+	"name": "DestDataMart",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "datamartSqlSecret",
