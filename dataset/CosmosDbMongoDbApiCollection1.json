@@ -1,0 +1,15 @@
+{
+	"name": "CosmosDbMongoDbApiCollection1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "raaCdbSecret",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbMongoDbApiCollection",
+		"schema": [],
+		"typeProperties": {
+			"collection": "vacancies"
+		}
+	}
+}

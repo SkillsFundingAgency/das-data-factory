@@ -387,14 +387,18 @@
 					"sink": {
 						"type": "AzureSqlSink"
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mapComplexValuesToString": true
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "SrcRAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "Vacancies"
+							"CollectionName": "vacancies"
 						}
 					}
 				],
