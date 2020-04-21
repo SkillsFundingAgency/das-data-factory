@@ -77,7 +77,7 @@
 					},
 					"enableStaging": false,
 					"translator": {
-						"value": "\"type":"TabularTranslator","schemaMapping":{"$['_id']['$binary']":"BinaryId"}",
+						"value": "\"type\":\"TabularTranslator\",\"schemaMapping\":{\"$['_id']['$binary']\":\"BinaryId\"}",
 						"type": "Expression"
 					}
 				},
