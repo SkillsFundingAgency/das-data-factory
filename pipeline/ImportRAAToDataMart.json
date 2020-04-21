@@ -77,7 +77,7 @@
 					},
 					"enableStaging": false,
 					"translator": {
-						"value": "\"translator\":{\n\t\t\t\t\t\t\"type\": \"TabularTranslator\",\n\t\t\t\t\t\t\"schemaMapping\": \n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"$['_id']['$binary']\": \"BinaryId\"\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t",
+						"value": "\"translator\":{\"type\":\"TabularTranslator\",\"schemaMapping\":{\"$['_id']['$binary']\":\"BinaryId\"}}",
 						"type": "Expression"
 					}
 				},
