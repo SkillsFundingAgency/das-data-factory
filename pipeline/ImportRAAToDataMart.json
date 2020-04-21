@@ -77,8 +77,29 @@
 					},
 					"enableStaging": false,
 					"translator": {
-						"value": "\"type\":\"TabularTranslator\",\"schemaMapping\":{\"$['_id']['$binary']\":\"BinaryId\"}",
-						"type": "Expression"
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "",
+						"mapComplexValuesToString": true
 					}
 				},
 				"inputs": [
