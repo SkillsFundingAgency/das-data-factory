@@ -78,26 +78,98 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "BinaryId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_id']['$type']"
-								},
-								"sink": {
-									"name": "TypeCode",
-									"type": "String"
-								}
-							}
-						],
+            "mappings": [
+              {
+                "source": {
+                  "path": "$['_id']['$binary']"
+                },
+                "sink": {
+                  "name": "BinaryId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['_id']['$type']"
+                },
+                "sink": {
+                  "name": "TypeCode",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['idamUserId']"
+                },
+                "sink": {
+                  "name": "IdamUserId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['userType']"
+                },
+                "sink": {
+                  "name": "UserType",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['name']"
+                },
+                "sink": {
+                  "name": "UserName",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['email']"
+                },
+                "sink": {
+                  "name": "UserEmail",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['createdDate']['$date']"
+                },
+                "sink": {
+                  "name": "UserCreatedTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['lastSignedInDate']['$date']"
+                },
+                "sink": {
+                  "name": "LastSignedInTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['RunId']"
+                },
+                "sink": {
+                  "name": "RunId",
+                  "type": "Int64"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['ukprn']"
+                },
+                "sink": {
+                  "name": "Ukprn",
+                  "type": "String"
+                }
+              }
+            ],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
