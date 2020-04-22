@@ -460,15 +460,6 @@
 							},
 							{
 								"source": {
-									"path": "$['closedDate']['$date']"
-								},
-								"sink": {
-									"name": "ClosingDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['createdDate']['$date']"
 								},
 								"sink": {
