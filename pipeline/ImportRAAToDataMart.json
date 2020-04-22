@@ -78,98 +78,98 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
-            "mappings": [
-              {
-                "source": {
-                  "path": "$['_id']['$binary']"
-                },
-                "sink": {
-                  "name": "BinaryId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['_id']['$type']"
-                },
-                "sink": {
-                  "name": "TypeCode",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['idamUserId']"
-                },
-                "sink": {
-                  "name": "IdamUserId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['userType']"
-                },
-                "sink": {
-                  "name": "UserType",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['name']"
-                },
-                "sink": {
-                  "name": "UserName",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['email']"
-                },
-                "sink": {
-                  "name": "UserEmail",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['createdDate']['$date']"
-                },
-                "sink": {
-                  "name": "UserCreatedTimeStamp",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['lastSignedInDate']['$date']"
-                },
-                "sink": {
-                  "name": "LastSignedInTimeStamp",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['RunId']"
-                },
-                "sink": {
-                  "name": "RunId",
-                  "type": "Int64"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['ukprn']"
-                },
-                "sink": {
-                  "name": "Ukprn",
-                  "type": "String"
-                }
-              }
-            ],
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['idamUserId']"
+								},
+								"sink": {
+									"name": "IdamUserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['userType']"
+								},
+								"sink": {
+									"name": "UserType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['name']"
+								},
+								"sink": {
+									"name": "UserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['email']"
+								},
+								"sink": {
+									"name": "UserEmail",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdDate']['$date']"
+								},
+								"sink": {
+									"name": "UserCreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastSignedInDate']['$date']"
+								},
+								"sink": {
+									"name": "LastSignedInTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['ukprn']"
+								},
+								"sink": {
+									"name": "Ukprn",
+									"type": "String"
+								}
+							}
+						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
@@ -294,7 +294,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAUsers').output",
+								"value": "@activity('ImportRAAUsers').output.errors",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -347,7 +347,11 @@
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Users"
+						}
 					}
 				}
 			},
@@ -378,7 +382,532 @@
 					"sink": {
 						"type": "AzureSqlSink"
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountId']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['vacancyReference']"
+								},
+								"sink": {
+									"name": "VacancyReference",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['status']"
+								},
+								"sink": {
+									"name": "VacancyStatus",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['ownerType']"
+								},
+								"sink": {
+									"name": "OwnerType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['sourceOrigin']"
+								},
+								"sink": {
+									"name": "SourceOrigin",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['sourceType']"
+								},
+								"sink": {
+									"name": "SourceType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['closedDate']['$date']"
+								},
+								"sink": {
+									"name": "ClosingDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdDate']['$date']"
+								},
+								"sink": {
+									"name": "CreatedDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdByUser']['userId']"
+								},
+								"sink": {
+									"name": "CreatedByUserID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdByUser']['name']"
+								},
+								"sink": {
+									"name": "CreatedByUserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdByUser']['email']"
+								},
+								"sink": {
+									"name": "CreatedByUserEmail",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedDate']['$date']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['userId']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['name']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['email']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['approvedDate']['$date']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['liveDate']['$date']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedDate']['$date']"
+								},
+								"sink": {
+									"name": "LastUpdatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedByUser']['userId']"
+								},
+								"sink": {
+									"name": "LastUpdatedByUserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedByUser']['name']"
+								},
+								"sink": {
+									"name": "LastUpdatedByUserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedByUser']['email']"
+								},
+								"sink": {
+									"name": "LastUpdatedByUserEmail",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['isDeleted']"
+								},
+								"sink": {
+									"name": "IsDeleted",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['applicationMethod']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['applicationUrl']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['closingDate']['$date']"
+								},
+								"sink": {
+									"name": "ClosingDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['description']"
+								},
+								"sink": {
+									"name": "ShortDescription",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['disabilityConfident']"
+								},
+								"sink": {
+									"name": "DisabilityConfident",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerDescription']"
+								},
+								"sink": {
+									"name": ""
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['addressLine1']"
+								},
+								"sink": {
+									"name": "EmployerAddressLine1",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['postcode']"
+								},
+								"sink": {
+									"name": "EmployerPostCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['latitude']"
+								},
+								"sink": {
+									"name": "EmployerLatitude",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['longitude']"
+								},
+								"sink": {
+									"name": "EmployerLongitude",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['addressLine2']"
+								},
+								"sink": {
+									"name": "EmployerAddressLine2",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['addressLine3']"
+								},
+								"sink": {
+									"name": ""
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerName']"
+								},
+								"sink": {
+									"name": "EmployerName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerNameOption']"
+								},
+								"sink": {
+									"name": "EmployerNameOption",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['legalEntityName']"
+								},
+								"sink": {
+									"name": "LegalEntityName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['geoCodeMethod']"
+								},
+								"sink": {
+									"name": "GeoCodeMethod",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['legalEntityId']"
+								},
+								"sink": {
+									"name": "LegalEntityId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['numberOfPositions']"
+								},
+								"sink": {
+									"name": "NumberOfPositions",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['outcomeDescription']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['programmeId']"
+								},
+								"sink": {
+									"name": "ProgrammeId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['qualificationType']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['subject']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['grade']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['weighting']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['shortDescription']"
+								},
+								"sink": {
+									"name": "ShortDescription",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['skills']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['startDate']['$date']"
+								},
+								"sink": {
+									"name": "StartDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['title']"
+								},
+								"sink": {
+									"name": "VacancyTitle",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingDescription']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['ukprn']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['name']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['address']['addressLine3']"
+								},
+								"sink": {
+									"name": ""
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['address']['addressLine4']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['address']['postcode']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['duration']"
+								},
+								"sink": {
+									"name": "WageDuration",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['durationUnit']"
+								},
+								"sink": {
+									"name": "WageDurationUnit",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['workingWeekDescription']"
+								},
+								"sink": {
+									"name": "WorkingWeekDescription",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['weeklyHours']"
+								},
+								"sink": {
+									"name": "WeeklyHours",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['wageType']"
+								},
+								"sink": {
+									"name": "WageType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['fixedWageYearlyAmount']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['closureReason']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerContact']['Name']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerContact']['Email']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerContact']['Phone']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['applicationInstructions']"
+								}
+							}
+						],
+						"collectionReference": "",
+						"mapComplexValuesToString": true
+					}
 				},
 				"inputs": [
 					{
