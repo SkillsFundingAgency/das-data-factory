@@ -505,36 +505,6 @@
 							},
 							{
 								"source": {
-									"path": "$['submittedDate']['$date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['submittedByUser']['userId']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['submittedByUser']['name']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['submittedByUser']['email']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['approvedDate']['$date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['liveDate']['$date']"
-								}
-							},
-							{
-								"source": {
 									"path": "$['lastUpdatedDate']['$date']"
 								},
 								"sink": {
@@ -580,29 +550,10 @@
 							},
 							{
 								"source": {
-									"path": "$['applicationMethod']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['applicationUrl']"
-								}
-							},
-							{
-								"source": {
 									"path": "$['closingDate']['$date']"
 								},
 								"sink": {
 									"name": "ClosingDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['description']"
-								},
-								"sink": {
-									"name": "ShortDescription",
 									"type": "String"
 								}
 							},
@@ -613,14 +564,6 @@
 								"sink": {
 									"name": "DisabilityConfident",
 									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerDescription']"
-								},
-								"sink": {
-									"name": ""
 								}
 							},
 							{
@@ -666,14 +609,6 @@
 								"sink": {
 									"name": "EmployerAddressLine2",
 									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['addressLine3']"
-								},
-								"sink": {
-									"name": ""
 								}
 							},
 							{
@@ -732,11 +667,6 @@
 							},
 							{
 								"source": {
-									"path": "$['outcomeDescription']"
-								}
-							},
-							{
-								"source": {
 									"path": "$['programmeId']"
 								},
 								"sink": {
@@ -746,36 +676,11 @@
 							},
 							{
 								"source": {
-									"path": "$['qualifications'][0]['qualificationType']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications'][0]['subject']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications'][0]['grade']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications'][0]['weighting']"
-								}
-							},
-							{
-								"source": {
 									"path": "$['shortDescription']"
 								},
 								"sink": {
 									"name": "ShortDescription",
 									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['skills']"
 								}
 							},
 							{
@@ -794,39 +699,6 @@
 								"sink": {
 									"name": "VacancyTitle",
 									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingDescription']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['ukprn']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['name']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['address']['addressLine3']"
-								},
-								"sink": {
-									"name": ""
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['address']['addressLine4']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['address']['postcode']"
 								}
 							},
 							{
@@ -872,36 +744,6 @@
 								"sink": {
 									"name": "WageType",
 									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['fixedWageYearlyAmount']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['closureReason']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerContact']['Name']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerContact']['Email']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerContact']['Phone']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['applicationInstructions']"
 								}
 							}
 						],
