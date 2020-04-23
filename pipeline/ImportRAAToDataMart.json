@@ -1048,7 +1048,7 @@
 								}
 							}
 						],
-						"collectionReference": "$['Column_1']",
+						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
 				},
