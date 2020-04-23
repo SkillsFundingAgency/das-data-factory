@@ -700,6 +700,14 @@
 							},
 							{
 								"source": {
+									"path": "$['employerLocation']['addressLine4']"
+								},
+								"sink": {
+									"name": "EmployerAddressLine4"
+								}
+							},
+							{
+								"source": {
 									"path": "$['employerName']"
 								},
 								"sink": {
@@ -939,6 +947,14 @@
 							},
 							{
 								"source": {
+									"path": "$['wage']['wageAdditionalInformation']"
+								},
+								"sink": {
+									"name": "WageAdditionalInformation"
+								}
+							},
+							{
+								"source": {
 									"path": "$['closureReason']"
 								},
 								"sink": {
@@ -976,9 +992,66 @@
 								"sink": {
 									"name": "ApplicationInstructions"
 								}
+							},
+							{
+								"source": {
+									"path": "$['employerWebsiteUrl']"
+								},
+								"sink": {
+									"name": "EmployerWebsiteUrl"
+								}
+							},
+							{
+								"source": {
+									"path": "$['accountLegalEntityPublicHashedId']"
+								},
+								"sink": {
+									"name": "AccountLegalEntityPublicHashedId"
+								}
+							},
+							{
+								"source": {
+									"path": "$['thingsToConsider']"
+								},
+								"sink": {
+									"name": "ThingsToConsider"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedDate']['$date']"
+								},
+								"sink": {
+									"name": "DeletedDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedByUser']['userId']"
+								},
+								"sink": {
+									"name": "DeletedByUserId"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedByUser']['name']"
+								},
+								"sink": {
+									"name": "DeletedByUserName"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedByUser']['email']"
+								},
+								"sink": {
+									"name": "DeletedByUserEmail"
+								}
 							}
 						],
-						"collectionReference": "",
+						"collectionReference": "$['Column_1']",
 						"mapComplexValuesToString": true
 					}
 				},
