@@ -406,15 +406,6 @@
 							},
 							{
 								"source": {
-									"path": "$['employerAccountId']"
-								},
-								"sink": {
-									"name": "EmployerAccountId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['vacancyReference']"
 								},
 								"sink": {
@@ -463,7 +454,8 @@
 									"path": "$['closedDate']['$date']"
 								},
 								"sink": {
-									"name": "ClosedDateTimeStamp (nvarchar)"
+									"name": "ClosedDateTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -507,7 +499,8 @@
 									"path": "$['submittedDate']['$date']"
 								},
 								"sink": {
-									"name": "SubmittedDateTimeStamp (nvarchar)"
+									"name": "SubmittedDateTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -515,7 +508,8 @@
 									"path": "$['submittedByUser']['userId']"
 								},
 								"sink": {
-									"name": "SubmittedByUserId (nvarchar)"
+									"name": "SubmittedByUserId",
+									"type": "String"
 								}
 							},
 							{
@@ -523,7 +517,8 @@
 									"path": "$['submittedByUser']['name']"
 								},
 								"sink": {
-									"name": "SubmittedByUserName (nvarchar)"
+									"name": "SubmittedByUserName",
+									"type": "String"
 								}
 							},
 							{
@@ -531,7 +526,8 @@
 									"path": "$['submittedByUser']['email']"
 								},
 								"sink": {
-									"name": "SubmittedByUserEmail (nvarchar)"
+									"name": "SubmittedByUserEmail",
+									"type": "String"
 								}
 							},
 							{
@@ -539,7 +535,8 @@
 									"path": "$['approvedDate']['$date']"
 								},
 								"sink": {
-									"name": "ApprovedDateTimeStamp (nvarchar)"
+									"name": "ApprovedDateTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -547,7 +544,8 @@
 									"path": "$['liveDate']['$date']"
 								},
 								"sink": {
-									"name": "LiveDateTimeStamp (nvarchar)"
+									"name": "LiveDateTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -555,7 +553,8 @@
 									"path": "$['lastUpdatedDate']['$date']"
 								},
 								"sink": {
-									"name": "LastUpdatedTimeStamp (nvarchar)"
+									"name": "LastUpdatedTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -599,7 +598,8 @@
 									"path": "$['applicationMethod']"
 								},
 								"sink": {
-									"name": "ApplicationMethod (nvarchar)"
+									"name": "ApplicationMethod",
+									"type": "String"
 								}
 							},
 							{
@@ -607,7 +607,8 @@
 									"path": "$['applicationUrl']"
 								},
 								"sink": {
-									"name": "ApplicationUrl (nvarchar)"
+									"name": "ApplicationUrl",
+									"type": "String"
 								}
 							},
 							{
@@ -615,7 +616,8 @@
 									"path": "$['closingDate']['$date']"
 								},
 								"sink": {
-									"name": "ClosingDateTimeStamp (nvarchar)"
+									"name": "ClosingDateTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -623,7 +625,8 @@
 									"path": "$['description']"
 								},
 								"sink": {
-									"name": "VacancyDescription (nvarchar)"
+									"name": "VacancyDescription",
+									"type": "String"
 								}
 							},
 							{
@@ -640,7 +643,7 @@
 									"path": "$['employerDescription']"
 								},
 								"sink": {
-									"name": "EmployerDescription (nvarchar)"
+									"name": "EmployerDescription"
 								}
 							},
 							{
@@ -693,15 +696,8 @@
 									"path": "$['employerLocation']['addressLine3']"
 								},
 								"sink": {
-									"name": "EmployerAddressLine3 (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['addressLine4']"
-								},
-								"sink": {
-									"name": "EmployerAddressLine4 (nvarchar)"
+									"name": "EmployerAddressLine3",
+									"type": "String"
 								}
 							},
 							{
@@ -763,7 +759,8 @@
 									"path": "$['outcomeDescription']"
 								},
 								"sink": {
-									"name": "OutcomeDescription (nvarchar)"
+									"name": "OutcomeDescription",
+									"type": "String"
 								}
 							},
 							{
@@ -780,7 +777,8 @@
 									"path": "$['qualifications'][0]['qualificationType']"
 								},
 								"sink": {
-									"name": "QualificationType (nvarchar)"
+									"name": "QualificationType",
+									"type": "String"
 								}
 							},
 							{
@@ -788,7 +786,8 @@
 									"path": "$['qualifications'][0]['subject']"
 								},
 								"sink": {
-									"name": "QualificationSubject (nvarchar)"
+									"name": "QualificationSubject",
+									"type": "String"
 								}
 							},
 							{
@@ -796,7 +795,8 @@
 									"path": "$['qualifications'][0]['grade']"
 								},
 								"sink": {
-									"name": "QualificationGrade (nvarchar)"
+									"name": "QualificationGrade",
+									"type": "String"
 								}
 							},
 							{
@@ -804,7 +804,8 @@
 									"path": "$['qualifications'][0]['weighting']"
 								},
 								"sink": {
-									"name": "QualificationWeighting (nvarchar)"
+									"name": "QualificationWeighting",
+									"type": "String"
 								}
 							},
 							{
@@ -821,7 +822,8 @@
 									"path": "$['skills']"
 								},
 								"sink": {
-									"name": "Skills (nvarchar)"
+									"name": "Skills",
+									"type": "String"
 								}
 							},
 							{
@@ -847,7 +849,8 @@
 									"path": "$['trainingDescription']"
 								},
 								"sink": {
-									"name": "TrainingDescription (nvarchar)"
+									"name": "TrainingDescription",
+									"type": "String"
 								}
 							},
 							{
@@ -855,7 +858,8 @@
 									"path": "$['trainingProvider']['ukprn']"
 								},
 								"sink": {
-									"name": "TrainingProviderUkprn (nvarchar)"
+									"name": "TrainingProviderUkprn",
+									"type": "String"
 								}
 							},
 							{
@@ -863,7 +867,8 @@
 									"path": "$['trainingProvider']['name']"
 								},
 								"sink": {
-									"name": "TrainingProviderName (nvarchar)"
+									"name": "TrainingProviderName",
+									"type": "String"
 								}
 							},
 							{
@@ -871,7 +876,8 @@
 									"path": "$['trainingProvider']['address']['addressLine3']"
 								},
 								"sink": {
-									"name": "TrainingProviderAddressLine3 (nvarchar)"
+									"name": "TrainingProviderAddressLine3",
+									"type": "String"
 								}
 							},
 							{
@@ -879,7 +885,8 @@
 									"path": "$['trainingProvider']['address']['addressLine4']"
 								},
 								"sink": {
-									"name": "TrainingProviderAddressLine4 (nvarchar)"
+									"name": "TrainingProviderAddressLine4",
+									"type": "String"
 								}
 							},
 							{
@@ -887,7 +894,8 @@
 									"path": "$['trainingProvider']['address']['postcode']"
 								},
 								"sink": {
-									"name": "TrainingProviderPostCode (nvarchar)"
+									"name": "TrainingProviderPostcode",
+									"type": "String"
 								}
 							},
 							{
@@ -940,15 +948,8 @@
 									"path": "$['wage']['fixedWageYearlyAmount']"
 								},
 								"sink": {
-									"name": "FixedWageYearlyAmount (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['wageAdditionalInformation']"
-								},
-								"sink": {
-									"name": "WageAdditionalInformation (nvarchar)"
+									"name": "FixedWageYearlyAmount",
+									"type": "String"
 								}
 							},
 							{
@@ -956,7 +957,8 @@
 									"path": "$['closureReason']"
 								},
 								"sink": {
-									"name": "ClosureReason (nvarchar)"
+									"name": "ClosureReason",
+									"type": "String"
 								}
 							},
 							{
@@ -964,7 +966,8 @@
 									"path": "$['employerContact']['Name']"
 								},
 								"sink": {
-									"name": "EmployerContactName (nvarchar)"
+									"name": "EmployerContactName",
+									"type": "String"
 								}
 							},
 							{
@@ -972,7 +975,8 @@
 									"path": "$['employerContact']['Email']"
 								},
 								"sink": {
-									"name": "EmployerContactEmail (nvarchar)"
+									"name": "EmployerContactEmail",
+									"type": "String"
 								}
 							},
 							{
@@ -980,7 +984,8 @@
 									"path": "$['employerContact']['Phone']"
 								},
 								"sink": {
-									"name": "EmployerContactPhone (nvarchar)"
+									"name": "EmployerContactPhone",
+									"type": "String"
 								}
 							},
 							{
@@ -988,63 +993,8 @@
 									"path": "$['applicationInstructions']"
 								},
 								"sink": {
-									"name": "ApplicationInstructions (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerWebsiteUrl']"
-								},
-								"sink": {
-									"name": "EmployerWebsiteUrl (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['accountLegalEntityPublicHashedId']"
-								},
-								"sink": {
-									"name": "AccountLegalEntityPublicHashedId (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['thingsToConsider']"
-								},
-								"sink": {
-									"name": "ThingsToConsider (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedDate']['$date']"
-								},
-								"sink": {
-									"name": "DeletedDateTimeStamp (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['userId']"
-								},
-								"sink": {
-									"name": "DeletedByUserId (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['name']"
-								},
-								"sink": {
-									"name": "DeletedByUserName (nvarchar)"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['email']"
-								},
-								"sink": {
-									"name": "DeletedByUserEmail (nvarchar)"
+									"name": "ApplicationIstructions",
+									"type": "String"
 								}
 							}
 						],
