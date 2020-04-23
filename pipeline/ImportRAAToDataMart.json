@@ -380,7 +380,9 @@
 						"batchSize": 100
 					},
 					"sink": {
-						"type": "AzureSqlSink"
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAv2VacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -996,6 +998,87 @@
 									"name": "ApplicationIstructions",
 									"type": "String"
 								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['addressLine4']"
+								},
+								"sink": {
+									"name": "EmployerAddressLine4",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerWebsiteUrl']"
+								},
+								"sink": {
+									"name": "EmployerWebsiteUrl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['accountLegalEntityPublicHashedId']"
+								},
+								"sink": {
+									"name": "AccountLegalEntityPublicHashedId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['thingsToConsider']"
+								},
+								"sink": {
+									"name": "ThingsToConsider",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['wageAdditionalInformation']"
+								},
+								"sink": {
+									"name": "WageAdditionalInformation",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedDate']['$date']"
+								},
+								"sink": {
+									"name": "DeletedDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedByUser']['userId']"
+								},
+								"sink": {
+									"name": "DeletedByUserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedByUser']['name']"
+								},
+								"sink": {
+									"name": "DeletedByUserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['deletedByUser']['email']"
+								},
+								"sink": {
+									"name": "DeletedByUserEmail",
+									"type": "String"
+								}
 							}
 						],
 						"collectionReference": "",
@@ -1017,6 +1100,104 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"TableName": "RAA_Vacancies",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "LogRAAUserImportErrorDetails_copy1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAVacancies",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+					"storedProcedureParameters": {
+						"ErrorMessage": {
+							"value": {
+								"value": "@activity('ImportRAAUsers').output.errors",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"TaskType": {
+							"value": "ImportRAAVacanciesToDM",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamartSqlSecret",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ImportRAAApplicationReviews",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAVacancies",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAv2VacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "applicationReviews"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_ApplicationReviews",
 							"SchemaName": "Stg"
 						}
 					}
