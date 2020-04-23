@@ -460,6 +460,14 @@
 							},
 							{
 								"source": {
+									"path": "$['closedDate']['$date']"
+								},
+								"sink": {
+									"name": "ClosedDateTimeStamp"
+								}
+							},
+							{
+								"source": {
 									"path": "$['createdDate']['$date']"
 								},
 								"sink": {
@@ -492,6 +500,54 @@
 								"sink": {
 									"name": "CreatedByUserEmail",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedDate']['$date']"
+								},
+								"sink": {
+									"name": "SubmittedDateTimeStamp"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['userId']"
+								},
+								"sink": {
+									"name": "SubmittedByUserId"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['name']"
+								},
+								"sink": {
+									"name": "SubmittedByUserName"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['email']"
+								},
+								"sink": {
+									"name": "SubmittedByUserEmail"
+								}
+							},
+							{
+								"source": {
+									"path": "$['approvedDate']['$date']"
+								},
+								"sink": {
+									"name": "ApprovedDateTimeStamp"
+								}
+							},
+							{
+								"source": {
+									"path": "$['liveDate']['$date']"
+								},
+								"sink": {
+									"name": "LiveDateTimeStamp"
 								}
 							},
 							{
@@ -541,6 +597,22 @@
 							},
 							{
 								"source": {
+									"path": "$['applicationMethod']"
+								},
+								"sink": {
+									"name": "ApplicationMethod"
+								}
+							},
+							{
+								"source": {
+									"path": "$['applicationUrl']"
+								},
+								"sink": {
+									"name": "ApplicationUrl"
+								}
+							},
+							{
+								"source": {
 									"path": "$['closingDate']['$date']"
 								},
 								"sink": {
@@ -550,11 +622,27 @@
 							},
 							{
 								"source": {
+									"path": "$['description']"
+								},
+								"sink": {
+									"name": "VacancyDescription"
+								}
+							},
+							{
+								"source": {
 									"path": "$['disabilityConfident']"
 								},
 								"sink": {
 									"name": "DisabilityConfident",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerDescription']"
+								},
+								"sink": {
+									"name": "EmployerDescription"
 								}
 							},
 							{
@@ -600,6 +688,14 @@
 								"sink": {
 									"name": "EmployerAddressLine2",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerLocation']['addressLine3']"
+								},
+								"sink": {
+									"name": "EmployerAddressLine3"
 								}
 							},
 							{
@@ -658,6 +754,14 @@
 							},
 							{
 								"source": {
+									"path": "$['outcomeDescription']"
+								},
+								"sink": {
+									"name": "OutcomeDescription"
+								}
+							},
+							{
+								"source": {
 									"path": "$['programmeId']"
 								},
 								"sink": {
@@ -667,11 +771,51 @@
 							},
 							{
 								"source": {
+									"path": "$['qualifications'][0]['qualificationType']"
+								},
+								"sink": {
+									"name": "QualificationType"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['subject']"
+								},
+								"sink": {
+									"name": "QualificationSubject"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['grade']"
+								},
+								"sink": {
+									"name": "QualificationGrade"
+								}
+							},
+							{
+								"source": {
+									"path": "$['qualifications'][0]['weighting']"
+								},
+								"sink": {
+									"name": "QualificationWeighting"
+								}
+							},
+							{
+								"source": {
 									"path": "$['shortDescription']"
 								},
 								"sink": {
 									"name": "ShortDescription",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['skills']"
+								},
+								"sink": {
+									"name": "Skills"
 								}
 							},
 							{
@@ -690,6 +834,54 @@
 								"sink": {
 									"name": "VacancyTitle",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingDescription']"
+								},
+								"sink": {
+									"name": "TrainingDescription"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['ukprn']"
+								},
+								"sink": {
+									"name": "TrainingProviderUkprn"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['name']"
+								},
+								"sink": {
+									"name": "TrainingProviderName"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['address']['addressLine3']"
+								},
+								"sink": {
+									"name": "TrainingProviderAddressLine3"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['address']['addressLine4']"
+								},
+								"sink": {
+									"name": "TrainingProviderAddressLine4"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainingProvider']['address']['postcode']"
+								},
+								"sink": {
+									"name": "TrainingProviderPostCode"
 								}
 							},
 							{
@@ -735,6 +927,54 @@
 								"sink": {
 									"name": "WageType",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['wage']['fixedWageYearlyAmount']"
+								},
+								"sink": {
+									"name": "FixedWageYearlyAmount"
+								}
+							},
+							{
+								"source": {
+									"path": "$['closureReason']"
+								},
+								"sink": {
+									"name": "ClosureReason"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerContact']['Name']"
+								},
+								"sink": {
+									"name": "EmployerContactName"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerContact']['Email']"
+								},
+								"sink": {
+									"name": "EmployerContactEmail"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerContact']['Phone']"
+								},
+								"sink": {
+									"name": "EmployerContactPhone"
+								}
+							},
+							{
+								"source": {
+									"path": "$['applicationInstructions']"
+								},
+								"sink": {
+									"name": "ApplicationInstructions"
 								}
 							}
 						],
