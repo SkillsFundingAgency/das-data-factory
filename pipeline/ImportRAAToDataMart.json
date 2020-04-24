@@ -1693,11 +1693,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"batchSize": 100,
-						"filter": "\"{_id: ObjectId(\\\"CandidateSkills\\\") }\""
-					},
+          "source": {
+            "type": "CosmosDbMongoDbApiSource",
+            "batchSize": 100,
+            "filter": "{_id: ObjectId(\"CandidateSkills\") }"
+          },
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
