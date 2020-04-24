@@ -1695,7 +1695,8 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
-						"batchSize": 100
+						"batchSize": 100,
+						"filter": "\"{_id: ObjectId(\\\"CandidateSkills\\\") }\""
 					},
 					"sink": {
 						"type": "AzureSqlSink",
@@ -1706,7 +1707,37 @@
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
-					"enableSkipIncompatibleRow": false
+					"enableSkipIncompatibleRow": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedDate']"
+								},
+								"sink": {
+									"name": "LastUpdatedDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['skills']"
+								}
+							}
+						],
+						"collectionReference": "",
+						"mapComplexValuesToString": true
+					}
 				},
 				"inputs": [
 					{
@@ -1722,7 +1753,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "RAA_ReferenceData",
+							"TableName": "RAA_ReferenceDataCandidateSkills",
 							"SchemaName": "Stg"
 						}
 					}
