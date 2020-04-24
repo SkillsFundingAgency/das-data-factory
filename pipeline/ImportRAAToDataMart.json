@@ -707,6 +707,15 @@
 							},
 							{
 								"source": {
+									"path": "$['employerLocation']['addressLine4']"
+								},
+								"sink": {
+									"name": "EmployerAddressLine4",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
 									"path": "$['employerName']"
 								},
 								"sink": {
@@ -779,46 +788,10 @@
 							},
 							{
 								"source": {
-									"path": "$['qualifications'][0]['qualificationType']"
+									"path": "$['qualifications']"
 								},
 								"sink": {
 									"name": "QualificationType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications'][0]['subject']"
-								},
-								"sink": {
-									"name": "QualificationSubject",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications'][0]['grade']"
-								},
-								"sink": {
-									"name": "QualificationGrade",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications'][0]['weighting']"
-								},
-								"sink": {
-									"name": "QualificationWeighting",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['shortDescription']"
-								},
-								"sink": {
-									"name": "ShortDescription",
 									"type": "String"
 								}
 							},
@@ -959,6 +932,15 @@
 							},
 							{
 								"source": {
+									"path": "$['wage']['wageAdditionalInformation']"
+								},
+								"sink": {
+									"name": "WageAdditionalInformation",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
 									"path": "$['closureReason']"
 								},
 								"sink": {
@@ -1004,15 +986,6 @@
 							},
 							{
 								"source": {
-									"path": "$['employerLocation']['addressLine4']"
-								},
-								"sink": {
-									"name": "EmployerAddressLine4",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['employerWebsiteUrl']"
 								},
 								"sink": {
@@ -1035,15 +1008,6 @@
 								},
 								"sink": {
 									"name": "ThingsToConsider",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['wageAdditionalInformation']"
-								},
-								"sink": {
-									"name": "WageAdditionalInformation",
 									"type": "String"
 								}
 							},
