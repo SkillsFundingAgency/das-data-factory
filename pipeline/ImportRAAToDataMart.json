@@ -1672,6 +1672,61 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "ImportRAAReferenceData",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAapplicationReviews",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.RAA_ApplicationReviews\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAapplicationReviewToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"enableSkipIncompatibleRow": false
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "referenceData"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_ReferenceData",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"variables": {
