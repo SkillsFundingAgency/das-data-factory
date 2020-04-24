@@ -294,7 +294,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAUsers').output.errors",
+								"value": "activity('ImportRAAUsers').output.errors",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -381,7 +381,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAv2VacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAVacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -1106,7 +1109,7 @@
 				]
 			},
 			{
-				"name": "LogRAAUserImportErrorDetails_copy1",
+				"name": "LogRAAv2VacancyImportErrorDetails",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -1129,7 +1132,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAUsers').output.errors",
+								"value": "@activity('ImportRAAVacancies').output.errors",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -1153,7 +1156,7 @@
 				}
 			},
 			{
-				"name": "ImportRAAApplicationReviews",
+				"name": "ImportRAAapplicationReviews",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -1178,7 +1181,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAv2VacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.RAA_ApplicationReviews\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAapplicationReviewToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false
@@ -1202,6 +1208,53 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "LogRAAaplicationReviewImportErrorDetails",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAapplicationReviews",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+					"storedProcedureParameters": {
+						"ErrorMessage": {
+							"value": {
+								"value": "activity('ImportRAAapplicationReviews').output.errors",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"TaskType": {
+							"value": "ImportRAAApplicationReviewToDM",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamartSqlSecret",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
