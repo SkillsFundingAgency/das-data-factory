@@ -1153,16 +1153,382 @@
 					},
 					"enableStaging": false,
 					"enableSkipIncompatibleRow": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$"
-								}
-							}
-						]
-					}
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "path": "$['_id']['$binary']"
+                },
+                "sink": {
+                  "name": "BinaryId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['_id']['$type']"
+                },
+                "sink": {
+                  "name": "TypeCode",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['candidateId']['$binary']"
+                },
+                "sink": {
+                  "name": "CandidateId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['candidateId']['$type']"
+                },
+                "sink": {
+                  "name": "CandidateIdType",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['vacancyReference']"
+                },
+                "sink": {
+                  "name": "VacancyReference",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['status']"
+                },
+                "sink": {
+                  "name": "ApplicationStatus",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['createdDate']['$date']"
+                },
+                "sink": {
+                  "name": "CreatedDateTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['submittedDate']['$date']"
+                },
+                "sink": {
+                  "name": "SubmittedDateTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['candidateId']['$binary']"
+                },
+                "sink": {
+                  "name": "ApplicantId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['candidateId']['$type']"
+                },
+                "sink": {
+                  "name": "ApplicantType",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['vacancyReference']"
+                },
+                "sink": {
+                  "name": "ApplicantVacancyReference",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['addressLine1']"
+                },
+                "sink": {
+                  "name": "ApplicantAddressLine1",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['addressLine2']"
+                },
+                "sink": {
+                  "name": "ApplicantAddressLine2",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['addressLine3']"
+                },
+                "sink": {
+                  "name": "ApplicantAddressLine3",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['addressLine4']"
+                },
+                "sink": {
+                  "name": "ApplicantAddressLine4",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['applicationDate']['$date']"
+                },
+                "sink": {
+                  "name": "ApplicationDate",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['birthDate']['$date']"
+                },
+                "sink": {
+                  "name": "ApplicantBirthDate",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['disabilityStatus']"
+                },
+                "sink": {
+                  "name": "ApplicantDisabilityStatus",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['educationFromYear']"
+                },
+                "sink": {
+                  "name": "ApplicantEducationFromYear",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['educationInstitution']"
+                },
+                "sink": {
+                  "name": "ApplicantEducationInstitution",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['educationToYear']"
+                },
+                "sink": {
+                  "name": "ApplicantEducationToYear",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['email']"
+                },
+                "sink": {
+                  "name": "ApplicantEmail",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['firstName']"
+                },
+                "sink": {
+                  "name": "ApplicantFirstName",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['hobbiesAndInterests']"
+                },
+                "sink": {
+                  "name": "ApplicantHobbiesAndInterests",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['improvements']"
+                },
+                "sink": {
+                  "name": "ApplicantImprovements",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['lastName']"
+                },
+                "sink": {
+                  "name": "ApplicantLastName",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['phone']"
+                },
+                "sink": {
+                  "name": "ApplicantPhone",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['postcode']"
+                },
+                "sink": {
+                  "name": "ApplicantPostCode",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['qualifications']"
+                },
+                "sink": {
+                  "name": "ApplicantQualifications",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['skills']"
+                },
+                "sink": {
+                  "name": "ApplicantSkills",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['strengths']"
+                },
+                "sink": {
+                  "name": "ApplicantStrengths",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['support']"
+                },
+                "sink": {
+                  "name": "ApplicantSupport",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['trainingCourses']"
+                },
+                "sink": {
+                  "name": "ApplicantTrainingCourses",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['application']['workExperiences']"
+                },
+                "sink": {
+                  "name": "ApplicantWorkExperiences",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['statusUpdatedDate']['$date']"
+                },
+                "sink": {
+                  "name": "StatusUpdatedDateTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['statusUpdatedBy']['userId']"
+                },
+                "sink": {
+                  "name": "StatusUpdatedByUserId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['statusUpdatedBy']['name']"
+                },
+                "sink": {
+                  "name": "StatusUpdatedByName",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['statusUpdatedBy']['email']"
+                },
+                "sink": {
+                  "name": "StatusUpdtedByEmail",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['candidateFeedback']"
+                },
+                "sink": {
+                  "name": "CandidateFeedback",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['isWithdrawn']"
+                },
+                "sink": {
+                  "name": "IsWithDrawn",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['RunId']"
+                },
+                "sink": {
+                  "name": "RunId",
+                  "type": "Int64"
+                }
+              }
+            ],
+            "collectionReference": "",
+            "mapComplexValuesToString": true
+          }
 				},
 				"inputs": [
 					{
