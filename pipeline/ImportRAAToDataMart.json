@@ -1904,7 +1904,7 @@
 				]
 			},
 			{
-				"name": "Copy data1",
+				"name": "ImportRAAReferenceDataQualificationTypes",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -1926,7 +1926,7 @@
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
 						"batchSize": 100,
-						"filter": "{\"_id\":\"BankHolidays\"}"
+						"filter": "{\"_id\":\"QualificationTypes\"}"
 					},
 					"sink": {
 						"type": "AzureSqlSink"
@@ -1938,11 +1938,6 @@
 							{
 								"source": {
 									"path": "$['_id']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lastUpdatedDate']['$date']"
 								},
 								"sink": {
 									"name": "BinaryId",
@@ -1951,70 +1946,20 @@
 							},
 							{
 								"source": {
-									"path": "$['data']['england-and-wales']['division']"
+									"path": "$['lastUpdatedDate']"
 								},
 								"sink": {
-									"name": "Division",
+									"name": "LastUpdatedDateTimeStamp",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "$['data']['england-and-wales']['events']"
+									"path": "$['qualificationTypes']"
 								},
 								"sink": {
-									"name": "DivisionEvents",
+									"name": "QualificationTypes",
 									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['scotland']['division']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['scotland']['events'][0]['title']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['scotland']['events'][0]['date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['scotland']['events'][0]['notes']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['scotland']['events'][0]['bunting']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['northern-ireland']['division']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['northern-ireland']['events'][0]['title']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['northern-ireland']['events'][0]['date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['northern-ireland']['events'][0]['notes']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['data']['northern-ireland']['events'][0]['bunting']"
 								}
 							}
 						],
@@ -2035,7 +1980,173 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "RAA_ReferenceDataBankHolidays",
+							"TableName": "RAA_ReferenceDataQualificationTypes",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "ImportRAAReferenceDataProfanities",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAReferenceDataQualificationTypes",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100,
+						"filter": "{\"_id\":\"Profanities\"}"
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedDate']"
+								},
+								"sink": {
+									"name": "LastUpdatedDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['profanities']"
+								},
+								"sink": {
+									"name": "Profanities",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": ""
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "referenceData"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_ReferenceDataProfanities",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "ImportRAAReferenceDataBannedPhrases",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAReferenceDataProfanities",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100,
+						"filter": "{\"_id\":\"BannedPhrases\"}"
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedDate']"
+								},
+								"sink": {
+									"name": "LastUpdatedDateTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['bannedPhrases']"
+								},
+								"sink": {
+									"name": "BannedPhrases",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": ""
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "referenceData"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_ReferenceDataBannedPhrases",
 							"SchemaName": "Stg"
 						}
 					}
