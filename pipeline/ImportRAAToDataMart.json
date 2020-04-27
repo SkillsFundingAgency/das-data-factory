@@ -1674,7 +1674,7 @@
 				}
 			},
 			{
-				"name": "ImportRAAReferenceData",
+				"name": "ImportRAAReferenceDataCandidateSkills",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -1693,11 +1693,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-          "source": {
-            "type": "CosmosDbMongoDbApiSource",
-            "batchSize": 100,
-            "filter": "{_id: ObjectId(\"CandidateSkills\") }"
-          },
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100,
+						"filter": "{\"_id\":\"CandidateSkills\"}"
+					},
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
@@ -1716,7 +1716,7 @@
 									"path": "$['_id']"
 								},
 								"sink": {
-									"name": "BinaryId",
+									"name": "CandidateSkillsId",
 									"type": "String"
 								}
 							},
@@ -1725,13 +1725,17 @@
 									"path": "$['lastUpdatedDate']"
 								},
 								"sink": {
-									"name": "LastUpdatedDateTimeStamp",
+									"name": "CandidateSkillsLastUpdatedDateTimeStamp",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "$['skills']"
+								},
+								"sink": {
+									"name": "Skills",
+									"type": "String"
 								}
 							}
 						],
@@ -1754,6 +1758,284 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"TableName": "RAA_ReferenceDataCandidateSkills",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "ImportRAAReferenceDataApprenticeshipProgrammes",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAReferenceDataCandidateSkills",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100,
+						"filter": "{\"_id\":\"ApprenticeshipProgrammes\"}\n"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataApprenticeshipProgrammes\n",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['_id']"
+								},
+								"sink": {
+									"name": "ProgrammeId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['apprenticeshipType']"
+								},
+								"sink": {
+									"name": "ApprenticeshipType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['title']"
+								},
+								"sink": {
+									"name": "Title",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['effectiveFrom']['$date']"
+								},
+								"sink": {
+									"name": "EffectiveFrom",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['duration']"
+								},
+								"sink": {
+									"name": "Duration",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['isActive']"
+								},
+								"sink": {
+									"name": "IsActive",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['educationLevelNumber']"
+								},
+								"sink": {
+									"name": "EducationLevelNumber",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedDate']['$date']"
+								},
+								"sink": {
+									"name": "LastUpdatedDateTimeStamp",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['data']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "referenceData"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_ReferenceDataApprenticeshipProgrammes",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAReferenceDataApprenticeshipProgrammes",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"batchSize": 100,
+						"filter": "{\"_id\":\"BankHolidays\"}"
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastUpdatedDate']['$date']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['england-and-wales']['division']"
+								},
+								"sink": {
+									"name": "Division",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['england-and-wales']['events']"
+								},
+								"sink": {
+									"name": "DivisionEvents",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['scotland']['division']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['scotland']['events'][0]['title']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['scotland']['events'][0]['date']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['scotland']['events'][0]['notes']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['scotland']['events'][0]['bunting']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['northern-ireland']['division']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['northern-ireland']['events'][0]['title']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['northern-ireland']['events'][0]['date']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['northern-ireland']['events'][0]['notes']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['data']['northern-ireland']['events'][0]['bunting']"
+								}
+							}
+						],
+						"collectionReference": ""
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "referenceData"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_ReferenceDataBankHolidays",
 							"SchemaName": "Stg"
 						}
 					}
