@@ -2,7 +2,7 @@
 	"name": "SrcRAAUsers",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "raaCdbSecret",
+			"referenceName": "rcrt_cdbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],

@@ -2,7 +2,7 @@
 	"name": "DestDataMartRAAUsers",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "datamartSqlSecret",
+			"referenceName": "datamgmt_staging_dbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
