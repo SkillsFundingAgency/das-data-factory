@@ -648,7 +648,7 @@
 									"path": "$['employerDescription']"
 								},
 								"sink": {
-                  "name": "EmployerDescription"
+                  "name": "EmployerDescription",
                   "type": "String"
 								}
 							},
