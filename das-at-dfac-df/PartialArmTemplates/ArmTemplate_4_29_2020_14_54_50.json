@@ -6,244 +6,12 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "das-at-dfac-df"
-		},
-		"AzureKeyVault1_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
-		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "dasDataMAnagementConnectionString"
-		},
-		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "faaCdbConnectionString"
-		},
-		"faaCdbSecret_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "findapprenticeship"
-		},
-		"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "raaCdbConnectionString"
-		},
-		"raaCdbSecret_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "recruit"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/datamartSqlSecret')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/faaCdbSecret')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "CosmosDbMongoDbApi",
-				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "[parameters('faaCdbSecret_properties_typeProperties_connectionString_secretName')]"
-					},
-					"database": "[parameters('faaCdbSecret_properties_typeProperties_database')]"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/raaCdbSecret')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "CosmosDbMongoDbApi",
-				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "[parameters('raaCdbSecret_properties_typeProperties_connectionString_secretName')]"
-					},
-					"database": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DestDataMart')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Stg"
-					},
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "Users"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "SourseSK",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "BinaryId",
-						"type": "varchar"
-					},
-					{
-						"name": "TypeCode",
-						"type": "varchar"
-					},
-					{
-						"name": "IdamUserId",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "UserName",
-						"type": "varchar"
-					},
-					{
-						"name": "UserEmail",
-						"type": "varchar"
-					},
-					{
-						"name": "UserCreatedTimeStamp",
-						"type": "varchar"
-					},
-					{
-						"name": "LastSignedInTimeStamp",
-						"type": "varchar"
-					},
-					{
-						"name": "EmployerAccountId",
-						"type": "varchar"
-					},
-					{
-						"name": "Ukprn",
-						"type": "varchar"
-					},
-					{
-						"name": "RunId",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "AsDm_CreatedDate",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "AsDm_UpdatedDate",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "raaCdbSecret",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"CollectionName": {
-						"type": "string",
-						"defaultValue": "Users"
-					}
-				},
-				"annotations": [],
-				"type": "CosmosDbMongoDbApiCollection",
-				"schema": [],
-				"typeProperties": {
-					"collection": {
-						"value": "@dataset().CollectionName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/raaCdbSecret')]"
-			]
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportRAAToDataMart')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -277,8 +45,7 @@
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							},
 							"firstRowOnly": true
 						}
@@ -2845,47 +2612,131 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
-				"[concat(variables('factoryId'), '/datasets/SrcRAACosmos')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
+				"[concat(variables('factoryId'), '/datasets/SrcRAACosmos')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ImportRAAToDataMart')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
+			"name": "[concat(parameters('factoryName'), '/DestDataMart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"linkedServiceName": {
+					"referenceName": "datamartSqlSecret",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TableName": {
+						"type": "string",
+						"defaultValue": "Stg"
+					},
+					"SchemaName": {
+						"type": "string",
+						"defaultValue": "Users"
+					}
+				},
 				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
+				"type": "AzureSqlTable",
+				"schema": [
 					{
-						"pipelineReference": {
-							"referenceName": "ImportRAAToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
+						"name": "SourseSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BinaryId",
+						"type": "varchar"
+					},
+					{
+						"name": "TypeCode",
+						"type": "varchar"
+					},
+					{
+						"name": "IdamUserId",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "UserEmail",
+						"type": "varchar"
+					},
+					{
+						"name": "UserCreatedTimeStamp",
+						"type": "varchar"
+					},
+					{
+						"name": "LastSignedInTimeStamp",
+						"type": "varchar"
+					},
+					{
+						"name": "EmployerAccountId",
+						"type": "varchar"
+					},
+					{
+						"name": "Ukprn",
+						"type": "varchar"
+					},
+					{
+						"name": "RunId",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "AsDm_CreatedDate",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "AsDm_UpdatedDate",
+						"type": "datetime2",
+						"scale": 7
 					}
 				],
-				"type": "ScheduleTrigger",
 				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2020-04-14T10:08:00.000Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								1
-							]
-						}
+					"schema": {
+						"value": "@dataset().SchemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TableName",
+						"type": "Expression"
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/ImportRAAToDataMart')]"
-			]
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "raaCdbSecret",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"CollectionName": {
+						"type": "string",
+						"defaultValue": "Users"
+					}
+				},
+				"annotations": [],
+				"type": "CosmosDbMongoDbApiCollection",
+				"schema": [],
+				"typeProperties": {
+					"collection": {
+						"value": "@dataset().CollectionName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }

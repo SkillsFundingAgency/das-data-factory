@@ -68,7 +68,7 @@
 								"queryTimeout": "02:00:00"
 							},
 							"dataset": {
-								"referenceName": "DestDataMartRAAUsers",
+								"referenceName": "DestDataMart",
 								"type": "DatasetReference",
 								"parameters": {}
 							},
@@ -140,7 +140,7 @@
 									},
 									{
 										"source": {
-											"path": "$['idamsUserId']"
+											"path": "$['idamUserId']"
 										},
 										"sink": {
 											"name": "IdamUserId",
@@ -194,15 +194,6 @@
 									},
 									{
 										"source": {
-											"path": "$['employerAccountIds']"
-										},
-										"sink": {
-											"name": "EmployerAccountId",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
 											"path": "$['RunId']"
 										},
 										"sink": {
@@ -226,16 +217,21 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "SrcRAAUsers",
+								"referenceName": "SrcRAACosmos",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"CollectionName": "users"
+								}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DestDataMartRAAUsers",
+								"referenceName": "DestDataMart",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"TableName": "RAA_Users",
+									"SchemaName": "Stg"
+								}
 							}
 						]
 					},
@@ -339,7 +335,7 @@
 							"storedProcedureParameters": {
 								"ErrorMessage": {
 									"value": {
-										"value": "@activity('ImportRAAUsers').output",
+										"value": "activity('ImportRAAUsers').output.errors",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -391,9 +387,2242 @@
 								"queryTimeout": "02:00:00"
 							},
 							"dataset": {
-								"referenceName": "DestDataMartRAAUsers",
+								"referenceName": "DestDataMart",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Users"
+								}
+							}
+						}
+					},
+					{
+						"name": "ImportRAAVacancies",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAUsers",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAVacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['vacancyReference']"
+										},
+										"sink": {
+											"name": "VacancyReference",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['status']"
+										},
+										"sink": {
+											"name": "VacancyStatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['ownerType']"
+										},
+										"sink": {
+											"name": "OwnerType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['sourceOrigin']"
+										},
+										"sink": {
+											"name": "SourceOrigin",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['sourceType']"
+										},
+										"sink": {
+											"name": "SourceType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['closedDate']['$date']"
+										},
+										"sink": {
+											"name": "ClosedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['createdDate']['$date']"
+										},
+										"sink": {
+											"name": "CreatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['createdByUser']['userId']"
+										},
+										"sink": {
+											"name": "CreatedByUserID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['createdByUser']['name']"
+										},
+										"sink": {
+											"name": "CreatedByUserName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['createdByUser']['email']"
+										},
+										"sink": {
+											"name": "CreatedByUserEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['submittedDate']['$date']"
+										},
+										"sink": {
+											"name": "SubmittedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['submittedByUser']['userId']"
+										},
+										"sink": {
+											"name": "SubmittedByUserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['submittedByUser']['name']"
+										},
+										"sink": {
+											"name": "SubmittedByUserName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['submittedByUser']['email']"
+										},
+										"sink": {
+											"name": "SubmittedByUserEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['approvedDate']['$date']"
+										},
+										"sink": {
+											"name": "ApprovedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['liveDate']['$date']"
+										},
+										"sink": {
+											"name": "LiveDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']['$date']"
+										},
+										"sink": {
+											"name": "LastUpdatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedByUser']['userId']"
+										},
+										"sink": {
+											"name": "LastUpdatedByUserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedByUser']['name']"
+										},
+										"sink": {
+											"name": "LastUpdatedByUserName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedByUser']['email']"
+										},
+										"sink": {
+											"name": "LastUpdatedByUserEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['isDeleted']"
+										},
+										"sink": {
+											"name": "IsDeleted",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['applicationMethod']"
+										},
+										"sink": {
+											"name": "ApplicationMethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['applicationUrl']"
+										},
+										"sink": {
+											"name": "ApplicationUrl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['closingDate']['$date']"
+										},
+										"sink": {
+											"name": "ClosingDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['description']"
+										},
+										"sink": {
+											"name": "VacancyDescription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['disabilityConfident']"
+										},
+										"sink": {
+											"name": "DisabilityConfident",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerDescription']"
+										},
+										"sink": {
+											"name": "EmployerDescription"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine1']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine1",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['postcode']"
+										},
+										"sink": {
+											"name": "EmployerPostCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['latitude']"
+										},
+										"sink": {
+											"name": "EmployerLatitude",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['longitude']"
+										},
+										"sink": {
+											"name": "EmployerLongitude",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine2']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine3']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine3",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine4']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine4",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerName']"
+										},
+										"sink": {
+											"name": "EmployerName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerNameOption']"
+										},
+										"sink": {
+											"name": "EmployerNameOption",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['legalEntityName']"
+										},
+										"sink": {
+											"name": "LegalEntityName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['geoCodeMethod']"
+										},
+										"sink": {
+											"name": "GeoCodeMethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['legalEntityId']"
+										},
+										"sink": {
+											"name": "LegalEntityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['numberOfPositions']"
+										},
+										"sink": {
+											"name": "NumberOfPositions",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['outcomeDescription']"
+										},
+										"sink": {
+											"name": "OutcomeDescription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['programmeId']"
+										},
+										"sink": {
+											"name": "ProgrammeId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['qualifications']"
+										},
+										"sink": {
+											"name": "QualificationType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['skills']"
+										},
+										"sink": {
+											"name": "Skills",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['startDate']['$date']"
+										},
+										"sink": {
+											"name": "StartDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['title']"
+										},
+										"sink": {
+											"name": "VacancyTitle",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['trainingDescription']"
+										},
+										"sink": {
+											"name": "TrainingDescription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['trainingProvider']['ukprn']"
+										},
+										"sink": {
+											"name": "TrainingProviderUkprn",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['trainingProvider']['name']"
+										},
+										"sink": {
+											"name": "TrainingProviderName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['trainingProvider']['address']['addressLine3']"
+										},
+										"sink": {
+											"name": "TrainingProviderAddressLine3",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['trainingProvider']['address']['addressLine4']"
+										},
+										"sink": {
+											"name": "TrainingProviderAddressLine4",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['trainingProvider']['address']['postcode']"
+										},
+										"sink": {
+											"name": "TrainingProviderPostcode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['duration']"
+										},
+										"sink": {
+											"name": "WageDuration",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['durationUnit']"
+										},
+										"sink": {
+											"name": "WageDurationUnit",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['workingWeekDescription']"
+										},
+										"sink": {
+											"name": "WorkingWeekDescription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['weeklyHours']"
+										},
+										"sink": {
+											"name": "WeeklyHours",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['wageType']"
+										},
+										"sink": {
+											"name": "WageType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['fixedWageYearlyAmount']"
+										},
+										"sink": {
+											"name": "FixedWageYearlyAmount",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['wage']['wageAdditionalInformation']"
+										},
+										"sink": {
+											"name": "WageAdditionalInformation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['closureReason']"
+										},
+										"sink": {
+											"name": "ClosureReason",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerContact']['Name']"
+										},
+										"sink": {
+											"name": "EmployerContactName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerContact']['Email']"
+										},
+										"sink": {
+											"name": "EmployerContactEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerContact']['Phone']"
+										},
+										"sink": {
+											"name": "EmployerContactPhone",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['applicationInstructions']"
+										},
+										"sink": {
+											"name": "ApplicationIstructions",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerWebsiteUrl']"
+										},
+										"sink": {
+											"name": "EmployerWebsiteUrl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['accountLegalEntityPublicHashedId']"
+										},
+										"sink": {
+											"name": "AccountLegalEntityPublicHashedId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['thingsToConsider']"
+										},
+										"sink": {
+											"name": "ThingsToConsider",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['deletedDate']['$date']"
+										},
+										"sink": {
+											"name": "DeletedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['deletedByUser']['userId']"
+										},
+										"sink": {
+											"name": "DeletedByUserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['deletedByUser']['name']"
+										},
+										"sink": {
+											"name": "DeletedByUserName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['deletedByUser']['email']"
+										},
+										"sink": {
+											"name": "DeletedByUserEmail",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "vacancies"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_Vacancies",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogRAAv2VacancyImportErrorDetails",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAVacancies",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAVacancies').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAVacanciesToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportRAAapplicationReviews",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAVacancies",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.RAA_ApplicationReviews\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAapplicationReviewToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['candidateId']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['candidateId']['$type']"
+										},
+										"sink": {
+											"name": "CandidateIdType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['vacancyReference']"
+										},
+										"sink": {
+											"name": "VacancyReference",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['status']"
+										},
+										"sink": {
+											"name": "ApplicationStatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['createdDate']['$date']"
+										},
+										"sink": {
+											"name": "CreatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['submittedDate']['$date']"
+										},
+										"sink": {
+											"name": "SubmittedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['candidateId']['$binary']"
+										},
+										"sink": {
+											"name": "ApplicantId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['candidateId']['$type']"
+										},
+										"sink": {
+											"name": "ApplicantType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['vacancyReference']"
+										},
+										"sink": {
+											"name": "ApplicantVacancyReference",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['addressLine1']"
+										},
+										"sink": {
+											"name": "ApplicantAddressLine1",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['addressLine2']"
+										},
+										"sink": {
+											"name": "ApplicantAddressLine2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['addressLine3']"
+										},
+										"sink": {
+											"name": "ApplicantAddressLine3",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['addressLine4']"
+										},
+										"sink": {
+											"name": "ApplicantAddressLine4",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['applicationDate']['$date']"
+										},
+										"sink": {
+											"name": "ApplicationDate",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['birthDate']['$date']"
+										},
+										"sink": {
+											"name": "ApplicantBirthDate",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['disabilityStatus']"
+										},
+										"sink": {
+											"name": "ApplicantDisabilityStatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['educationFromYear']"
+										},
+										"sink": {
+											"name": "ApplicantEducationFromYear",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['educationInstitution']"
+										},
+										"sink": {
+											"name": "ApplicantEducationInstitution",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['educationToYear']"
+										},
+										"sink": {
+											"name": "ApplicantEducationToYear",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['email']"
+										},
+										"sink": {
+											"name": "ApplicantEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['firstName']"
+										},
+										"sink": {
+											"name": "ApplicantFirstName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['hobbiesAndInterests']"
+										},
+										"sink": {
+											"name": "ApplicantHobbiesAndInterests",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['improvements']"
+										},
+										"sink": {
+											"name": "ApplicantImprovements",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['lastName']"
+										},
+										"sink": {
+											"name": "ApplicantLastName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['phone']"
+										},
+										"sink": {
+											"name": "ApplicantPhone",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['postcode']"
+										},
+										"sink": {
+											"name": "ApplicantPostCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['qualifications']"
+										},
+										"sink": {
+											"name": "ApplicantQualifications",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['skills']"
+										},
+										"sink": {
+											"name": "ApplicantSkills",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['strengths']"
+										},
+										"sink": {
+											"name": "ApplicantStrengths",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['support']"
+										},
+										"sink": {
+											"name": "ApplicantSupport",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['trainingCourses']"
+										},
+										"sink": {
+											"name": "ApplicantTrainingCourses",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['application']['workExperiences']"
+										},
+										"sink": {
+											"name": "ApplicantWorkExperiences",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['statusUpdatedDate']['$date']"
+										},
+										"sink": {
+											"name": "StatusUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['statusUpdatedBy']['userId']"
+										},
+										"sink": {
+											"name": "StatusUpdatedByUserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['statusUpdatedBy']['name']"
+										},
+										"sink": {
+											"name": "StatusUpdatedByName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['statusUpdatedBy']['email']"
+										},
+										"sink": {
+											"name": "StatusUpdtedByEmail",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['candidateFeedback']"
+										},
+										"sink": {
+											"name": "CandidateFeedback",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['isWithdrawn']"
+										},
+										"sink": {
+											"name": "IsWithDrawn",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "applicationReviews"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ApplicationReviews",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogRAAaplicationReviewImportErrorDetails",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAapplicationReviews",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "activity('ImportRAAapplicationReviews').output.error.message",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAApplicationReviewToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfVacancies",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAVacancies",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAVacanciesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfApplicationReviews",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAapplicationReviews",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAapplicationReviewToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "ImportRAAReferenceDataCandidateSkills",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAapplicationReviews",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": "{\"_id\":\"CandidateSkills\"}"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.RAA_ReferenceDataCandidateSkills\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAReferenceDataToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']"
+										},
+										"sink": {
+											"name": "CandidateSkillsId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']"
+										},
+										"sink": {
+											"name": "CandidateSkillsLastUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['skills']"
+										},
+										"sink": {
+											"name": "Skills",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "referenceData"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ReferenceDataCandidateSkills",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "ImportRAAReferenceDataApprenticeshipProgrammes",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataCandidateSkills",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": "{\"_id\":\"ApprenticeshipProgrammes\"}\n"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataApprenticeshipProgrammes\n",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['_id']"
+										},
+										"sink": {
+											"name": "ProgrammeId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['apprenticeshipType']"
+										},
+										"sink": {
+											"name": "ApprenticeshipType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['title']"
+										},
+										"sink": {
+											"name": "Title",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['effectiveFrom']['$date']"
+										},
+										"sink": {
+											"name": "EffectiveFrom",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['duration']"
+										},
+										"sink": {
+											"name": "Duration",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isActive']"
+										},
+										"sink": {
+											"name": "IsActive",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['educationLevelNumber']"
+										},
+										"sink": {
+											"name": "EducationLevelNumber",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']['$date']"
+										},
+										"sink": {
+											"name": "LastUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "$['data']",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "referenceData"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ReferenceDataApprenticeshipProgrammes",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "ImportRAAReferenceDataQualificationTypes",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataApprenticeshipProgrammes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": "{\"_id\":\"QualificationTypes\"}"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataQualificationTypes",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']"
+										},
+										"sink": {
+											"name": "LastUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['qualificationTypes']"
+										},
+										"sink": {
+											"name": "QualificationTypes",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "referenceData"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ReferenceDataQualificationTypes",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "ImportRAAReferenceDataProfanities",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataQualificationTypes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": "{\"_id\":\"Profanities\"}"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataProfanities\n",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']"
+										},
+										"sink": {
+											"name": "LastUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['profanities']"
+										},
+										"sink": {
+											"name": "Profanities",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "referenceData"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ReferenceDataProfanities",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "ImportRAAReferenceDataBannedPhrases",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataProfanities",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": "{\"_id\":\"BannedPhrases\"}"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataBannedPhrases",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']"
+										},
+										"sink": {
+											"name": "LastUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['bannedPhrases']"
+										},
+										"sink": {
+											"name": "BannedPhrases",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "referenceData"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ReferenceDataBannedPhrases",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogRDErrorMessage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataCandidateSkills",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAReferenceDataCandidateSkills').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAReferenceDataToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogRDAPErrorMessage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataApprenticeshipProgrammes",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAReferenceDataApprenticeshipProgrammes').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAReferenceDataToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogRDQTErrorMessage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataQualificationTypes",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAReferenceDataQualificationTypes').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAReferenceDataToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportRAAReferenceDataBankHolidays",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataBannedPhrases",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"batchSize": 100,
+								"filter": "{\"_id\":\"BankHolidays\"}"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataBankHolidays\n",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastUpdatedDate']['$date']"
+										},
+										"sink": {
+											"name": "LastUpdatedDateTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['data']['england-and-wales']['events']"
+										},
+										"sink": {
+											"name": "EnglandAndWalesEvents",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['data']['scotland']['events']"
+										},
+										"sink": {
+											"name": "ScotlandEvents",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['data']['northern-ireland']['events']"
+										},
+										"sink": {
+											"name": "NortherIrelandEvents",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "referenceData"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "RAA_ReferenceDataBankHolidays",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogRDProfanitiesErrorMessage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataProfanities",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAReferenceDataProfanities').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAReferenceDataToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogRDBannedPhrasesErrorMessage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataBannedPhrases",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAReferenceDataBannedPhrases').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAReferenceDataToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogRDBankHolidaysErrorMessage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataBankHolidays",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@activity('ImportRAAReferenceDataBankHolidays').output.errors",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportRAAReferenceDataToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamartSqlSecret",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfReferenceData",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportRAAReferenceDataBankHolidays",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAReferenceDataToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
 							}
 						}
 					}
@@ -407,19 +2636,29 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DestDataMartRAAUsers')]",
-				"[concat(variables('factoryId'), '/datasets/SrcRAAUsers')]",
+				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
+				"[concat(variables('factoryId'), '/datasets/SrcRAACosmos')]",
 				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DestDataMartRAAUsers')]",
+			"name": "[concat(parameters('factoryName'), '/DestDataMart')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "datamartSqlSecret",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TableName": {
+						"type": "string",
+						"defaultValue": "Stg"
+					},
+					"SchemaName": {
+						"type": "string",
+						"defaultValue": "Users"
+					}
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -486,8 +2725,14 @@
 					}
 				],
 				"typeProperties": {
-					"schema": "Stg",
-					"table": "RAA_Users"
+					"schema": {
+						"value": "@dataset().SchemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TableName",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
@@ -495,7 +2740,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SrcRAAUsers')]",
+			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -503,11 +2748,20 @@
 					"referenceName": "raaCdbSecret",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"CollectionName": {
+						"type": "string",
+						"defaultValue": "Users"
+					}
+				},
 				"annotations": [],
 				"type": "CosmosDbMongoDbApiCollection",
 				"schema": [],
 				"typeProperties": {
-					"collection": "users"
+					"collection": {
+						"value": "@dataset().CollectionName",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
