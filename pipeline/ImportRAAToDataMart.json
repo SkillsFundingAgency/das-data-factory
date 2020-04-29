@@ -228,11 +228,8 @@
 					"secureInput": false
 				},
 				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[GenerateRunId]"
-				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -256,7 +253,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[ImportRAAUsersStgToLive]",
 					"storedProcedureParameters": {
 						"RunId": {
 							"value": {
@@ -268,7 +264,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -292,7 +288,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
@@ -315,7 +310,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
