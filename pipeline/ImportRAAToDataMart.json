@@ -73,6 +73,7 @@
 							"value": "DELETE FROM Stg.RAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
+						"sqlWriterStoredProcedureName": "[dbo].[ImportRAAUsersStgToLive]",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -228,6 +229,9 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[GenerateRunId]"
+				},
 				"linkedServiceName": {
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
@@ -288,6 +292,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
