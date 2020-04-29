@@ -29,7 +29,11 @@
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Users"
+						}
 					},
 					"firstRowOnly": true
 				}
@@ -230,7 +234,7 @@
 					"storedProcedureName": "[dbo].[GenerateRunId]"
 				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -266,7 +270,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -313,7 +317,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -1115,7 +1119,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -1591,10 +1595,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2202,10 +2202,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2249,10 +2245,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2296,10 +2288,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2447,10 +2435,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2494,10 +2478,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2541,10 +2521,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
