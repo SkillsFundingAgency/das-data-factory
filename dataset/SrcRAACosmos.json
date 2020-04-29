@@ -1,15 +1,24 @@
 {
-	"name": "SrcRAAUsers",
+	"name": "SrcRAACosmos",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "raaCdbSecret",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"CollectionName": {
+				"type": "string",
+				"defaultValue": "Users"
+			}
+		},
 		"annotations": [],
 		"type": "CosmosDbMongoDbApiCollection",
 		"schema": [],
 		"typeProperties": {
-			"collection": "users"
+			"collection": {
+				"value": "@dataset().CollectionName",
+				"type": "Expression"
+			}
 		}
 	}
 }

@@ -1,9 +1,19 @@
 {
-	"name": "DestDataMartRAAUsers",
+	"name": "DestDataMart",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "datamartSqlSecret",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "Stg"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "Users"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
@@ -70,8 +80,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "Stg",
-			"table": "RAA_Users"
+			"schema": {
+				"value": "@dataset().SchemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
