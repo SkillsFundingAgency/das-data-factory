@@ -648,7 +648,8 @@
 									"path": "$['employerDescription']"
 								},
 								"sink": {
-									"name": "EmployerDescription"
+                  "name": "EmployerDescription"
+                  "type": "String"
 								}
 							},
 							{
@@ -1296,7 +1297,7 @@
 									"path": "$['application']['applicationDate']['$date']"
 								},
 								"sink": {
-									"name": "ApplicationDate",
+									"name": "ApplicationDateTimeStamp",
 									"type": "String"
 								}
 							},
