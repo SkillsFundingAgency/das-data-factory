@@ -10,7 +10,7 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "raa-cdbconnectionstring"
+				"secretName": "rcrt-cdbconnectionstring"
 			},
 			"database": "recruit"
 		}
