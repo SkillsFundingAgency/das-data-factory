@@ -648,8 +648,8 @@
 									"path": "$['employerDescription']"
 								},
 								"sink": {
-                  "name": "EmployerDescription",
-                  "type": "String"
+									"name": "EmployerDescription",
+									"type": "String"
 								}
 							},
 							{
@@ -1575,7 +1575,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "activity('ImportRAAapplicationReviews').output.error.message",
+								"value": "activity('ImportRAAapplicationReviews').output.errors",
 								"type": "Expression"
 							},
 							"type": "String"
