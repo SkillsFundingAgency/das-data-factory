@@ -1,5 +1,5 @@
 {
-	"name": "datamartSqlSecret",
+	"name": "datamgmt_staging_dbconnectionstring",
 	"properties": {
 		"annotations": [],
 		"type": "AzureSqlDatabase",
@@ -10,7 +10,7 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "dasDataMAnagementConnectionString"
+				"secretName": "datamgmt-staging-dbconnectionstring"
 			}
 		}
 	}

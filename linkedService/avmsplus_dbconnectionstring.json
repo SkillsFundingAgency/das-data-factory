@@ -1,8 +1,8 @@
 {
-	"name": "faaCdbSecret",
+	"name": "avmsplus_dbconnectionstring",
 	"properties": {
 		"annotations": [],
-		"type": "CosmosDbMongoDbApi",
+		"type": "AzureSqlDatabase",
 		"typeProperties": {
 			"connectionString": {
 				"type": "AzureKeyVaultSecret",
@@ -10,9 +10,8 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "faaCdbConnectionString"
-			},
-			"database": "findapprenticeship"
+				"secretName": "avmsplus-dbconnectionstring"
+			}
 		}
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"name": "raaCdbSecret",
+	"name": "faa_cdbconnectionstring",
 	"properties": {
 		"annotations": [],
 		"type": "CosmosDbMongoDbApi",
@@ -10,9 +10,9 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "raaCdbConnectionString"
+				"secretName": "faa-cdbconnectionstring"
 			},
-			"database": "recruit"
+			"database": "findapprenticeship"
 		}
 	}
 }
