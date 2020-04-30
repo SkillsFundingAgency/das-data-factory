@@ -652,7 +652,8 @@
 									"path": "$['employerDescription']"
 								},
 								"sink": {
-									"name": "EmployerDescription"
+									"name": "EmployerDescription",
+									"type": "String"
 								}
 							},
 							{
@@ -1300,7 +1301,7 @@
 									"path": "$['application']['applicationDate']['$date']"
 								},
 								"sink": {
-									"name": "ApplicationDate",
+									"name": "ApplicationDateTimeStamp",
 									"type": "String"
 								}
 							},
@@ -1578,7 +1579,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "activity('ImportRAAapplicationReviews').output.error.message",
+								"value": "activity('ImportRAAapplicationReviews').output.errors",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -1595,6 +1596,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2202,6 +2207,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2245,6 +2254,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2288,6 +2301,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2435,6 +2452,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2478,6 +2499,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -2521,6 +2546,10 @@
 							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
