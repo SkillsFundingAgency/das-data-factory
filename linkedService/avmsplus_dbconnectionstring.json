@@ -1,0 +1,17 @@
+{
+	"name": "avmsplus_dbconnectionstring",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "avmsplus-dbconnectionstring"
+			}
+		}
+	}
+}
