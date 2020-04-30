@@ -6,34 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "das-at-dfac-df"
-		},
-		"AzureKeyVault1_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
-		},
-		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "avmsplus-dbconnectionstring"
-		},
-		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "datamgmt-staging-dbconnectionstring"
-		},
-		"faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "faa-cdbconnectionstring"
-		},
-		"faa_cdbconnectionstring_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "findapprenticeship"
-		},
-		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "rcrt-cdbconnectionstring"
-		},
-		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "recruit"
 		}
 	},
 	"variables": {
@@ -2777,19 +2749,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/avmsplus_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -2803,13 +2762,11 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "avmsplus-dbconnectionstring"
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/datamgmt_staging_dbconnectionstring')]",
@@ -2825,13 +2782,11 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "datamgmt-staging-dbconnectionstring"
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/faa_cdbconnectionstring')]",
@@ -2847,14 +2802,12 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "faa-cdbconnectionstring"
 					},
-					"database": "[parameters('faa_cdbconnectionstring_properties_typeProperties_database')]"
+					"database": "findapprenticeship"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/rcrt_cdbconnectionstring')]",
@@ -2870,52 +2823,12 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "rcrt-cdbconnectionstring"
 					},
-					"database": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
+					"database": "recruit"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ImportRAAToDataMart')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "ImportRAAToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2020-04-14T10:08:00.000Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								1
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/ImportRAAToDataMart')]"
-			]
+			"dependsOn": []
 		}
 	]
 }

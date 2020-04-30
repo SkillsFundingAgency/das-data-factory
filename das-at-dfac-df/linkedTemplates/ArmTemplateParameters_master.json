@@ -8,19 +8,22 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://das-at-dfac-kv.vault.azure.net/"
 		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-			"value": "dasDataMAnagementConnectionString"
+		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "avmsplus-dbconnectionstring"
 		},
-		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
-			"value": "faaCdbConnectionString"
+		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "datamgmt-staging-dbconnectionstring"
 		},
-		"faaCdbSecret_properties_typeProperties_database": {
+		"faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "faa-cdbconnectionstring"
+		},
+		"faa_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "findapprenticeship"
 		},
-		"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
-			"value": "raaCdbConnectionString"
+		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "rcrt-cdbconnectionstring"
 		},
-		"raaCdbSecret_properties_typeProperties_database": {
+		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "recruit"
 		},
 		"containerUri": {

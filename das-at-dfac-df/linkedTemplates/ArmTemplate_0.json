@@ -11,23 +11,27 @@
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
 		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
-			"defaultValue": "dasDataMAnagementConnectionString"
+			"defaultValue": "avmsplus-dbconnectionstring"
 		},
-		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
+		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
-			"defaultValue": "faaCdbConnectionString"
+			"defaultValue": "datamgmt-staging-dbconnectionstring"
 		},
-		"faaCdbSecret_properties_typeProperties_database": {
+		"faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "faa-cdbconnectionstring"
+		},
+		"faa_cdbconnectionstring_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "findapprenticeship"
 		},
-		"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
+		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
-			"defaultValue": "raaCdbConnectionString"
+			"defaultValue": "rcrt-cdbconnectionstring"
 		},
-		"raaCdbSecret_properties_typeProperties_database": {
+		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "recruit"
 		}
@@ -50,7 +54,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/datamartSqlSecret')]",
+			"name": "[concat(parameters('factoryName'), '/avmsplus_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -63,7 +67,7 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "[parameters('avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -72,12 +76,12 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/faaCdbSecret')]",
+			"name": "[concat(parameters('factoryName'), '/datamgmt_staging_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "CosmosDbMongoDbApi",
+				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": {
 						"type": "AzureKeyVaultSecret",
@@ -85,9 +89,8 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('faaCdbSecret_properties_typeProperties_connectionString_secretName')]"
-					},
-					"database": "[parameters('faaCdbSecret_properties_typeProperties_database')]"
+						"secretName": "[parameters('datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
 				}
 			},
 			"dependsOn": [
@@ -95,7 +98,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/raaCdbSecret')]",
+			"name": "[concat(parameters('factoryName'), '/faa_cdbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -108,9 +111,32 @@
 							"referenceName": "AzureKeyVault1",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('raaCdbSecret_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "[parameters('faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
-					"database": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
+					"database": "[parameters('faa_cdbconnectionstring_properties_typeProperties_database')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/rcrt_cdbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDbMongoDbApi",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"database": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
 				}
 			},
 			"dependsOn": [
@@ -123,7 +149,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "datamartSqlSecret",
+					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -212,7 +238,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -221,7 +247,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "raaCdbSecret",
+					"referenceName": "rcrt_cdbconnectionstring",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -241,7 +267,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/raaCdbSecret')]"
+				"[concat(variables('factoryId'), '/linkedServices/rcrt_cdbconnectionstring')]"
 			]
 		},
 		{
@@ -278,7 +304,10 @@
 							"dataset": {
 								"referenceName": "DestDataMart",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Users"
+								}
 							},
 							"firstRowOnly": true
 						}
@@ -479,7 +508,7 @@
 							"storedProcedureName": "[[dbo].[GenerateRunId]"
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -515,7 +544,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -562,7 +591,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -897,7 +926,8 @@
 											"path": "$['employerDescription']"
 										},
 										"sink": {
-											"name": "EmployerDescription"
+											"name": "EmployerDescription",
+											"type": "String"
 										}
 									},
 									{
@@ -1364,7 +1394,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -1545,7 +1575,7 @@
 											"path": "$['application']['applicationDate']['$date']"
 										},
 										"sink": {
-											"name": "ApplicationDate",
+											"name": "ApplicationDateTimeStamp",
 											"type": "String"
 										}
 									},
@@ -1823,7 +1853,7 @@
 							"storedProcedureParameters": {
 								"ErrorMessage": {
 									"value": {
-										"value": "activity('ImportRAAapplicationReviews').output.error.message",
+										"value": "activity('ImportRAAapplicationReviews').output.errors",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -1842,7 +1872,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2453,7 +2483,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2500,7 +2530,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2547,7 +2577,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2698,7 +2728,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2745,7 +2775,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2792,7 +2822,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "datamartSqlSecret",
+							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2846,7 +2876,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcRAACosmos')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamartSqlSecret')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{

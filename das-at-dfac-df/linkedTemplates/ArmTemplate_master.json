@@ -11,23 +11,27 @@
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
 		},
-		"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
+		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
-			"defaultValue": "dasDataMAnagementConnectionString"
+			"defaultValue": "avmsplus-dbconnectionstring"
 		},
-		"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
+		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
-			"defaultValue": "faaCdbConnectionString"
+			"defaultValue": "datamgmt-staging-dbconnectionstring"
 		},
-		"faaCdbSecret_properties_typeProperties_database": {
+		"faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "faa-cdbconnectionstring"
+		},
+		"faa_cdbconnectionstring_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "findapprenticeship"
 		},
-		"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
+		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
-			"defaultValue": "raaCdbConnectionString"
+			"defaultValue": "rcrt-cdbconnectionstring"
 		},
-		"raaCdbSecret_properties_typeProperties_database": {
+		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "recruit"
 		},
@@ -61,20 +65,23 @@
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
-					"datamartSqlSecret_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('datamartSqlSecret_properties_typeProperties_connectionString_secretName')]"
+					"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
-					"faaCdbSecret_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('faaCdbSecret_properties_typeProperties_connectionString_secretName')]"
+					"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
-					"faaCdbSecret_properties_typeProperties_database": {
-						"value": "[parameters('faaCdbSecret_properties_typeProperties_database')]"
+					"faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
-					"raaCdbSecret_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('raaCdbSecret_properties_typeProperties_connectionString_secretName')]"
+					"faa_cdbconnectionstring_properties_typeProperties_database": {
+						"value": "[parameters('faa_cdbconnectionstring_properties_typeProperties_database')]"
 					},
-					"raaCdbSecret_properties_typeProperties_database": {
-						"value": "[parameters('raaCdbSecret_properties_typeProperties_database')]"
+					"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"rcrt_cdbconnectionstring_properties_typeProperties_database": {
+						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
 					}
 				}
 			},
