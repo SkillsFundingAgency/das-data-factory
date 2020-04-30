@@ -796,7 +796,7 @@
 									"path": "$['qualifications']"
 								},
 								"sink": {
-									"name": "QualificationType",
+									"name": "Qualifications",
 									"type": "String"
 								}
 							},
@@ -1499,7 +1499,7 @@
 									"path": "$['statusUpdatedBy']['email']"
 								},
 								"sink": {
-									"name": "StatusUpdtedByEmail",
+									"name": "StatusUpdatedByEmail",
 									"type": "String"
 								}
 							},
