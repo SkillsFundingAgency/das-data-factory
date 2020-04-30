@@ -2,7 +2,7 @@
 	"name": "SrcRAACosmos",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "raaCdbSecret",
+			"referenceName": "rcrt_cdbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
