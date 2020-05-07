@@ -1,6 +1,12 @@
 {
 	"name": "ImportAvmsToDataMart",
 	"properties": {
+		"parameters": {
+			"RunId": {
+				"type": "string",
+				"defaultValue": "\"1\""
+			}
+		},
 		"annotations": []
 	}
 }
