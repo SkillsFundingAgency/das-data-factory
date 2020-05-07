@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT  TABLE_SCHEMA,TABLE_NAME FROM information_schema.TABLES where table_schema<>'sys'\"",
+							"value": "SELECT  TABLE_SCHEMA,TABLE_NAME FROM information_schema.TABLES where table_schema<>'sys'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -26,12 +26,13 @@
 					"dataset": {
 						"referenceName": "SrcAvmsPlus",
 						"type": "DatasetReference"
-					}
+					},
+					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEachTableInSource",
-				"type": "ForEach",
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
 						"activity": "GetTableList",
@@ -42,61 +43,17 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"items": {
-						"value": "@activity('GetTableList').output.value",
-						"type": "Expression"
+					"pipeline": {
+						"referenceName": "BulkCopy",
+						"type": "PipelineReference"
 					},
-					"activities": [
-						{
-							"name": "CopyAvmsPlusTablesToDataMart",
-							"type": "Copy",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": "SELECT * FROM [@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]",
-									"queryTimeout": "02:00:00"
-								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"preCopyScript": {
-										"value": "TRUNCATE TABLE Stg.@{item().TABLE_NAME}",
-										"type": "Expression"
-									},
-									"tableOption": "autoCreate",
-									"disableMetricsCollection": false
-								},
-								"enableStaging": false
-							},
-							"inputs": [
-								{
-									"referenceName": "SrcAvmsPlus",
-									"type": "DatasetReference"
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DestDataMart",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": {
-											"value": "@{item().TABLE_NAME}",
-											"type": "Expression"
-										},
-										"SchemaName": "Stg"
-									}
-								}
-							]
+					"waitOnCompletion": true,
+					"parameters": {
+						"tableList": {
+							"value": "@activity('GetTableList').output.value",
+							"type": "Expression"
 						}
-					]
+					}
 				}
 			}
 		],
