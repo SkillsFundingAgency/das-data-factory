@@ -6,7 +6,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "ImportRAAToDataMart",
+					"referenceName": "ImportRAACosmosToDataMart",
 					"type": "PipelineReference"
 				}
 			}
