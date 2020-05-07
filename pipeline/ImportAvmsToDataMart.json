@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT  TABLE_SCHEMA,TABLE_NAME FROM information_schema.TABLES where table_schema<>'sys'",
+							"value": "SELECT  TABLE_SCHEMA,TABLE_NAME FROM information_schema.TABLES where table_schema<>'sys' and table_name in ('vacancy','vacancystatusType','vacancyownerRelationship',\n'Employer','ProviderSite','ProviderSiteRelationship',\n'ProviderSiteRelationshipType','Provider','TrainingType',\n'Standard','StandardSector','EducationLevel','ApprenticeshipFramework',\n'ApprenticeshipOccupation','VacancyHistory','LocalAuthority','County',\n'ApprenticeshipType','WageType','VacancySource','Candidate',\n'Application','ApplicationStatusType','ApplicationHistory',\n'ApplicationHistory')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -89,7 +89,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"TableName": {
-											"value": "[@{item().TABLE_NAME}]",
+											"value": "avms_[@{item().TABLE_NAME}]",
 											"type": "Expression"
 										},
 										"SchemaName": "Stg"
