@@ -89,7 +89,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"TableName": {
-											"value": "[avms_@{item().TABLE_NAME}]",
+											"value": "Avms_@{item().TABLE_NAME}",
 											"type": "Expression"
 										},
 										"SchemaName": "Stg"
