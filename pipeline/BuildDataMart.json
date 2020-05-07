@@ -83,32 +83,6 @@
 						}
 					}
 				}
-			},
-			{
-				"name": "ExecuteImportAvmsToDataMart",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "ExecuteRAACosmosToDataMart",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "ImportAvmsToDataMart",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"RunId": {
-							"value": "@activity('GetRunId').firstRow.RunId",
-							"type": "Expression"
-						}
-					}
-				}
 			}
 		],
 		"parameters": {
