@@ -1,0 +1,16 @@
+{
+	"name": "SrcAvmsPlus",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "avmsplus_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "SrcTable"
+		}
+	}
+}
