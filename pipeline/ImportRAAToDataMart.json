@@ -14,11 +14,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.00:30:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
-					"secureInput": false
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -50,11 +50,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
-					"secureInput": false
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -75,6 +75,10 @@
 						"type": "AzureSqlSink",
 						"preCopyScript": {
 							"value": "DELETE FROM Stg.RAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
 							"type": "Expression"
 						},
 						"disableMetricsCollection": false
@@ -223,11 +227,11 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.00:30:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
-					"secureInput": false
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2591,6 +2595,12 @@
 				}
 			}
 		],
+		"parameters": {
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
 		"variables": {
 			"RunId": {
 				"type": "String",
