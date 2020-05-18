@@ -127,25 +127,7 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['name']"
-							//	},
-							//	"sink": {
-							//		"name": "UserName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['email']"
-							//	},
-							//	"sink": {
-							//		"name": "UserEmail",
-							//		"type": "String"
-							//	}
-							//},
-							{
+						 {
 								"source": {
 									"path": "$['createdDate']['$date']"
 								},
@@ -501,24 +483,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['createdByUser']['name']"
-							//	},
-							//	"sink": {
-							//		"name": "CreatedByUserName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['createdByUser']['email']"
-							//	},
-							//	"sink": {
-							//		"name": "CreatedByUserEmail",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['submittedDate']['$date']"
@@ -537,25 +501,7 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['submittedByUser']['name']"
-							//	},
-							//	"sink": {
-							//		"name": "SubmittedByUserName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['submittedByUser']['email']"
-							//	},
-							//	"sink": {
-							//		"name": "SubmittedByUserEmail",
-							//		"type": "String"
-							//	}
-							//},
-							{
+				 		{
 								"source": {
 									"path": "$['approvedDate']['$date']"
 								},
@@ -591,24 +537,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['lastUpdatedByUser']['name']"
-							//	},
-							//	"sink": {
-							//		"name": "LastUpdatedByUserName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['lastUpdatedByUser']['email']"
-							//	},
-							//	"sink": {
-							//		"name": "LastUpdatedByUserEmail",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['isDeleted']"
@@ -654,15 +582,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['disabilityConfident']"
-							//	},
-							//	"sink": {
-							//		"name": "DisabilityConfident",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['employerDescription']"
@@ -672,15 +591,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['employerLocation']['addressLine1']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerAddressLine1",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['employerLocation']['postcode']"
@@ -690,51 +600,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['employerLocation']['latitude']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerLatitude",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['employerLocation']['longitude']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerLongitude",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['employerLocation']['addressLine2']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerAddressLine2",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['employerLocation']['addressLine3']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerAddressLine3",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['employerLocation']['addressLine4']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerAddressLine4",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['employerName']"
@@ -870,24 +735,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['trainingProvider']['address']['addressLine3']"
-							//	},
-							//	"sink": {
-							//		"name": "TrainingProviderAddressLine3",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['trainingProvider']['address']['addressLine4']"
-							//	},
-							//	"sink": {
-							//		"name": "TrainingProviderAddressLine4",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['trainingProvider']['address']['postcode']"
@@ -969,33 +816,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['employerContact']['Name']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerContactName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['employerContact']['Email']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerContactEmail",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['employerContact']['Phone']"
-							//	},
-							//	"sink": {
-							//		"name": "EmployerContactPhone",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['applicationInstructions']"
@@ -1050,24 +870,6 @@
 									"type": "String"
 								}
 							}
-							//{
-							//	"source": {
-							//		"path": "$['deletedByUser']['name']"
-							//	},
-							//	"sink": {
-							//		"name": "DeletedByUserName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['deletedByUser']['email']"
-							//	},
-							//	"sink": {
-							//		"name": "DeletedByUserEmail",
-							//		"type": "String"
-							//	}
-							//}
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
@@ -1284,42 +1086,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['application']['addressLine1']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantAddressLine1",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['addressLine2']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantAddressLine2",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['addressLine3']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantAddressLine3",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['addressLine4']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantAddressLine4",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['application']['applicationDate']['$date']"
@@ -1338,96 +1104,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['application']['disabilityStatus']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantDisabilityStatus",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['educationFromYear']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantEducationFromYear",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['educationInstitution']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantEducationInstitution",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['educationToYear']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantEducationToYear",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['email']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantEmail",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['firstName']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantFirstName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['hobbiesAndInterests']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantHobbiesAndInterests",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['improvements']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantImprovements",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['lastName']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantLastName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['phone']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantPhone",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['application']['postcode']"
@@ -1437,33 +1113,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['application']['qualifications']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantQualifications",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['skills']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantSkills",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['strengths']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantStrengths",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['application']['support']"
@@ -1473,24 +1122,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['application']['trainingCourses']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantTrainingCourses",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['application']['workExperiences']"
-							//	},
-							//	"sink": {
-							//		"name": "ApplicantWorkExperiences",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['statusUpdatedDate']['$date']"
@@ -1509,33 +1140,6 @@
 									"type": "String"
 								}
 							},
-							//{
-							//	"source": {
-							//		"path": "$['statusUpdatedBy']['name']"
-							//	},
-							//	"sink": {
-							//		"name": "StatusUpdatedByName",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['statusUpdatedBy']['email']"
-							//	},
-							//	"sink": {
-							//		"name": "StatusUpdatedByEmail",
-							//		"type": "String"
-							//	}
-							//},
-							//{
-							//	"source": {
-							//		"path": "$['candidateFeedback']"
-							//	},
-							//	"sink": {
-							//		"name": "CandidateFeedback",
-							//		"type": "String"
-							//	}
-							//},
 							{
 								"source": {
 									"path": "$['isWithdrawn']"
