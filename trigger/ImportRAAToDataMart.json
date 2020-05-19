@@ -14,18 +14,10 @@
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
-				"frequency": "Day",
+				"frequency": "Hour",
 				"interval": 1,
 				"startTime": "2020-04-14T10:08:00.000Z",
-				"timeZone": "UTC",
-				"schedule": {
-					"minutes": [
-						0
-					],
-					"hours": [
-						1
-					]
-				}
+				"timeZone": "UTC"
 			}
 		}
 	}
