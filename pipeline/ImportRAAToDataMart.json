@@ -14,11 +14,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.00:30:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -50,11 +50,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -77,9 +77,17 @@
 							"value": "DELETE FROM Stg.RAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -119,25 +127,7 @@
 									"type": "String"
 								}
 							},
-							{
-								"source": {
-									"path": "$['name']"
-								},
-								"sink": {
-									"name": "UserName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['email']"
-								},
-								"sink": {
-									"name": "UserEmail",
-									"type": "String"
-								}
-							},
-							{
+						 {
 								"source": {
 									"path": "$['createdDate']['$date']"
 								},
@@ -223,11 +213,11 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.00:30:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -250,11 +240,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -286,11 +276,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -333,11 +323,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -371,11 +361,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -389,9 +379,17 @@
 							"value": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAVacanciesToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -487,24 +485,6 @@
 							},
 							{
 								"source": {
-									"path": "$['createdByUser']['name']"
-								},
-								"sink": {
-									"name": "CreatedByUserName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['createdByUser']['email']"
-								},
-								"sink": {
-									"name": "CreatedByUserEmail",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['submittedDate']['$date']"
 								},
 								"sink": {
@@ -521,25 +501,7 @@
 									"type": "String"
 								}
 							},
-							{
-								"source": {
-									"path": "$['submittedByUser']['name']"
-								},
-								"sink": {
-									"name": "SubmittedByUserName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['submittedByUser']['email']"
-								},
-								"sink": {
-									"name": "SubmittedByUserEmail",
-									"type": "String"
-								}
-							},
-							{
+				 		{
 								"source": {
 									"path": "$['approvedDate']['$date']"
 								},
@@ -572,24 +534,6 @@
 								},
 								"sink": {
 									"name": "LastUpdatedByUserId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lastUpdatedByUser']['name']"
-								},
-								"sink": {
-									"name": "LastUpdatedByUserName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lastUpdatedByUser']['email']"
-								},
-								"sink": {
-									"name": "LastUpdatedByUserEmail",
 									"type": "String"
 								}
 							},
@@ -640,15 +584,6 @@
 							},
 							{
 								"source": {
-									"path": "$['disabilityConfident']"
-								},
-								"sink": {
-									"name": "DisabilityConfident",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['employerDescription']"
 								},
 								"sink": {
@@ -658,64 +593,10 @@
 							},
 							{
 								"source": {
-									"path": "$['employerLocation']['addressLine1']"
-								},
-								"sink": {
-									"name": "EmployerAddressLine1",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['employerLocation']['postcode']"
 								},
 								"sink": {
 									"name": "EmployerPostCode",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['latitude']"
-								},
-								"sink": {
-									"name": "EmployerLatitude",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['longitude']"
-								},
-								"sink": {
-									"name": "EmployerLongitude",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['addressLine2']"
-								},
-								"sink": {
-									"name": "EmployerAddressLine2",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['addressLine3']"
-								},
-								"sink": {
-									"name": "EmployerAddressLine3",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerLocation']['addressLine4']"
-								},
-								"sink": {
-									"name": "EmployerAddressLine4",
 									"type": "String"
 								}
 							},
@@ -856,24 +737,6 @@
 							},
 							{
 								"source": {
-									"path": "$['trainingProvider']['address']['addressLine3']"
-								},
-								"sink": {
-									"name": "TrainingProviderAddressLine3",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['address']['addressLine4']"
-								},
-								"sink": {
-									"name": "TrainingProviderAddressLine4",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['trainingProvider']['address']['postcode']"
 								},
 								"sink": {
@@ -955,33 +818,6 @@
 							},
 							{
 								"source": {
-									"path": "$['employerContact']['Name']"
-								},
-								"sink": {
-									"name": "EmployerContactName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerContact']['Email']"
-								},
-								"sink": {
-									"name": "EmployerContactEmail",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerContact']['Phone']"
-								},
-								"sink": {
-									"name": "EmployerContactPhone",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['applicationInstructions']"
 								},
 								"sink": {
@@ -1025,33 +861,24 @@
 									"type": "String"
 								}
 							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['userId']"
-								},
-								"sink": {
-									"name": "DeletedByUserId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['name']"
-								},
-								"sink": {
-									"name": "DeletedByUserName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['email']"
-								},
-								"sink": {
-									"name": "DeletedByUserEmail",
-									"type": "String"
-								}
-							}
+              {
+                "source": {
+                  "path": "$['deletedByUser']['userId']"
+                },
+                "sink": {
+                  "name": "DeletedByUserId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerAccountId']"
+                },
+                "sink": {
+                  "name": "EmployerAccountId",
+                  "type": "String"
+                }
+              }
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
@@ -1089,11 +916,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1136,11 +963,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1154,10 +981,18 @@
 							"value": "DELETE FROM Stg.RAA_ApplicationReviews\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAapplicationReviewToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"enableSkipIncompatibleRow": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -1262,42 +1097,6 @@
 							},
 							{
 								"source": {
-									"path": "$['application']['addressLine1']"
-								},
-								"sink": {
-									"name": "ApplicantAddressLine1",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['addressLine2']"
-								},
-								"sink": {
-									"name": "ApplicantAddressLine2",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['addressLine3']"
-								},
-								"sink": {
-									"name": "ApplicantAddressLine3",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['addressLine4']"
-								},
-								"sink": {
-									"name": "ApplicantAddressLine4",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['application']['applicationDate']['$date']"
 								},
 								"sink": {
@@ -1316,96 +1115,6 @@
 							},
 							{
 								"source": {
-									"path": "$['application']['disabilityStatus']"
-								},
-								"sink": {
-									"name": "ApplicantDisabilityStatus",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['educationFromYear']"
-								},
-								"sink": {
-									"name": "ApplicantEducationFromYear",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['educationInstitution']"
-								},
-								"sink": {
-									"name": "ApplicantEducationInstitution",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['educationToYear']"
-								},
-								"sink": {
-									"name": "ApplicantEducationToYear",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['email']"
-								},
-								"sink": {
-									"name": "ApplicantEmail",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['firstName']"
-								},
-								"sink": {
-									"name": "ApplicantFirstName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['hobbiesAndInterests']"
-								},
-								"sink": {
-									"name": "ApplicantHobbiesAndInterests",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['improvements']"
-								},
-								"sink": {
-									"name": "ApplicantImprovements",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['lastName']"
-								},
-								"sink": {
-									"name": "ApplicantLastName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['phone']"
-								},
-								"sink": {
-									"name": "ApplicantPhone",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['application']['postcode']"
 								},
 								"sink": {
@@ -1415,55 +1124,10 @@
 							},
 							{
 								"source": {
-									"path": "$['application']['qualifications']"
-								},
-								"sink": {
-									"name": "ApplicantQualifications",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['skills']"
-								},
-								"sink": {
-									"name": "ApplicantSkills",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['strengths']"
-								},
-								"sink": {
-									"name": "ApplicantStrengths",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['application']['support']"
 								},
 								"sink": {
 									"name": "ApplicantSupport",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['trainingCourses']"
-								},
-								"sink": {
-									"name": "ApplicantTrainingCourses",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['workExperiences']"
-								},
-								"sink": {
-									"name": "ApplicantWorkExperiences",
 									"type": "String"
 								}
 							},
@@ -1482,33 +1146,6 @@
 								},
 								"sink": {
 									"name": "StatusUpdatedByUserId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['statusUpdatedBy']['name']"
-								},
-								"sink": {
-									"name": "StatusUpdatedByName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['statusUpdatedBy']['email']"
-								},
-								"sink": {
-									"name": "StatusUpdatedByEmail",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['candidateFeedback']"
-								},
-								"sink": {
-									"name": "CandidateFeedback",
 									"type": "String"
 								}
 							},
@@ -1567,11 +1204,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1614,11 +1251,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1652,11 +1289,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1690,11 +1327,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1709,10 +1346,18 @@
 							"value": "DELETE FROM Stg.RAA_ReferenceDataCandidateSkills\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAReferenceDataToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"enableSkipIncompatibleRow": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -1780,11 +1425,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1796,9 +1441,17 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataApprenticeshipProgrammes\n",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -1920,11 +1573,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -1936,9 +1589,17 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataQualificationTypes",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -2006,11 +1667,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2022,9 +1683,17 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataProfanities\n",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -2092,11 +1761,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2108,9 +1777,17 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataBannedPhrases",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -2178,11 +1855,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2225,11 +1902,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2272,11 +1949,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2319,11 +1996,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2335,9 +2012,17 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataBankHolidays\n",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -2423,11 +2108,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2470,11 +2155,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2517,11 +2202,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2564,11 +2249,11 @@
 					}
 				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -2591,6 +2276,16 @@
 				}
 			}
 		],
+		"parameters": {
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
 		"variables": {
 			"RunId": {
 				"type": "String",

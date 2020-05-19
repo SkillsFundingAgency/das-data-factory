@@ -12,6 +12,10 @@
 				},
 				"secretName": "datamgmt-staging-dbconnectionstring"
 			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }

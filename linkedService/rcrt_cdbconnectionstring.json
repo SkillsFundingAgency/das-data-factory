@@ -1,18 +1,22 @@
 {
 	"name": "rcrt_cdbconnectionstring",
-	"properties": {
-		"annotations": [],
-		"type": "CosmosDbMongoDbApi",
-		"typeProperties": {
-			"connectionString": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "AzureKeyVault1",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "rcrt-cdbconnectionstring"
-			},
-			"database": "recruit"
-		}
-	}
+  "properties": {
+    "annotations": [],
+    "type": "CosmosDbMongoDbApi",
+    "typeProperties": {
+      "connectionString": {
+        "type": "AzureKeyVaultSecret",
+        "store": {
+          "referenceName": "AzureKeyVault1",
+          "type": "LinkedServiceReference"
+        },
+        "secretName": "rcrt-cdbconnectionstring"
+      },
+      "database": "recruit"
+    },
+    "connectVia": {
+      "referenceName": "AzureIntegrationRunTime",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
 }

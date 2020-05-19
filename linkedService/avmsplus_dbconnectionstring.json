@@ -12,6 +12,10 @@
 				},
 				"secretName": "avmsplus-dbconnectionstring"
 			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
