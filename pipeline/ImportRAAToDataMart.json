@@ -861,15 +861,24 @@
 									"type": "String"
 								}
 							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['userId']"
-								},
-								"sink": {
-									"name": "DeletedByUserId",
-									"type": "String"
-								}
-							}
+              {
+                "source": {
+                  "path": "$['deletedByUser']['userId']"
+                },
+                "sink": {
+                  "name": "DeletedByUserId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerAccountId']"
+                },
+                "sink": {
+                  "name": "EmployerAccountId",
+                  "type": "String"
+                }
+              }
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
