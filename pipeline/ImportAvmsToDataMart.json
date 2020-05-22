@@ -102,7 +102,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "declare @cols varchar(max), @query varchar(max);\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n\t\t\tand TABLE_SCHEMA='@{item().TABLE_SCHEMA}'\n            and column_name not in (@{variables('ExcludeList')})\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @query = 'select ' + @cols + ' from [@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]'; \n\nselect @query",
+										"value": "declare @cols varchar(max), @query varchar(max);\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n\t\t\tand TABLE_SCHEMA='@{item().TABLE_SCHEMA}'\n            and column_name not in (@{variables('ExcludeList')})\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @query = 'select ' + @cols + ' from [@{item().TABLE_SCHEMA}].[@{item().TABLE_NAME}]'; \n\nselect @query SourceQuery",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00"
