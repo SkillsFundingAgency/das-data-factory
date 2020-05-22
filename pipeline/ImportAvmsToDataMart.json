@@ -136,7 +136,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@activity('Lookup2').output.firstRow.SourceQuery",
+										"value": "@{activity('Lookup2').output.firstRow.SourceQuery}",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00"
@@ -144,7 +144,7 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"preCopyScript": {
-										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'[avms_@{item().TABLE_NAME}]' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[avms_@{item().TABLE_NAME}]",
+										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'avms_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[avms_@{item().TABLE_NAME}]",
 										"type": "Expression"
 									},
 									"tableOption": "autoCreate",
