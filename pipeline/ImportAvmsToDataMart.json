@@ -88,7 +88,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnListToVariable",
+									"activity": "DetectAndLogSourceDbChanges",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -199,6 +199,54 @@
 									"value": "@{activity('GetSourceColumnList').output.firstRow.Columns}",
 									"type": "Expression"
 								}
+							}
+						},
+						{
+							"name": "DetectAndLogSourceDbChanges",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "GetSourceColumnListToVariable",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[DetectAndLogSourceDbChanges]",
+								"storedProcedureParameters": {
+									"Cols": {
+										"value": {
+											"value": "@{variables('SourceColumnList')}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SourceDatabaseName": {
+										"value": "AvmsPlus",
+										"type": "String"
+									},
+									"SourceSchemaName": {
+										"value": "@{item().SCHEMA_NAME}",
+										"type": "String"
+									},
+									"SourceTableName": {
+										"value": "@{item().TABLE_NAME}",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
