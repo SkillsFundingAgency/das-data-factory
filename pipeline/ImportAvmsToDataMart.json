@@ -35,7 +35,7 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ForEachSourceTable",
 				"type": "ForEach",
 				"dependsOn": [
 					{
