@@ -127,7 +127,7 @@
 									"type": "String"
 								}
 							},
-						 {
+							{
 								"source": {
 									"path": "$['createdDate']['$date']"
 								},
@@ -288,7 +288,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "activity('ImportRAAUsers').output.errors",
+								"value": "@{activity('ImportRAAUsers').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -501,7 +501,7 @@
 									"type": "String"
 								}
 							},
-				 		{
+							{
 								"source": {
 									"path": "$['approvedDate']['$date']"
 								},
@@ -861,24 +861,24 @@
 									"type": "String"
 								}
 							},
-              {
-                "source": {
-                  "path": "$['deletedByUser']['userId']"
-                },
-                "sink": {
-                  "name": "DeletedByUserId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerAccountId']"
-                },
-                "sink": {
-                  "name": "EmployerAccountId",
-                  "type": "String"
-                }
-              }
+							{
+								"source": {
+									"path": "$['deletedByUser']['userId']"
+								},
+								"sink": {
+									"name": "DeletedByUserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountId']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
+									"type": "String"
+								}
+							}
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
@@ -928,7 +928,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAVacancies').output.errors",
+								"value": "@{activity('ImportRAAVacancies').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -1216,7 +1216,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "activity('ImportRAAapplicationReviews').output.errors",
+								"value": "@{activity('ImportRAAapplicationReviews').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -1867,7 +1867,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAReferenceDataCandidateSkills').output.errors",
+								"value": "@{activity('ImportRAAReferenceDataCandidateSkills').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -1914,7 +1914,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAReferenceDataApprenticeshipProgrammes').output.errors",
+								"value": "@{activity('ImportRAAReferenceDataApprenticeshipProgrammes').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -1961,7 +1961,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAReferenceDataQualificationTypes').output.errors",
+								"value": "@{activity('ImportRAAReferenceDataQualificationTypes').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -2120,7 +2120,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAReferenceDataProfanities').output.errors",
+								"value": "@{activity('ImportRAAReferenceDataProfanities').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -2167,7 +2167,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAReferenceDataBannedPhrases').output.errors",
+								"value": "@{activity('ImportRAAReferenceDataBannedPhrases').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -2214,7 +2214,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('ImportRAAReferenceDataBankHolidays').output.errors",
+								"value": "@{activity('ImportRAAReferenceDataBankHolidays').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
