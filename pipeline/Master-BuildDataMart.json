@@ -113,6 +113,44 @@
 						"DIU": "4"
 					}
 				}
+			},
+			{
+				"name": "CompleteLogging",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportAvmsToDataMart",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "UPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{pipeline().parameters.RunId})\n\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_Execution_Results Mgmt\n\tWHERE RunId=@{pipeline().parameters.RunId}\n\nSELECT 'na'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
 			}
 		],
 		"parameters": {
