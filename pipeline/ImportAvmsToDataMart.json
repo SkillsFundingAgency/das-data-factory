@@ -155,10 +155,18 @@
 										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'avms_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[avms_@{item().TABLE_NAME}]",
 										"type": "Expression"
 									},
+									"maxConcurrentConnections": {
+										"value": "@pipeline().parameters.MaxConcurrentConnections",
+										"type": "Expression"
+									},
 									"tableOption": "autoCreate",
 									"disableMetricsCollection": false
 								},
-								"enableStaging": false
+								"enableStaging": false,
+								"dataIntegrationUnits": {
+									"value": "@pipeline().parameters.DIU",
+									"type": "Expression"
+								}
 							},
 							"inputs": [
 								{
@@ -235,11 +243,17 @@
 										"type": "String"
 									},
 									"SourceSchemaName": {
-										"value": "@{item().SCHEMA_NAME}",
+										"value": {
+											"value": "@{item().SCHEMA_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"SourceTableName": {
-										"value": "@{item().TABLE_NAME}",
+										"value": {
+											"value": "@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -257,6 +271,14 @@
 			"RunId": {
 				"type": "string",
 				"defaultValue": "\"1\""
+			},
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
 			}
 		},
 		"variables": {
