@@ -113,44 +113,6 @@
 						"DIU": "4"
 					}
 				}
-			},
-			{
-				"name": "CompleteLogging",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ExecuteImportAvmsToDataMart",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:30:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "@/* Update Log Execution last step as Finish */\n  UPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{pipeline().parameters.RunId})\n\n/* Update RunId Finish Time */\n   UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_Execution_Results Mgmt\n\tWHERE RunId=@{pipeline().parameters.RunId}\n\nSELECT 'N/A'",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
 			}
 		],
 		"parameters": {
