@@ -530,15 +530,6 @@
 							},
 							{
 								"source": {
-									"path": "$['employerLocation']['postcode']"
-								},
-								"sink": {
-									"name": "EmployerPostCode",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['employerName']"
 								},
 								"sink": {
@@ -669,15 +660,6 @@
 								},
 								"sink": {
 									"name": "TrainingProviderName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['address']['postcode']"
-								},
-								"sink": {
-									"name": "TrainingProviderPostcode",
 									"type": "String"
 								}
 							},
@@ -1038,24 +1020,6 @@
 								},
 								"sink": {
 									"name": "ApplicationDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['birthDate']['$date']"
-								},
-								"sink": {
-									"name": "ApplicantBirthDate",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['application']['postcode']"
-								},
-								"sink": {
-									"name": "ApplicantPostCode",
 									"type": "String"
 								}
 							},
