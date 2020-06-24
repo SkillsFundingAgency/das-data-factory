@@ -8,11 +8,11 @@
 		"parameters": {
 			"TableName": {
 				"type": "string",
-				"defaultValue": "Stg"
+				"defaultValue": "Users"
 			},
 			"SchemaName": {
 				"type": "string",
-				"defaultValue": "Users"
+				"defaultValue": "Stg"
 			}
 		},
 		"annotations": [],

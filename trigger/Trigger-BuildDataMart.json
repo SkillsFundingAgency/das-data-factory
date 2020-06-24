@@ -1,13 +1,16 @@
 {
-	"name": "ImportRAAToDataMart",
+	"name": "Trigger-BuildDataMart",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "ImportRAAToDataMart",
+					"referenceName": "Master-BuildDataMart",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"RunId": "\"1\""
 				}
 			}
 		],
