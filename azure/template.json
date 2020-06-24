@@ -8,7 +8,7 @@
         "serviceName": {
             "type": "string"
         },
-        "logAnalytiecsWorkspace": {
+        "logAnalyticsWorkspace": {
             "type": "string"
         },
         "keyVaultAccessObjectIds": {
@@ -67,7 +67,7 @@
             "apiVersion": "2017-05-01-preview",
             "properties": {
                 "name": "diagnostics",
-                "workspaceId": "[parameters('logAnalytiecsWorkspace')]",
+                "workspaceId": "[parameters('logAnalyticsWorkspace')]",
                 "logs": [
                     {
                         "category": "PipelineRuns",
