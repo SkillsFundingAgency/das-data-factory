@@ -19,7 +19,10 @@
 						"type": "CosmosDbMongoDbApiSource",
 						"batchSize": 100,
 						"cursorMethods": {
-							"project": "{\"name\":1,\"withTax\": {$multiply: [\"$name\", 1.0825]}}"
+							"project": {
+								"value": "@replace('[\"MonitoringInformation.Gender\": \"1\"]', '1',  '2')",
+								"type": "Expression"
+							}
 						}
 					},
 					"sink": {
