@@ -1,0 +1,62 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "ten",
+								"value": {
+									"value": "replace('MonitoringInformation.Ethnicity',2,1)",
+									"type": "Expression"
+								}
+							}
+						],
+						"batchSize": 100,
+						"cursorMethods": {
+							"project": "{\"name\":1,\"withTax\": {$multiply: [\"$name\", 1.0825]}}"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "users"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
