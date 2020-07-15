@@ -19,16 +19,27 @@
 						"type": "CosmosDbMongoDbApiSource",
 						"batchSize": 100,
 						"cursorMethods": {
-							"project": {
-								"value": "@replace('[\"MonitoringInformation.Gender\": \"1\"]', '1',  '2')",
-								"type": "Expression"
-							}
+							"project": "{\"MonitoringInformation.Ethnicity\":1}"
 						}
 					},
 					"sink": {
 						"type": "AzureSqlSink"
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['MonitoringInformation']['Ethnicity']"
+								},
+								"sink": {
+									"name": "UserName",
+									"type": "String"
+								}
+							}
+						]
+					}
 				},
 				"inputs": [
 					{
@@ -44,7 +55,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "Users",
+							"TableName": "RAA_Users",
 							"SchemaName": "Stg"
 						}
 					}
