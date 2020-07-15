@@ -5,11 +5,20 @@
 			"referenceName": "faa_cdbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"Query": {
+				"type": "string",
+				"defaultValue": "candidates"
+			}
+		},
 		"annotations": [],
 		"type": "CosmosDbMongoDbApiCollection",
 		"schema": [],
 		"typeProperties": {
-			"collection": "candidates"
+			"collection": {
+				"value": "@dataset().Query",
+				"type": "Expression"
+			}
 		}
 	}
 }

@@ -17,15 +17,6 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "ten",
-								"value": {
-									"value": "replace('MonitoringInformation.Ethnicity',2,1)",
-									"type": "Expression"
-								}
-							}
-						],
 						"batchSize": 100,
 						"cursorMethods": {
 							"project": "{\"name\":1,\"withTax\": {$multiply: [\"$name\", 1.0825]}}"
@@ -38,10 +29,10 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRAACosmos",
+						"referenceName": "CosmosDbMongoDbApiCollection1",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "users"
+							"Query": "candidates"
 						}
 					}
 				],
