@@ -1,0 +1,24 @@
+{
+	"name": "SrcFAACosmos",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "faa_cdbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"CollectionName": {
+				"type": "string",
+				"defaultValue": "Candidate"
+			}
+		},
+		"annotations": [],
+		"type": "CosmosDbMongoDbApiCollection",
+		"schema": [],
+		"typeProperties": {
+			"collection": {
+				"value": "@dataset().CollectionName",
+				"type": "Expression"
+			}
+		}
+	}
+}
