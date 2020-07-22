@@ -17,10 +17,19 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@concat(pipeline().parameters.RunId,'1')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":1}",
+						"filter": "",
 						"cursorMethods": {
-							"project": "{\"CandidateId\":1,\"LegacyCandidateId\":1}"
+							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
 					},
 					"sink": {
@@ -32,10 +41,28 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['MonitoringInformation']['Ethnicity']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
-									"name": "UserName",
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['LegacyCandidateId']"
+								},
+								"sink": {
+									"name": "IdamUserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
 									"type": "String"
 								}
 							}
@@ -63,6 +90,12 @@
 				]
 			}
 		],
+		"parameters": {
+			"RunId": {
+				"type": "string",
+				"defaultValue": "1"
+			}
+		},
 		"annotations": []
 	}
 }
