@@ -21,7 +21,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "@concat(pipeline().parameters.RunId,'1')",
+									"value": "add(pipeline().parameters.RunId,1)",
 									"type": "Expression"
 								}
 							}
@@ -41,10 +41,10 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$binary']"
+									"path": "$['_id']['$type']"
 								},
 								"sink": {
-									"name": "BinaryId",
+									"name": "CandidateId",
 									"type": "String"
 								}
 							},
@@ -53,8 +53,8 @@
 									"path": "$['LegacyCandidateId']"
 								},
 								"sink": {
-									"name": "IdamUserId",
-									"type": "String"
+									"name": "LegacyCandidateId",
+									"type": "Int64"
 								}
 							},
 							{
@@ -62,8 +62,8 @@
 									"path": "$['RunId']"
 								},
 								"sink": {
-									"name": "EmployerAccountId",
-									"type": "String"
+									"name": "EID",
+									"type": "Int64"
 								}
 							}
 						]
@@ -83,7 +83,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "RAA_Users",
+							"TableName": "FAA_Candidate",
 							"SchemaName": "Stg"
 						}
 					}
@@ -92,8 +92,8 @@
 		],
 		"parameters": {
 			"RunId": {
-				"type": "string",
-				"defaultValue": "1"
+				"type": "int",
+				"defaultValue": 1
 			}
 		},
 		"annotations": []
