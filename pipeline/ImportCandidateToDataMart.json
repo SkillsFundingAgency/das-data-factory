@@ -27,7 +27,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\":{ $nin: [ 5, 15 ] }}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
