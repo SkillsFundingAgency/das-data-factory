@@ -464,6 +464,100 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "ImportCandidateToDataMart_6",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportCandidateToDataMart_5",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "add(pipeline().parameters.RunId,6)",
+									"type": "Expression"
+								}
+							}
+						],
+						"batchSize": 100,
+						"filter": "{\"MonitoringInformation.Ethnicity\":{ $nin: [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] }}",
+						"cursorMethods": {
+							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "CandidateId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['LegacyCandidateId']"
+								},
+								"sink": {
+									"name": "LegacyCandidateId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "EID",
+									"type": "Int64"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcFAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "candidates"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "FAA_Candidate",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
