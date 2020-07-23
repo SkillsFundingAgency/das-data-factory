@@ -27,7 +27,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":{ $eq: [ 1 ] }}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\":1}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -121,7 +121,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":{ $eq: [ 2 ] }}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\": 2 }}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -215,7 +215,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":{ $in: [ 3] }}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\":3}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -309,7 +309,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":{ $eq: [ 4] }}",
+						"filter": "{\"MonitoringInformation.Ethnicity\":4}",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -403,7 +403,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":{ $eq: [ 5] }}",
+						"filter": "{\"MonitoringInformation.Ethnicity\":5}",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
