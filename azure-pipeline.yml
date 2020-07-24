@@ -20,7 +20,7 @@ pool:
     - Agent.OS -equals Windows_NT
 
 steps:
-- task: gittools.gitversion.gitversion-task.GitVersion@5
+- task: gittools.gitversion.gitversion-task.GitVersion@3
   displayName: GitVersion
   inputs:
     updateAssemblyInfo: true
