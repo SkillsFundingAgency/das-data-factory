@@ -110,6 +110,44 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "GetLookUpForFAA",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetLookUpFromAVMS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "INSERT INTO [Stg].[CandidateEthLookUp]\n           ([EID]\n           ,[FullName]\n           ,[SourceDb])\n     VALUES\n((@{pipeline().parameters.RunId}+1,'English / Welsh / Scottish / Northern Irish / British','RAAv2'),\n((@{pipeline().parameters.RunId}+2,'Irish','RAAv2')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
 			}
 		],
 		"parameters": {
