@@ -24,7 +24,7 @@
 							}
 						],
 						"sqlReaderQuery": {
-							"value": "TRUNCATE TABLE [Stg].[CandidateEthLookUp]\n\nSELECT (@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID\n       ,ShortName\n\t   ,FullName\n\tFROM [dbo].[CandidateEthnicOrigin]",
+							"value": "DELETE FROM [Stg].[CandidateEthLookUp]\n\nSELECT (@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID\n       ,ShortName\n\t   ,FullName\n\tFROM [dbo].[CandidateEthnicOrigin]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
