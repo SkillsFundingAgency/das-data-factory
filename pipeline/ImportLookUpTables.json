@@ -134,7 +134,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "INSERT INTO [Stg].[CandidateEthLookUp]\n           ([EID]\n           ,[FullName]\n           ,[SourceDb])\n     VALUES\n((@{pipeline().parameters.RunId}+1,'English / Welsh / Scottish / Northern Irish / British','RAAv2'),\n((@{pipeline().parameters.RunId}+2,'Irish','RAAv2')",
+							"value": "INSERT INTO [Stg].[CandidateEthLookUp]\n           ([EID]\n           ,[FullName]\n           ,[SourceDb])\n     VALUES\n((@{pipeline().parameters.RunId}+1),'English','RAAv2'),((@{pipeline().parameters.RunId}+2),'Irish','RAAv2')\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
