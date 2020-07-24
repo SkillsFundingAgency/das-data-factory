@@ -1,0 +1,123 @@
+{
+	"name": "ImportLookUpTables",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetLookUpFromAVMS",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "SourceDb",
+								"value": "RAAv1"
+							}
+						],
+						"sqlReaderQuery": {
+							"value": "SELECT (@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID\n       ,ShortName\n\t   ,FullName\n\tFROM [dbo].[CandidateEthnicOrigin]",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "EID",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "EID",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "ShortName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "ShortName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "FullName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "FullName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SourceDb"
+								},
+								"sink": {
+									"name": "SourceDb",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcAvmsPlus",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "CandidateEthnicOrigin",
+							"SchemaName": "dbo"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "CandidateEthLookUp",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"RunId": {
+				"type": "int",
+				"defaultValue": 1
+			}
+		},
+		"annotations": []
+	}
+}
