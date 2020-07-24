@@ -121,7 +121,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\": 2 }}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\": 2}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
