@@ -24,7 +24,7 @@
 							}
 						],
 						"sqlReaderQuery": {
-							"value": "DELETE FROM [Stg].[CandidateEthLookUp]\n\nSELECT (@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID\n       ,ShortName\n\t   ,FullName\n\tFROM [dbo].[CandidateEthnicOrigin]",
+							"value": "SELECT (@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID\n       ,ShortName\n\t   ,FullName\n\tFROM [dbo].[CandidateEthnicOrigin]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -134,7 +134,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "INSERT INTO [Stg].[CandidateEthLookUp]\n           ([EID]\n           ,[FullName]\n           ,[SourceDb])\n     VALUES\n((@{pipeline().parameters.RunId}+1),'English','RAAv2'),((@{pipeline().parameters.RunId}+2),'Irish','RAAv2')\n\nSELECT 1",
+							"value": "DELETE FROM [Stg].[CandidateEthLookUp]\nINSERT INTO [Stg].[CandidateEthLookUp]\n           ([EID]\n           ,[FullName]\n           ,[SourceDb])\n     VALUES\n((@{pipeline().parameters.RunId}+1),'English','RAAv2'),((@{pipeline().parameters.RunId}+2),'Irish','RAAv2')\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
