@@ -33,7 +33,7 @@
 								}
 							}
 						],
-						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=0",
+						"sqlReaderQuery": "select distinct ethnicorigin\nfrom dbo.candidate",
 						"queryTimeout": "02:00:00"
 					},
 					"sink": {
@@ -302,7 +302,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "@activity('GenerateCopyActvity2').output.firstRow.CAID\n",
+									"value": "@activity('GenerateCopyActvity3').output.firstRow.CAID\n",
 									"type": "Expression"
 								}
 							}
@@ -423,7 +423,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "@activity('GenerateCopyActvity2').output.firstRow.CAID\n",
+									"value": "@activity('GenerateCopyActvity4').output.firstRow.CAID\n",
 									"type": "Expression"
 								}
 							}
@@ -544,7 +544,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "@activity('GenerateCopyActvity2').output.firstRow.CAID\n",
+									"value": "@activity('GenerateCopyActvity5').output.firstRow.CAID\n",
 									"type": "Expression"
 								}
 							}
