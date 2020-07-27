@@ -40,7 +40,9 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink"
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM Stg.FAA_Candidate",
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -48,7 +50,7 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
 									"name": "CandidateId",
@@ -142,7 +144,7 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
 									"name": "CandidateId",
@@ -236,7 +238,7 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
 									"name": "CandidateId",
@@ -330,7 +332,7 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
 									"name": "CandidateId",
@@ -424,7 +426,7 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
 									"name": "CandidateId",
@@ -518,7 +520,7 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
 									"name": "CandidateId",
