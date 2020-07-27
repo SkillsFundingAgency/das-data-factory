@@ -3,95 +3,11 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "ImportCandidateToDataMart_1",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
-									"type": "Expression"
-								}
-							}
-						],
-						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=0",
-						"queryTimeout": "02:00:00"
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM [Stg].[Avms_CandidateEth]",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "CandidateId",
-									"type": "Int32"
-								},
-								"sink": {
-									"name": "CandidateId"
-								}
-							},
-							{
-								"source": {
-									"name": "RunId"
-								},
-								"sink": {
-									"name": "EID"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcAvmsPlus",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Candidate",
-							"SchemaName": "dbo"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Avms_CandidateEth",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "GenerateCopyActvity1",
+				"name": "GetList",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.01:00:00",
+					"timeout": "7.00:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -101,10 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
+						"sqlReaderQuery": "DELETE FROM Stg.Avms_CandidateEth\n\nSELECT ShortCode\nFROM Stg.CandidateConfig",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
@@ -114,492 +27,145 @@
 							"TableName": "Users",
 							"SchemaName": "Stg"
 						}
-					}
-				}
-			},
-			{
-				"name": "GenerateCopyActvity2",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
 					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
+					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ImportCandidateToDataMart_2",
-				"type": "Copy",
+				"name": "ForEach1",
+				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "GenerateCopyActvity2",
+						"activity": "GetList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity2').output.firstRow.CAID\n",
-									"type": "Expression"
+					"items": {
+						"value": "@activity('GetList').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "ImportCandidateToDataMart_1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GenerateCopyActvity1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
-							}
-						],
-						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=1",
-						"queryTimeout": "02:00:00"
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
 								"source": {
-									"name": "CandidateId",
-									"type": "Int32"
+									"type": "AzureSqlSource",
+									"additionalColumns": [
+										{
+											"name": "RunId",
+											"value": {
+												"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
+												"type": "Expression"
+											}
+										}
+									],
+									"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=@{item().ShortCode}",
+									"queryTimeout": "02:00:00"
 								},
 								"sink": {
-									"name": "CandidateId"
+									"type": "AzureSqlSink",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "CandidateId",
+												"type": "Int32"
+											},
+											"sink": {
+												"name": "CandidateId"
+											}
+										},
+										{
+											"source": {
+												"name": "RunId"
+											},
+											"sink": {
+												"name": "EID"
+											}
+										}
+									]
 								}
 							},
-							{
-								"source": {
-									"name": "RunId"
-								},
-								"sink": {
-									"name": "EID"
+							"inputs": [
+								{
+									"referenceName": "SrcAvmsPlus",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Candidate",
+										"SchemaName": "dbo"
+									}
 								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcAvmsPlus",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Candidate",
-							"SchemaName": "dbo"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Avms_CandidateEth",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "GenerateCopyActvity3",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_2",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
+							],
+							"outputs": [
+								{
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Avms_CandidateEth",
+										"SchemaName": "Stg"
+									}
+								}
+							]
 						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "ImportCandidateToDataMart_3",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity3",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity3').output.firstRow.CAID\n",
-									"type": "Expression"
-								}
-							}
-						],
-						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=2",
-						"queryTimeout": "02:00:00"
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "CandidateId",
-									"type": "Int32"
-								},
-								"sink": {
-									"name": "CandidateId"
-								}
+						{
+							"name": "GenerateCopyActvity1",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
 							},
-							{
+							"userProperties": [],
+							"typeProperties": {
 								"source": {
-									"name": "RunId"
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00"
 								},
-								"sink": {
-									"name": "EID"
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
 								}
 							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcAvmsPlus",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Candidate",
-							"SchemaName": "dbo"
 						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Avms_CandidateEth",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "GenerateCopyActvity4",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_3",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
+					]
 				}
-			},
-			{
-				"name": "ImportCandidateToDataMart_4",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity4",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity4').output.firstRow.CAID\n",
-									"type": "Expression"
-								}
-							}
-						],
-						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=7",
-						"queryTimeout": "02:00:00"
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "CandidateId",
-									"type": "Int32"
-								},
-								"sink": {
-									"name": "CandidateId"
-								}
-							},
-							{
-								"source": {
-									"name": "RunId"
-								},
-								"sink": {
-									"name": "EID"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcAvmsPlus",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Candidate",
-							"SchemaName": "dbo"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Avms_CandidateEth",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "GenerateCopyActvity5",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_4",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "ImportCandidateToDataMart_5",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity5",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity5').output.firstRow.CAID\n",
-									"type": "Expression"
-								}
-							}
-						],
-						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=20",
-						"queryTimeout": "02:00:00"
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "CandidateId",
-									"type": "Int32"
-								},
-								"sink": {
-									"name": "CandidateId"
-								}
-							},
-							{
-								"source": {
-									"name": "RunId"
-								},
-								"sink": {
-									"name": "EID"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcAvmsPlus",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Candidate",
-							"SchemaName": "dbo"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Avms_CandidateEth",
-							"SchemaName": "Stg"
-						}
-					}
-				]
 			}
 		],
 		"parameters": {
