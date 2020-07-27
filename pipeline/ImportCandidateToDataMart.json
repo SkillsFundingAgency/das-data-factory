@@ -101,7 +101,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportCandidateToDataMart_1",
+						"activity": "GenerateCopyActvity2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -122,7 +122,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "add(pipeline().parameters.RunId,2)",
+									"value": "@activity('GenerateCopyActvity2').output.firstRow.CAID",
 									"type": "Expression"
 								}
 							}
@@ -570,6 +570,44 @@
 				"name": "GenerateCopyActvity1",
 				"type": "Lookup",
 				"dependsOn": [],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GenerateCopyActvity2",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCandidateToDataMart_1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.01:00:00",
 					"retry": 0,
