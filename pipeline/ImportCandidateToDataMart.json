@@ -28,7 +28,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "@activity('GenerateCopyActvity1').output",
+									"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n@activity('GetRunId').output.firstRow.RunId",
 									"type": "Expression"
 								}
 							}
@@ -574,26 +574,16 @@
 					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
+					"secureOutput": false,
+					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[dbo].[GenerateCopyActivityId]",
-						"storedProcedureParameters": {
-							"RunId": {
-								"type": "Int64",
-								"value": {
-									"value": "@pipeline().parameters.RunId",
-									"type": "Expression"
-								}
-							},
-							"SourceDb": {
-								"type": "String",
-								"value": "RAAv2"
-							}
+						"sqlReaderQuery": {
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
 					},
