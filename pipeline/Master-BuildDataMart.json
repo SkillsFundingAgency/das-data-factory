@@ -119,7 +119,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportLookUpTables",
+						"activity": "ExecuteImportAvmsCandidateToDataMart",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -179,7 +179,7 @@
 				}
 			},
 			{
-				"name": "ExecuteImportLookUpTables",
+				"name": "ExecuteImportAvmsCandidateToDataMart",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
