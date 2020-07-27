@@ -33,7 +33,7 @@
 								}
 							}
 						],
-						"sqlReaderQuery": "select distinct ethnicorigin\nfrom dbo.candidate",
+						"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=0",
 						"queryTimeout": "02:00:00"
 					},
 					"sink": {
