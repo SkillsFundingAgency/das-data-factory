@@ -195,7 +195,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportCandidateToDataMart_2",
+						"activity": "GenerateCopyActvity3",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -216,7 +216,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "add(pipeline().parameters.RunId,3)",
+									"value": "@activity('GenerateCopyActvity3').output.firstRow.CAID",
 									"type": "Expression"
 								}
 							}
@@ -289,7 +289,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportCandidateToDataMart_3",
+						"activity": "GenerateCopyActvity4",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -310,7 +310,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "add(pipeline().parameters.RunId,4)",
+									"value": "@activity('GenerateCopyActvity4').output.firstRow.CAID",
 									"type": "Expression"
 								}
 							}
@@ -383,7 +383,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportCandidateToDataMart_4",
+						"activity": "GenerateCopyActvity5",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -404,7 +404,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "add(pipeline().parameters.RunId,5)",
+									"value": "@activity('GenerateCopyActvity5').output.firstRow.CAID",
 									"type": "Expression"
 								}
 							}
@@ -477,7 +477,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportCandidateToDataMart_5",
+						"activity": "GenerateCopyActvity6",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -498,7 +498,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "add(pipeline().parameters.RunId,6)",
+									"value": "@activity('GenerateCopyActvity6').output.firstRow.CAID",
 									"type": "Expression"
 								}
 							}
@@ -603,6 +603,158 @@
 				"dependsOn": [
 					{
 						"activity": "ImportCandidateToDataMart_1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GenerateCopyActvity3",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCandidateToDataMart_2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GenerateCopyActvity4",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCandidateToDataMart_3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GenerateCopyActvity5",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCandidateToDataMart_4",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GenerateCopyActvity6",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportCandidateToDataMart_5",
 						"dependencyConditions": [
 							"Succeeded"
 						]
