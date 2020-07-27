@@ -584,7 +584,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -622,7 +622,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -660,7 +660,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -698,7 +698,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -736,7 +736,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
@@ -774,7 +774,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00"
