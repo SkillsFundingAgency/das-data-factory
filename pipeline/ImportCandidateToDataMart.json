@@ -5,7 +5,14 @@
 			{
 				"name": "ImportCandidateToDataMart_1",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GenerateCopyActvity1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.01:00:00",
 					"retry": 0,
@@ -21,13 +28,13 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "add(pipeline().parameters.RunId,1)",
+									"value": "@activity('GenerateCopyActvity1').output",
 									"type": "Expression"
 								}
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":1}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\":31}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -121,7 +128,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\": 2}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\": 32}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -215,7 +222,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":3}\n",
+						"filter": "\n{\"MonitoringInformation.Ethnicity\":33}\n",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -309,7 +316,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":4}",
+						"filter": "{\"MonitoringInformation.Ethnicity\":34}",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -403,7 +410,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":5}",
+						"filter": "{\"MonitoringInformation.Ethnicity\":35}",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -497,7 +504,7 @@
 							}
 						],
 						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":{ $nin: [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] }}",
+						"filter": "{\"MonitoringInformation.Ethnicity\":{ $nin: [ 31,32,33,34,35,36] }}",
 						"cursorMethods": {
 							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 						}
@@ -558,6 +565,47 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "GenerateCopyActvity1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[GenerateCopyActivityId]",
+						"storedProcedureParameters": {
+							"RunId": {
+								"type": "Int64",
+								"value": {
+									"value": "@pipeline().parameters.RunId",
+									"type": "Expression"
+								}
+							},
+							"SourceDb": {
+								"type": "String",
+								"value": "RAAv2"
+							}
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
 			}
 		],
 		"parameters": {
