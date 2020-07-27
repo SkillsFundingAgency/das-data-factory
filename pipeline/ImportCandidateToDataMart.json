@@ -28,7 +28,7 @@
 							{
 								"name": "RunId",
 								"value": {
-									"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n@activity('GetRunId').output.firstRow.RunId",
+									"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
 									"type": "Expression"
 								}
 							}
