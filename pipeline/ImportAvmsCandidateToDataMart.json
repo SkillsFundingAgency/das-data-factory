@@ -38,7 +38,6 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.Avms_CandidateEth",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -191,7 +190,6 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.Avms_CandidateEth",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -313,7 +311,6 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.Avms_CandidateEth",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
