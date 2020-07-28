@@ -115,7 +115,17 @@
 												"type": "Int32"
 											},
 											"sink": {
-												"name": "CandidateId"
+												"name": "CandidateId",
+												"type": "Int64"
+											}
+										},
+										{
+											"source": {
+												"name": "CAID"
+											},
+											"sink": {
+												"name": "EID",
+												"type": "Int64"
 											}
 										},
 										{
@@ -123,15 +133,8 @@
 												"name": "RunID"
 											},
 											"sink": {
-												"name": "RunID"
-											}
-										},
-										{
-											"source": {
-												"name": "RunId"
-											},
-											"sink": {
-												"name": "EID"
+												"name": "RunId",
+												"type": "Int64"
 											}
 										}
 									]
