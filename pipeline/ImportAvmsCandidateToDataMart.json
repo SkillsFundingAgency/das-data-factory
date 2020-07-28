@@ -5,9 +5,16 @@
 			{
 				"name": "GetList",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GenerateConfig",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -74,14 +81,24 @@
 									"type": "AzureSqlSource",
 									"additionalColumns": [
 										{
-											"name": "RunId",
+											"name": "CAID",
 											"value": {
 												"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
 												"type": "Expression"
 											}
+										},
+										{
+											"name": "RunID",
+											"value": {
+												"value": "@pipeline().parameters.RunId",
+												"type": "Expression"
+											}
 										}
 									],
-									"sqlReaderQuery": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=@{item().ShortCode}",
+									"sqlReaderQuery": {
+										"value": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=@{item().ShortCode}",
+										"type": "Expression"
+									},
 									"queryTimeout": "02:00:00"
 								},
 								"sink": {
@@ -99,6 +116,14 @@
 											},
 											"sink": {
 												"name": "CandidateId"
+											}
+										},
+										{
+											"source": {
+												"name": "RunID"
+											},
+											"sink": {
+												"name": "RunID"
 											}
 										},
 										{
@@ -165,6 +190,43 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "GenerateConfig",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[GenerateConfig]",
+					"storedProcedureParameters": {
+						"Category": {
+							"value": "Ethnicity",
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@pipeline().parameters.RunId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"SourceDb": {
+							"value": "RAAv1",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
