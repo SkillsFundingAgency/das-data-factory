@@ -1,5 +1,5 @@
 {
-	"name": "ImportCandidateToDataMart",
+	"name": "ImportFAACandidateToDataMart",
 	"properties": {
 		"activities": [
 			{

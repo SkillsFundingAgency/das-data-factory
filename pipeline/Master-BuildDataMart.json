@@ -166,7 +166,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportCandidateToDataMart",
+						"referenceName": "ImportFAACandidateToDataMart",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
