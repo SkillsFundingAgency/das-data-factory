@@ -118,9 +118,16 @@
 									"type": "CosmosDbMongoDbApiSource",
 									"additionalColumns": [
 										{
-											"name": "RunId",
+											"name": "CAID",
 											"value": {
 												"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "RunID",
+											"value": {
+												"value": "@pipeline().parameters.RunId",
 												"type": "Expression"
 											}
 										}
