@@ -133,10 +133,7 @@
 										}
 									],
 									"batchSize": 100,
-									"filter": {
-										"value": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
-										"type": "Expression"
-									},
+									"filter": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
 									"cursorMethods": {
 										"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 									}
@@ -169,10 +166,19 @@
 										},
 										{
 											"source": {
-												"path": "$['RunId']"
+												"path": "$['CAID']"
 											},
 											"sink": {
 												"name": "EID",
+												"type": "Int64"
+											}
+										},
+										{
+											"source": {
+												"path": "$['RunID']"
+											},
+											"sink": {
+												"name": "RunID",
 												"type": "Int64"
 											}
 										}
