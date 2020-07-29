@@ -24,7 +24,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DELETE FROM Stg.Avms_CandidateEth\n\nSELECT ShortCode\nFROM Stg.CandidateConfig",
+						"sqlReaderQuery": "DELETE FROM Stg.FAA_Candidate\n\nSELECT ShortCode\nFROM Stg.CandidateConfig",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
@@ -126,14 +126,16 @@
 										}
 									],
 									"batchSize": 100,
-									"filter": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
+									"filter": {
+										"value": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
+										"type": "Expression"
+									},
 									"cursorMethods": {
 										"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 									}
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"preCopyScript": "DELETE FROM Stg.FAA_Candidate",
 									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
