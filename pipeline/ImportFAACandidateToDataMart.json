@@ -3,577 +3,47 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "ImportCandidateToDataMart_1",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
-									"type": "Expression"
-								}
-							}
-						],
-						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":31}\n",
-						"cursorMethods": {
-							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.FAA_Candidate",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LegacyCandidateId']"
-								},
-								"sink": {
-									"name": "LegacyCandidateId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "EID",
-									"type": "Int64"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcFAACosmos",
-						"type": "DatasetReference",
-						"parameters": {
-							"CollectionName": "candidates"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "FAA_Candidate",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "ImportCandidateToDataMart_2",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity2",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity2').output.firstRow.CAID",
-									"type": "Expression"
-								}
-							}
-						],
-						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\": 32}\n",
-						"cursorMethods": {
-							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LegacyCandidateId']"
-								},
-								"sink": {
-									"name": "LegacyCandidateId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "EID",
-									"type": "Int64"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcFAACosmos",
-						"type": "DatasetReference",
-						"parameters": {
-							"CollectionName": "candidates"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "FAA_Candidate",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "ImportCandidateToDataMart_3",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity3",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity3').output.firstRow.CAID",
-									"type": "Expression"
-								}
-							}
-						],
-						"batchSize": 100,
-						"filter": "\n{\"MonitoringInformation.Ethnicity\":33}\n",
-						"cursorMethods": {
-							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LegacyCandidateId']"
-								},
-								"sink": {
-									"name": "LegacyCandidateId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "EID",
-									"type": "Int64"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcFAACosmos",
-						"type": "DatasetReference",
-						"parameters": {
-							"CollectionName": "candidates"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "FAA_Candidate",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "ImportCandidateToDataMart_4",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity4",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity4').output.firstRow.CAID",
-									"type": "Expression"
-								}
-							}
-						],
-						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":34}",
-						"cursorMethods": {
-							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LegacyCandidateId']"
-								},
-								"sink": {
-									"name": "LegacyCandidateId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "EID",
-									"type": "Int64"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcFAACosmos",
-						"type": "DatasetReference",
-						"parameters": {
-							"CollectionName": "candidates"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "FAA_Candidate",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "ImportCandidateToDataMart_5",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity5",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity5').output.firstRow.CAID",
-									"type": "Expression"
-								}
-							}
-						],
-						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":35}",
-						"cursorMethods": {
-							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LegacyCandidateId']"
-								},
-								"sink": {
-									"name": "LegacyCandidateId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "EID",
-									"type": "Int64"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcFAACosmos",
-						"type": "DatasetReference",
-						"parameters": {
-							"CollectionName": "candidates"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "FAA_Candidate",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "ImportCandidateToDataMart_6",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GenerateCopyActvity6",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "CosmosDbMongoDbApiSource",
-						"additionalColumns": [
-							{
-								"name": "RunId",
-								"value": {
-									"value": "@activity('GenerateCopyActvity6').output.firstRow.CAID",
-									"type": "Expression"
-								}
-							}
-						],
-						"batchSize": 100,
-						"filter": "{\"MonitoringInformation.Ethnicity\":{ $nin: [ 31,32,33,34,35,36] }}",
-						"cursorMethods": {
-							"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LegacyCandidateId']"
-								},
-								"sink": {
-									"name": "LegacyCandidateId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "EID",
-									"type": "Int64"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SrcFAACosmos",
-						"type": "DatasetReference",
-						"parameters": {
-							"CollectionName": "candidates"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "FAA_Candidate",
-							"SchemaName": "Stg"
-						}
-					}
-				]
-			},
-			{
-				"name": "GenerateCopyActvity1",
+				"name": "GetList",
 				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GenerateConfig",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "DELETE FROM Stg.Avms_CandidateEth\n\nSELECT ShortCode\nFROM Stg.CandidateConfig",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "GenerateConfig",
+				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.01:00:00",
+					"timeout": "7.00:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -581,212 +51,177 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
+					"storedProcedureName": "[dbo].[GenerateConfig]",
+					"storedProcedureParameters": {
+						"Category": {
+							"value": "Ethnicity",
+							"type": "String"
 						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
+						"RunId": {
+							"value": {
+								"value": "@pipeline().parameters.RunId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"SourceDb": {
+							"value": "RAAv2",
+							"type": "String"
 						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
-				"name": "GenerateCopyActvity2",
-				"type": "Lookup",
+				"name": "ForEach1",
+				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "ImportCandidateToDataMart_1",
+						"activity": "GetList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
+					"items": {
+						"value": "@activity('GetList').output.value",
+						"type": "Expression"
 					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "GenerateCopyActvity3",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_2",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "ImportCandidateToDataMart_1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GenerateCopyActvity1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "CosmosDbMongoDbApiSource",
+									"additionalColumns": [
+										{
+											"name": "RunId",
+											"value": {
+												"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
+												"type": "Expression"
+											}
+										}
+									],
+									"batchSize": 100,
+									"filter": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
+									"cursorMethods": {
+										"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": "DELETE FROM Stg.FAA_Candidate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "$['_id']['$binary']"
+											},
+											"sink": {
+												"name": "CandidateId",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['LegacyCandidateId']"
+											},
+											"sink": {
+												"name": "LegacyCandidateId",
+												"type": "Int64"
+											}
+										},
+										{
+											"source": {
+												"path": "$['RunId']"
+											},
+											"sink": {
+												"name": "EID",
+												"type": "Int64"
+											}
+										}
+									]
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SrcFAACosmos",
+									"type": "DatasetReference",
+									"parameters": {
+										"CollectionName": "candidates"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "FAA_Candidate",
+										"SchemaName": "Stg"
+									}
+								}
+							]
 						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
+						{
+							"name": "GenerateCopyActvity1",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
 						}
-					}
-				}
-			},
-			{
-				"name": "GenerateCopyActvity4",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_3",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "GenerateCopyActvity5",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_4",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "GenerateCopyActvity6",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ImportCandidateToDataMart_5",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
+					]
 				}
 			}
 		],
