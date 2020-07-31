@@ -1795,15 +1795,6 @@
 									},
 									{
 										"source": {
-											"path": "$['application']['support']"
-										},
-										"sink": {
-											"name": "ApplicantSupport",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
 											"path": "$['statusUpdatedDate']['$date']"
 										},
 										"sink": {
@@ -3098,7 +3089,7 @@
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "ExecuteImportAvmsToDataMart",
+								"activity": "BuildPresentationLayerForVacancies",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -3129,6 +3120,42 @@
 									"SchemaName": "Stg"
 								}
 							}
+						}
+					},
+					{
+						"name": "BuildPresentationLayerForVacancies",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ExecuteImportAvmsToDataMart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.03:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[BuildVacanciesPresentationLayer]",
+							"storedProcedureParameters": {
+								"RunId": {
+									"value": {
+										"value": "@activity('GetRunId').output.firstRow.RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
