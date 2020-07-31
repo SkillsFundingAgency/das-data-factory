@@ -28,6 +28,7 @@ steps:
   inputs:
     Contents: |
       azure/**
+      das-at-dfac-df/**
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
 
