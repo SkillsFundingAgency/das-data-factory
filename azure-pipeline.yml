@@ -16,11 +16,9 @@ variables:
 
 pool:
   name: 'DAS - Continuous Integration'
-  demands:
-    - Agent.OS -equals Windows_NT
 
 steps:
-- task: gittools.gitversion.gitversion-task.GitVersion@3
+- task: gittools.gitversion.gitversion-task.GitVersion@5
   displayName: GitVersion
   inputs:
     updateAssemblyInfo: true
@@ -29,8 +27,7 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     Contents: |
-      azure\**
-      das-at-dfac-df\**
+      azure/**
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
 
