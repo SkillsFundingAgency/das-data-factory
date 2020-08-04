@@ -133,7 +133,10 @@
 										}
 									],
 									"batchSize": 100,
-									"filter": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
+									"filter": {
+										"value": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
+										"type": "Expression"
+									},
 									"cursorMethods": {
 										"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
 									}
@@ -221,7 +224,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2'\n\nSELECT @CAID as CAID",
+										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2','Eth'\n\nSELECT @CAID as CAID",
 										"type": "Expression"
 									},
 									"queryTimeout": "01:00:00"
