@@ -1,0 +1,33 @@
+{
+	"name": "DestDS_ASCampaignDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LSGCS_ASCampaignDBDS",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DashboardFilename": {
+				"type": "string",
+				"defaultValue": "RegistrationData.csv"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "GoogleCloudStorageLocation",
+				"bucketName": "eventdatabucket",
+				"folderPath": "CampaignDashboard",
+				"fileName": {
+					"value": "@dataset().DashboardFilename",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
