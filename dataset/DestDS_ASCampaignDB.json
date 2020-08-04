@@ -28,6 +28,35 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "AID",
+				"type": "String"
+			},
+			{
+				"name": "L\\/NL",
+				"type": "String"
+			},
+			{
+				"name": "any_ASV",
+				"type": "String"
+			},
+			{
+				"name": "RegistrationDate",
+				"type": "String"
+			},
+			{
+				"name": "MonthNumber",
+				"type": "String"
+			},
+			{
+				"name": "Month",
+				"type": "String"
+			},
+			{
+				"name": "SaltKeyID",
+				"type": "String"
+			}
+		]
 	}
 }
