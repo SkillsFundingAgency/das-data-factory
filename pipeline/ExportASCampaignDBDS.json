@@ -1,5 +1,5 @@
 {
-	"name": "ExportASCampaignDashboardDS",
+	"name": "ExportASCampaignDBDS",
 	"properties": {
 		"description": "Export apprenticeship Campaign Dashboard DataSets",
 		"concurrency": 1,
