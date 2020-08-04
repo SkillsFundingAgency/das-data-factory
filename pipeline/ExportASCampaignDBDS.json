@@ -50,6 +50,146 @@
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Registration Data",
+				"description": "Export Registration Data ",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GenerateSaltKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select [AID],[L\\/NL],[any_ASV],[RegistrationDate],[MonthNumber],[Month],[SaltKeyID] from [ASData_PL].[DAS_Dashboard_Registration]",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "AID",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "AID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "L\\/NL",
+									"type": "Byte",
+									"physicalType": "tinyint"
+								},
+								"sink": {
+									"name": "L\\/NL",
+									"type": "Byte"
+								}
+							},
+							{
+								"source": {
+									"name": "any_ASV",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "any_ASV",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "RegistrationDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "RegistrationDate",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "MonthNumber",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "MonthNumber",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "Month",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "Month",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SaltKeyID",
+									"type": "Int64",
+									"physicalType": "bigint"
+								},
+								"sink": {
+									"name": "SaltKeyID",
+									"type": "Int64"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDS_ASCampaignDB",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"concurrency": 1,

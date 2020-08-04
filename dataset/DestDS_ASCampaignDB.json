@@ -5,12 +5,6 @@
 			"referenceName": "LSGCS_ASCampaignDBDS",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"DashboardFilename": {
-				"type": "string",
-				"defaultValue": "RegistrationData.csv"
-			}
-		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
@@ -18,10 +12,7 @@
 				"type": "GoogleCloudStorageLocation",
 				"bucketName": "eventdatabucket",
 				"folderPath": "CampaignDashboard",
-				"fileName": {
-					"value": "@dataset().DashboardFilename",
-					"type": "Expression"
-				}
+				"fileName": "RegistrationData.csv"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
