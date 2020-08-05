@@ -202,7 +202,7 @@
 									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "FAA_Candidate",
+										"TableName": "FAA_CandidateDetails",
 										"SchemaName": "Stg"
 									}
 								}

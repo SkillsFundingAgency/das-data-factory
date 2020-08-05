@@ -155,7 +155,7 @@
 									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "Avms_CandidateEth",
+										"TableName": "Avms_CandidateDetails",
 										"SchemaName": "Stg"
 									}
 								}
