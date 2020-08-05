@@ -177,7 +177,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1'\n\nSELECT @CAID as CAID",
+										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1','Eth'\n\nSELECT @CAID as CAID",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00"
