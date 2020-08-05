@@ -24,7 +24,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DELETE FROM Stg.FAA_Candidate\n\nSELECT ShortCode\nFROM Stg.CandidateConfig",
+						"sqlReaderQuery": "DELETE FROM Stg.FAA_Candidate\n\nSELECT ShortCode\n FROM Stg.CandidateConfig\nWHERE SourceDb='RAAv2'",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
