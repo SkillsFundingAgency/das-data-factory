@@ -24,7 +24,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DELETE FROM Stg.Avms_CandidateEth\n\nSELECT ShortCode\nFROM Stg.CandidateConfig",
+						"sqlReaderQuery": "DELETE FROM Stg.Avms_CandidateEth\n\nSELECT ShortCode\n  FROM Stg.CandidateConfig\nWHERE SourceDb='RAAv1'\n    AND Category='Ethnicity'",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
