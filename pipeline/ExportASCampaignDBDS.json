@@ -74,7 +74,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select [AID],[L\\/NL],[any_ASV],[RegistrationDate],[MonthNumber],[Month],[SaltKeyID] from [ASData_PL].[DAS_Dashboard_Registration]",
+						"sqlReaderQuery": "select AID ,[L\\/NL],any_ASV,RegistrationDate,MonthNumber,Month,SaltKeyID from [ASData_PL].[DAS_Dashboard_Registration]",
 						"queryTimeout": "02:00:00"
 					},
 					"sink": {
@@ -190,6 +190,112 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Reservation Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GenerateSaltKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select Code, B4, any_B1, any_B2, any_B3, any_B5, any_B6, average_B7, average_B9, Name, Route, Level, SaltKeyID  from [ASData_PL].[DAS_Dashboard_Reservation]",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDS_ASCampaignDB",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Reservation and Training Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GenerateSaltKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"enableStaging": false
+				}
+			},
+			{
+				"name": "Reservation and Commitment Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GenerateSaltKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"enableStaging": false
+				}
 			}
 		],
 		"concurrency": 1,
