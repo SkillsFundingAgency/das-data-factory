@@ -58,11 +58,11 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "ImportCandidateToDataMart_1",
+							"name": "ImportCandidateToDataMart",
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "GenerateCopyActvity1",
+									"activity": "GenerateCopyActvity",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -83,7 +83,7 @@
 										{
 											"name": "CAID",
 											"value": {
-												"value": "@activity('GenerateCopyActvity1').output.firstRow.CAID\n",
+												"value": "@activity('GenerateCopyActvity').output.firstRow.CAID\n",
 												"type": "Expression"
 											}
 										},
@@ -162,7 +162,7 @@
 							]
 						},
 						{
-							"name": "GenerateCopyActvity1",
+							"name": "GenerateCopyActvity",
 							"type": "Lookup",
 							"dependsOn": [],
 							"policy": {
@@ -190,6 +190,53 @@
 										"SchemaName": "Stg"
 									}
 								}
+							}
+						},
+						{
+							"name": "LogError",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "ImportCandidateToDataMart",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+								"storedProcedureParameters": {
+									"ErrorMessage": {
+										"value": {
+											"value": "@{activity('ImportCandidateToDataMart').output.Error.message}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RunId": {
+										"value": {
+											"value": "@{pipeline().parameters.RunId}",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"TaskType": {
+										"value": "ImportAVMSCandidateEthToDM",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
