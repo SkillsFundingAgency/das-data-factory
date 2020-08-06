@@ -1025,15 +1025,6 @@
 							},
 							{
 								"source": {
-									"path": "$['application']['support']"
-								},
-								"sink": {
-									"name": "ApplicantSupport",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['statusUpdatedDate']['$date']"
 								},
 								"sink": {
