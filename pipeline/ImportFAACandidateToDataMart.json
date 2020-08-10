@@ -24,8 +24,9 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DELETE FROM Stg.FAA_Candidate\n\nSELECT ShortCode\n FROM Stg.CandidateConfig\nWHERE SourceDb='RAAv2'\n    AND Category='Ethnicity'",
-						"queryTimeout": "02:00:00"
+						"sqlReaderQuery": "DELETE FROM Stg.FAA_CandidateDetails\n\nSELECT ShortCode\n FROM Stg.CandidateConfig\nWHERE SourceDb='RAAv2'\n    AND Category='Ethnicity'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -234,7 +235,8 @@
 										"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2','Eth'\n\nSELECT @CAID as CAID",
 										"type": "Expression"
 									},
-									"queryTimeout": "01:00:00"
+									"queryTimeout": "01:00:00",
+									"partitionOption": "None"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -315,7 +317,8 @@
 							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAACandidateEthToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
