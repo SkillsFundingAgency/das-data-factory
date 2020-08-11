@@ -28,7 +28,7 @@
 								"SchemaName": "Stg"
 							},
 							"sink1": {
-								"TableName": "Users",
+								"TableName": "TestDataFlow",
 								"SchemaName": "Stg"
 							}
 						}
