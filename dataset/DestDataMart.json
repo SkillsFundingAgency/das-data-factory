@@ -8,7 +8,7 @@
 		"parameters": {
 			"TableName": {
 				"type": "string",
-				"defaultValue": "Users"
+				"defaultValue": "Avms_Provider"
 			},
 			"SchemaName": {
 				"type": "string",
