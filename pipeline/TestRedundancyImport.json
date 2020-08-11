@@ -17,7 +17,21 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "SourceDb1",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"TableName": "Users",
+								"SchemaName": "Stg"
+							},
+							"source2": {
+								"TableName": "Users",
+								"SchemaName": "Stg"
+							},
+							"sink1": {
+								"TableName": "Users",
+								"SchemaName": "Stg"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
