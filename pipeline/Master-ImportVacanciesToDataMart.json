@@ -1,5 +1,5 @@
 {
-	"name": "Master-BuildVacanciesIntoDataMart",
+	"name": "Master-ImportVacanciesToDataMart",
 	"properties": {
 		"activities": [
 			{
