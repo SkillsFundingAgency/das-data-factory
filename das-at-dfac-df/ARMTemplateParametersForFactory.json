@@ -26,7 +26,7 @@
 		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "recruit"
 		},
-		"Trigger-BuildDataMart_properties_Master-BuildDataMart_parameters_RunId": {
+		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 			"value": "\"1\""
 		}
 	}

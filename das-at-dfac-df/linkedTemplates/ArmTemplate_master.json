@@ -35,7 +35,7 @@
 			"type": "string",
 			"defaultValue": "recruit"
 		},
-		"Trigger-BuildDataMart_properties_Master-BuildDataMart_parameters_RunId": {
+		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 			"type": "string",
 			"defaultValue": "\"1\""
 		},
@@ -87,8 +87,8 @@
 					"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
 					},
-					"Trigger-BuildDataMart_properties_Master-BuildDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-BuildDataMart_properties_Master-BuildDataMart_parameters_RunId')]"
+					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
 					}
 				}
 			},

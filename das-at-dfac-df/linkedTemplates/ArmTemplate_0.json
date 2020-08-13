@@ -35,7 +35,7 @@
 			"type": "string",
 			"defaultValue": "recruit"
 		},
-		"Trigger-BuildDataMart_properties_Master-BuildDataMart_parameters_RunId": {
+		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 			"type": "string",
 			"defaultValue": "\"1\""
 		}
@@ -316,6 +316,35 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SrcFAACosmos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "faa_cdbconnectionstring",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"CollectionName": {
+						"type": "string",
+						"defaultValue": "Candidate"
+					}
+				},
+				"annotations": [],
+				"type": "CosmosDbMongoDbApiCollection",
+				"schema": [],
+				"typeProperties": {
+					"collection": {
+						"value": "@dataset().CollectionName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/faa_cdbconnectionstring')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -342,6 +371,346 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/rcrt_cdbconnectionstring')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ImportAvmsCandidateToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetList",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "GenerateConfig",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "DELETE FROM Stg.Avms_CandidateDetails\n\nSELECT ShortCode\n  FROM Stg.CandidateConfig\nWHERE SourceDb='RAAv1'\n    AND Category='Ethnicity'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetList').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "ImportCandidateToDataMart",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GenerateCopyActvity",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.05:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"additionalColumns": [
+												{
+													"name": "CAID",
+													"value": {
+														"value": "@activity('GenerateCopyActvity').output.firstRow.CAID\n",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "RunID",
+													"value": {
+														"value": "@pipeline().parameters.RunId",
+														"type": "Expression"
+													}
+												}
+											],
+											"sqlReaderQuery": {
+												"value": "Select CandidateId\nFrom dbo.Candidate\nWhere EthnicOrigin=@{item().ShortCode}",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"name": "CandidateId",
+														"type": "Int32"
+													},
+													"sink": {
+														"name": "CandidateId",
+														"type": "Int64"
+													}
+												},
+												{
+													"source": {
+														"name": "CAID"
+													},
+													"sink": {
+														"name": "EID",
+														"type": "Int64"
+													}
+												},
+												{
+													"source": {
+														"name": "RunID"
+													},
+													"sink": {
+														"name": "RunId",
+														"type": "Int64"
+													}
+												}
+											]
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcAvmsPlus",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Candidate",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Avms_CandidateDetails",
+												"SchemaName": "Stg"
+											}
+										}
+									]
+								},
+								{
+									"name": "GenerateCopyActvity",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.01:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv1','Eth'\n\nSELECT @CAID as CAID",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "LogError",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "ImportCandidateToDataMart",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+										"storedProcedureParameters": {
+											"ErrorMessage": {
+												"value": {
+													"value": "@{activity('ImportCandidateToDataMart').output.Error.message}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"RunId": {
+												"value": {
+													"value": "@{pipeline().parameters.RunId}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"TaskType": {
+												"value": "ImportAVMSCandidateEthToDM",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GenerateConfig",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "LogStartOfImport",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[GenerateConfig]",
+							"storedProcedureParameters": {
+								"Category": {
+									"value": "Ethnicity",
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@pipeline().parameters.RunId",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"SourceDb": {
+									"value": "RAAv1",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogStartOfImport",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAVMSCandidateEthToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"RunId": {
+						"type": "int",
+						"defaultValue": 1
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
+				"[concat(variables('factoryId'), '/datasets/SrcAvmsPlus')]"
 			]
 		},
 		{
@@ -376,7 +745,8 @@
 									"value": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='AVMSPlus' and IsEnabled=1",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -427,7 +797,8 @@
 												"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
 												"type": "Expression"
 											},
-											"queryTimeout": "02:00:00"
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
 										},
 										"dataset": {
 											"referenceName": "SrcAvmsPlus",
@@ -462,10 +833,11 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n/* Apply Transformations */\nSET @collist= \nREPLACE(\nREPLACE(\n@COLLIST\n,'[DATEOFBIRTH]',\n'(DATEDIFF(YEAR,[DateOfBirth],GETDATE())-(CASE WHEN DATEADD(YY,DATEDIFF(YEAR,[DateOfBirth],GETDATE()),[DateOfBirth]) > GETDATE() THEN 1 ELSE 0 END)) as [Age]'\n)\n,'[Postcode]'\n,'(LEFT([postcode], CASE WHEN CHARINDEX('' '', [postcode]) = 0 THEN LEN([postcode]) ELSE CHARINDEX('' '', [postcode])-1 END)) as [PostCode]'\n)\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery",
+												"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n/* Apply Transformations */\nSET @collist= \nREPLACE(\nREPLACE(\nREPLACE(\nREPLACE(\n@COLLIST\n,'[DATEOFBIRTH]',\n'(DATEDIFF(YEAR,[DateOfBirth],GETDATE())-(CASE WHEN DATEADD(YY,DATEDIFF(YEAR,[DateOfBirth],GETDATE()),[DateOfBirth]) > GETDATE() THEN 1 ELSE 0 END)) as [Age]'\n)\n,'[Postcode]'\n,'(LEFT([postcode], CASE WHEN CHARINDEX('' '', [postcode]) = 0 THEN LEN([postcode]) ELSE CHARINDEX('' '', [postcode])-1 END)) as [PostCode]'\n)\n,'[EthnicOrigin]'\n,'(@{pipeline().parameters.RunId}+EthnicOrigin) as EID'\n)\n,'[CandidateEthnicOriginId]'\n,'(@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID'\n)\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery",
 												"type": "Expression"
 											},
-											"queryTimeout": "02:00:00"
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
 										},
 										"dataset": {
 											"referenceName": "DestDataMart",
@@ -503,7 +875,8 @@
 												"value": "@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}",
 												"type": "Expression"
 											},
-											"queryTimeout": "02:00:00"
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
 										},
 										"sink": {
 											"type": "AzureSqlSink",
@@ -634,8 +1007,8 @@
 										"timeout": "0.00:30:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
+										"secureOutput": true,
+										"secureInput": true
 									},
 									"userProperties": [],
 									"typeProperties": {
@@ -688,7 +1061,8 @@
 									"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAvmsToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -726,7 +1100,8 @@
 									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAvmsToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -764,6 +1139,355 @@
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcAvmsPlus')]",
 				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ImportFAACandidateToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetList",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "GenerateConfig",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "DELETE FROM Stg.FAA_CandidateDetails\n\nSELECT ShortCode\n FROM Stg.CandidateConfig\nWHERE SourceDb='RAAv2'\n    AND Category='Ethnicity'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "GenerateConfig",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "LogStartOfImport",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[GenerateConfig]",
+							"storedProcedureParameters": {
+								"Category": {
+									"value": "Ethnicity",
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@pipeline().parameters.RunId",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"SourceDb": {
+									"value": "RAAv2",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetList').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "ImportCandidateToDataMart",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GenerateCopyActvity",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.05:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "CosmosDbMongoDbApiSource",
+											"additionalColumns": [
+												{
+													"name": "CAID",
+													"value": {
+														"value": "@activity('GenerateCopyActvity').output.firstRow.CAID\n",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "RunID",
+													"value": {
+														"value": "@pipeline().parameters.RunId",
+														"type": "Expression"
+													}
+												}
+											],
+											"batchSize": 100,
+											"filter": {
+												"value": "\n{\"MonitoringInformation.Ethnicity\":@{item().ShortCode}}\n",
+												"type": "Expression"
+											},
+											"cursorMethods": {
+												"project": "{\"_id\":1,\"LegacyCandidateId\":1}"
+											}
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "$['_id']['$binary']"
+													},
+													"sink": {
+														"name": "CandidateId",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['LegacyCandidateId']"
+													},
+													"sink": {
+														"name": "LegacyCandidateId",
+														"type": "Int64"
+													}
+												},
+												{
+													"source": {
+														"path": "$['CAID']"
+													},
+													"sink": {
+														"name": "EID",
+														"type": "Int64"
+													}
+												},
+												{
+													"source": {
+														"path": "$['RunID']"
+													},
+													"sink": {
+														"name": "RunID",
+														"type": "Int64"
+													}
+												}
+											]
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcFAACosmos",
+											"type": "DatasetReference",
+											"parameters": {
+												"CollectionName": "candidates"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "FAA_CandidateDetails",
+												"SchemaName": "Stg"
+											}
+										}
+									]
+								},
+								{
+									"name": "GenerateCopyActvity",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.01:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "DECLARE @CAID BIGINT\n\nEXECUTE @CAID= [dbo].[GenerateCopyActivityId] @{pipeline().parameters.RunId}, 'RAAv2','Eth'\n\nSELECT @CAID as CAID",
+												"type": "Expression"
+											},
+											"queryTimeout": "01:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "LogError",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "ImportCandidateToDataMart",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+										"storedProcedureParameters": {
+											"ErrorMessage": {
+												"value": {
+													"value": "@{activity('ImportCandidateToDataMart').output.Error.message}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"RunId": {
+												"value": {
+													"value": "@{pipeline().parameters.RunId}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"TaskType": {
+												"value": "ImportFAACandidateEthToDM",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "LogStartOfImport",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAACandidateEthToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"RunId": {
+						"type": "int",
+						"defaultValue": 1
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
+				"[concat(variables('factoryId'), '/datasets/SrcFAACosmos')]"
 			]
 		},
 		{
@@ -1044,7 +1768,8 @@
 									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -1927,7 +2652,8 @@
 									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAVacanciesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -1965,7 +2691,8 @@
 									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAapplicationReviewToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -2925,7 +3652,8 @@
 									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAReferenceDataToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -2967,7 +3695,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Master-BuildDataMart')]",
+			"name": "[concat(parameters('factoryName'), '/Master-ImportVacanciesToDataMart')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -2995,7 +3723,8 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -3110,7 +3839,8 @@
 									"value": "/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{activity('GetRunId').output.firstRow.RunId})\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{activity('GetRunId').output.firstRow.RunId}\n\nSELECT 'na'",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00"
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
 								"referenceName": "DestDataMart",
@@ -3127,7 +3857,7 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ExecuteImportAvmsToDataMart",
+								"activity": "ExecuteImportFAACandidateToDataMart",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -3157,6 +3887,58 @@
 							"referenceName": "datamgmt_staging_dbconnectionstring",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "ExecuteImportAvmsCandidateToDataMart",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExecuteImportAvmsToDataMart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ImportAvmsCandidateToDataMart",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"RunId": {
+									"value": "@activity('GetRunId').output.firstRow.RunId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ExecuteImportFAACandidateToDataMart",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExecuteImportAvmsCandidateToDataMart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ImportFAACandidateToDataMart",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"RunId": {
+									"value": "@activity('GetRunId').output.firstRow.RunId",
+									"type": "Expression"
+								}
+							}
+						}
 					}
 				],
 				"parameters": {
@@ -3171,7 +3953,9 @@
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportRAAToDataMart')]",
-				"[concat(variables('factoryId'), '/pipelines/ImportAvmsToDataMart')]"
+				"[concat(variables('factoryId'), '/pipelines/ImportAvmsToDataMart')]",
+				"[concat(variables('factoryId'), '/pipelines/ImportAvmsCandidateToDataMart')]",
+				"[concat(variables('factoryId'), '/pipelines/ImportFAACandidateToDataMart')]"
 			]
 		},
 		{
@@ -3184,11 +3968,11 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "Master-BuildDataMart",
+							"referenceName": "Master-ImportVacanciesToDataMart",
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"RunId": "[parameters('Trigger-BuildDataMart_properties_Master-BuildDataMart_parameters_RunId')]"
+							"RunId": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
 						}
 					}
 				],
@@ -3211,7 +3995,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Master-BuildDataMart')]"
+				"[concat(variables('factoryId'), '/pipelines/Master-ImportVacanciesToDataMart')]"
 			]
 		}
 	]
