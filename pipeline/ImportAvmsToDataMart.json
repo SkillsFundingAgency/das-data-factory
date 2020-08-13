@@ -28,7 +28,8 @@
 							"value": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='AVMSPlus' and IsEnabled=1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -79,7 +80,8 @@
 										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00"
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
 								},
 								"dataset": {
 									"referenceName": "SrcAvmsPlus",
@@ -114,10 +116,11 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n/* Apply Transformations */\nSET @collist= \nREPLACE(\nREPLACE(\n@COLLIST\n,'[DATEOFBIRTH]',\n'(DATEDIFF(YEAR,[DateOfBirth],GETDATE())-(CASE WHEN DATEADD(YY,DATEDIFF(YEAR,[DateOfBirth],GETDATE()),[DateOfBirth]) > GETDATE() THEN 1 ELSE 0 END)) as [Age]'\n)\n,'[Postcode]'\n,'(LEFT([postcode], CASE WHEN CHARINDEX('' '', [postcode]) = 0 THEN LEN([postcode]) ELSE CHARINDEX('' '', [postcode])-1 END)) as [PostCode]'\n)\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery",
+										"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n/* Apply Transformations */\nSET @collist= \nREPLACE(\nREPLACE(\nREPLACE(\nREPLACE(\n@COLLIST\n,'[DATEOFBIRTH]',\n'(DATEDIFF(YEAR,[DateOfBirth],GETDATE())-(CASE WHEN DATEADD(YY,DATEDIFF(YEAR,[DateOfBirth],GETDATE()),[DateOfBirth]) > GETDATE() THEN 1 ELSE 0 END)) as [Age]'\n)\n,'[Postcode]'\n,'(LEFT([postcode], CASE WHEN CHARINDEX('' '', [postcode]) = 0 THEN LEN([postcode]) ELSE CHARINDEX('' '', [postcode])-1 END)) as [PostCode]'\n)\n,'[EthnicOrigin]'\n,'(@{pipeline().parameters.RunId}+EthnicOrigin) as EID'\n)\n,'[CandidateEthnicOriginId]'\n,'(@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID'\n)\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00"
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -155,7 +158,8 @@
 										"value": "@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00"
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
 								},
 								"sink": {
 									"type": "AzureSqlSink",
@@ -286,8 +290,8 @@
 								"timeout": "0.00:30:00",
 								"retry": 0,
 								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
+								"secureOutput": true,
+								"secureInput": true
 							},
 							"userProperties": [],
 							"typeProperties": {
@@ -340,7 +344,8 @@
 							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAvmsToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -378,7 +383,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAvmsToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
