@@ -12,6 +12,10 @@
 				},
 				"secretName": "empinc-dbconnectionstring"
 			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
