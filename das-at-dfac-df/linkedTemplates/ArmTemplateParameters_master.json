@@ -14,6 +14,9 @@
 		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "datamgmt-staging-dbconnectionstring"
 		},
+		"empinc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "empinc-dbconnectionstring"
+		},
 		"faa_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "faa-cdbconnectionstring"
 		},
