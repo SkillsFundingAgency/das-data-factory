@@ -230,7 +230,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyAvmsTablesToStagingArea').Error.message}",
+											"value": "@{activity('CopyData').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
