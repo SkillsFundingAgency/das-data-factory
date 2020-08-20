@@ -213,7 +213,7 @@
 								{
 									"activity": "CopyData",
 									"dependencyConditions": [
-										"Succeeded"
+										"Failed"
 									]
 								}
 							],
