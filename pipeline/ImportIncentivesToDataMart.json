@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "GetRAAv1TableList",
+				"name": "GetEmpIncTableList",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -47,7 +47,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "GetRAAv1TableList",
+						"activity": "GetEmpIncTableList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -56,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetRAAv1TableList').output.value",
+						"value": "@activity('GetEmpIncTableList').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
