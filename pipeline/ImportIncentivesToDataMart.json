@@ -285,8 +285,8 @@
 											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
 										},
-										"DestTableName": {
-											"value": "'Stg.EL_@{item().TABLE_NAME}'",
+										"PreCopyScript": {
+											"value": "'DELETE FROM AsData_PL.EL_@{item().TABLE_NAME}'",
 											"type": "Expression"
 										}
 									},
