@@ -296,7 +296,7 @@
 											"SchemaName": "dbo"
 										},
 										"sink1": {
-											"TableName": "EI_@{item().TABLE_NAME}",
+											"TableName": "EL_@{item().TABLE_NAME}",
 											"SchemaName": "AsData_PL"
 										}
 									}
