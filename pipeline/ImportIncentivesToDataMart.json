@@ -284,10 +284,6 @@
 										"ColumnList": {
 											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
-										},
-										"PreCopyScript": {
-											"value": "'DELETE FROM AsData_PL.EI_@{item().TABLE_NAME}'",
-											"type": "Expression"
 										}
 									},
 									"datasetParameters": {
@@ -297,7 +293,7 @@
 										},
 										"sink1": {
 											"TableName": "EI_@{item().TABLE_NAME}",
-											"SchemaName": "AsData_PL"
+											"SchemaName": "Stg"
 										}
 									}
 								},
@@ -345,14 +341,7 @@
 			{
 				"name": "LogSuccessfulExecution",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ForEachSourceTable",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.00:30:00",
 					"retry": 0,
