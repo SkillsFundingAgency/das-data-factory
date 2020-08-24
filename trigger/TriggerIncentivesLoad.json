@@ -1,0 +1,28 @@
+{
+	"name": "TriggerIncentivesLoad",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "ImportIncentivesToDataMart",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"RunId": "121"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 10,
+				"startTime": "2020-08-24T11:31:00.000Z",
+				"endTime": "2020-08-25T00:31:00.000Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
