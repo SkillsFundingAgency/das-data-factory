@@ -368,42 +368,6 @@
 						}
 					}
 				}
-			},
-			{
-				"name": "CompleteLogging",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "LogSuccessfulExecution",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{activity('GetRunId').output.firstRow.RunId})\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{activity('GetRunId').output.firstRow.RunId}\n\nSELECT 'na'",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
 			}
 		],
 		"parameters": {
