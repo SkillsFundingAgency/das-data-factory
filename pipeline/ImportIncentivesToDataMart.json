@@ -236,10 +236,7 @@
 										"type": "String"
 									},
 									"RunId": {
-										"value": {
-											"value": "@{pipeline().parameters.RunId}",
-											"type": "Expression"
-										},
+										"value": "@{variables('RunId')}",
 										"type": "Int32"
 									},
 									"TaskType": {
@@ -383,7 +380,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportEmployerIncentivesToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportEmployerIncentivesToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -422,7 +419,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAvmsToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAvmsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -510,7 +507,7 @@
 				"typeProperties": {
 					"variableName": "RunId",
 					"value": {
-						"value": "@activity('GetRunId').output.firstRow",
+						"value": "@activity('GetRunId').output.firstRow.RunId",
 						"type": "Expression"
 					}
 				}
