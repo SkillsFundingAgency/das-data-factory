@@ -302,6 +302,60 @@
 									"type": "IntegrationRuntimeReference"
 								}
 							}
+						},
+						{
+							"name": "PresentationLayerFullRefresh",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopyData",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
+								"storedProcedureParameters": {
+									"ColumnList": {
+										"value": "@activity('GetImportSelectQuery').output.firstRow.ColumnList",
+										"type": "String"
+									},
+									"PLTableName": {
+										"value": {
+											"value": "AsData_PL.EI_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RunId": {
+										"value": {
+											"value": "@pipeline().parameters.RunId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"StgTableName": {
+										"value": {
+											"value": "Stg.EI_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
@@ -341,7 +395,14 @@
 			{
 				"name": "LogSuccessfulExecution",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "ForEachSourceTable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:30:00",
 					"retry": 0,
