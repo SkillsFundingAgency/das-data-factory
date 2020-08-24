@@ -286,7 +286,7 @@
 											"type": "Expression"
 										},
 										"PreCopyScript": {
-											"value": "'DELETE FROM AsData_PL.EL_@{item().TABLE_NAME}'",
+											"value": "'DELETE FROM AsData_PL.EI_@{item().TABLE_NAME}'",
 											"type": "Expression"
 										}
 									},
