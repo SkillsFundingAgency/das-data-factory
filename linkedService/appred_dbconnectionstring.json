@@ -12,6 +12,10 @@
 				},
 				"secretName": "appred-dbconnectionstring"
 			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
