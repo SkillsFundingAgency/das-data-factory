@@ -12,6 +12,10 @@
 				},
 				"secretName": "comt-dbconnectionstring"
 			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
