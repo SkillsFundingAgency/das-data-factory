@@ -43,6 +43,18 @@
 			"type": "string",
 			"defaultValue": "\"1\""
 		},
+		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
+			"type": "string",
+			"defaultValue": "1"
+		},
+		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
+			"type": "int",
+			"defaultValue": 4
+		},
+		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
+			"type": "int",
+			"defaultValue": 4
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -100,6 +112,35 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "das-at-dfac-df_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_0')]"
+			]
 		}
 	]
 }

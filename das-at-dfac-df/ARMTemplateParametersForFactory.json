@@ -31,6 +31,15 @@
 		},
 		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 			"value": "\"1\""
+		},
+		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
+			"value": "1"
+		},
+		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
+			"value": 4
+		},
+		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
+			"value": 4
 		}
 	}
 }
