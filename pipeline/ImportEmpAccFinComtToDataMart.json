@@ -131,7 +131,24 @@
 					"secureOutput": true,
 					"secureInput": true
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='EmpAcc' and IsEnabled=1",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					},
+					"firstRowOnly": false
+				}
 			}
 		],
 		"variables": {
