@@ -58,8 +58,31 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": []
 			}
 		],
+		"variables": {
+			"RunId": {
+				"type": "String",
+				"defaultValue": "\"1\""
+			},
+			"MaxConcurrentConnections": {
+				"type": "String",
+				"defaultValue": "4"
+			}
+		},
 		"annotations": []
 	}
 }
