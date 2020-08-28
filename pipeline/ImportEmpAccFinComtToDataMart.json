@@ -149,6 +149,103 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "ForEachSourceTable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetEmpAccFinComtTableList",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"activities": [
+						{
+							"name": "LogStartofImportToDatamart",
+							"description": "Log Start of Import to Datamart",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "120",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportEmpAccToDM-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "GetSourceColumnList",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "LogStartofImportToDatamart",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "GetSourceColumnListToVariable",
+							"description": "Get Source Column List to Variable ",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GetSourceColumnList",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": []
+						}
+					]
+				}
 			}
 		],
 		"variables": {
@@ -156,9 +253,8 @@
 				"type": "String",
 				"defaultValue": "\"1\""
 			},
-			"MaxConcurrentConnections": {
-				"type": "String",
-				"defaultValue": "4"
+			"SourceColumnList": {
+				"type": "String"
 			}
 		},
 		"annotations": []
