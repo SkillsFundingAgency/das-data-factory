@@ -14,7 +14,14 @@
 					"secureOutput": true,
 					"secureInput": true
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[GenerateRunId]"
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"annotations": []
