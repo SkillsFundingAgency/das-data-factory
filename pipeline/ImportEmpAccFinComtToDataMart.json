@@ -461,6 +461,52 @@
 								"referenceName": "datamgmt_staging_dbconnectionstring",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "PresentationLayerFullRefresh",
+							"description": "Presentation Layer Full Refresh",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "LogSuccessfulExecutionToStaging",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
+								"storedProcedureParameters": {
+									"ColumnList": {
+										"value": "@activity('GetImportSelectQuery').output.firstRow.ColumnList",
+										"type": "String"
+									},
+									"PLTableName": {
+										"value": "AsData_PL.Acct_@{item().TABLE_NAME}",
+										"type": "String"
+									},
+									"RunId": {
+										"value": "@{variables('RunId')}",
+										"type": "Int32"
+									},
+									"StgTableName": {
+										"value": "Stg.Acct_@{item().TABLE_NAME}",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
