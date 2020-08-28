@@ -111,6 +111,27 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "GetEmpAccFinComtTableList",
+				"description": "Get Employer Account Finance Commitment Table List",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LogStartOfImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": []
 			}
 		],
 		"variables": {
