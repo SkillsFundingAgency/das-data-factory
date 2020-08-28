@@ -70,7 +70,11 @@
 						]
 					}
 				],
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": "@activity('GetRunId').output.firstRow.RunId"
+				}
 			}
 		],
 		"variables": {
