@@ -1,0 +1,21 @@
+{
+	"name": "appred_dbconnectionstring",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "appred-dbconnectionstring"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
