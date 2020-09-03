@@ -209,7 +209,7 @@
 							}
 						},
 						{
-							"name": "GetSourceColumnList",
+							"name": "GetAccountsSourceColumnList",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -248,12 +248,12 @@
 							}
 						},
 						{
-							"name": "GetSourceColumnListToVariable",
+							"name": "GetAccountsSourceColumnListToVariable",
 							"description": "Get Source Column List to Variable ",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnList",
+									"activity": "GetAccountsSourceColumnList",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -263,17 +263,17 @@
 							"typeProperties": {
 								"variableName": "SourceColumnList",
 								"value": {
-									"value": "@{activity('GetSourceColumnList').output.firstRow.Columns}",
+									"value": "@{activity('GetAccountsSourceColumnList').output.firstRow.Columns}",
 									"type": "Expression"
 								}
 							}
 						},
 						{
-							"name": "DetectAndLogSourceDbChanges",
+							"name": "DetectAndLogAccountSourceDbChanges",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnListToVariable",
+									"activity": "GetAccountsSourceColumnListToVariable",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -323,11 +323,11 @@
 							}
 						},
 						{
-							"name": "GetImportSelectQuery",
+							"name": "GetImportAccountSelectQuery",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "DetectAndLogSourceDbChanges",
+									"activity": "DetectAndLogAccountSourceDbChanges",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -366,7 +366,7 @@
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
-									"activity": "GetImportSelectQuery",
+									"activity": "GetImportAccountSelectQuery",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -386,11 +386,11 @@
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
+											"value": "'@{activity('GetImportAccountSelectQuery').output.firstRow.SourceQuery}'",
 											"type": "Expression"
 										},
 										"ColumnList": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
+											"value": "'@{activity('GetImportAccountSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
 										}
 									},
@@ -412,7 +412,7 @@
 							}
 						},
 						{
-							"name": "LogSuccessfulExecutionToStaging",
+							"name": "LogAccountSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -451,7 +451,7 @@
 							}
 						},
 						{
-							"name": "LogError",
+							"name": "LogAccountDBError",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -503,7 +503,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "LogSuccessfulExecutionToStaging",
+									"activity": "LogAccountSuccessfulExecutionToStaging",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -522,7 +522,7 @@
 								"storedProcedureParameters": {
 									"ColumnList": {
 										"value": {
-											"value": "@activity('GetImportSelectQuery').output.firstRow.ColumnList",
+											"value": "@activity('GetImportAccountSelectQuery').output.firstRow.ColumnList",
 											"type": "Expression"
 										},
 										"type": "String"
