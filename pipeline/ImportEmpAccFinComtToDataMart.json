@@ -730,7 +730,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "LogStartOfImportToDatamart_copy1",
+							"name": "LogStartOfCommitImportToDatamart",
 							"description": "Log Start of Import to Datamart",
 							"type": "Lookup",
 							"dependsOn": [],
@@ -763,11 +763,11 @@
 							}
 						},
 						{
-							"name": "GetSourceColumnList_copy1",
+							"name": "GetCommitSourceColumnList",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "LogStartOfImportToDatamart_copy1",
+									"activity": "LogStartOfCommitImportToDatamart",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -802,12 +802,12 @@
 							}
 						},
 						{
-							"name": "GetSourceColumnListToVariable_copy1",
-							"description": "Get Source Column List to Variable ",
+							"name": "GetCommitSourceColumnListToVariable",
+							"description": "Get Commit Source Column List to Variable ",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnList_copy1",
+									"activity": "GetCommitSourceColumnList",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -823,11 +823,11 @@
 							}
 						},
 						{
-							"name": "DetectAndLogSourceDbChanges_copy1",
+							"name": "DetectAndLogCommitSourceDbChanges",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnListToVariable_copy1",
+									"activity": "GetCommitSourceColumnListToVariable",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -877,11 +877,11 @@
 							}
 						},
 						{
-							"name": "GetImportSelectQuery_copy1",
+							"name": "GetImportCommitSelectQuery",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "DetectAndLogSourceDbChanges_copy1",
+									"activity": "DetectAndLogCommitSourceDbChanges",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -916,11 +916,11 @@
 							}
 						},
 						{
-							"name": "Copy Data_copy1",
+							"name": "Copy Commit Data",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
-									"activity": "GetImportSelectQuery_copy1",
+									"activity": "GetImportCommitSelectQuery",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -966,11 +966,11 @@
 							}
 						},
 						{
-							"name": "LogSuccessfulExecutionToStaging_copy1",
+							"name": "LogCommitSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "Copy Data_copy1",
+									"activity": "Copy Commit Data",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1005,11 +1005,11 @@
 							}
 						},
 						{
-							"name": "LogError_copy1",
+							"name": "LogCommitError",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Copy Data_copy1",
+									"activity": "Copy Commit Data",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -1052,12 +1052,12 @@
 							}
 						},
 						{
-							"name": "PresentationLayerFullRefresh_copy1",
+							"name": "CommitPresentationLayerFullRefresh",
 							"description": "Presentation Layer Full Refresh",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "LogSuccessfulExecutionToStaging_copy1",
+									"activity": "LogCommitSuccessfulExecutionToStaging",
 									"dependencyConditions": [
 										"Succeeded"
 									]
