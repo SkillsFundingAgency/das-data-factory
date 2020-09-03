@@ -1133,8 +1133,8 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "LogStartOfImportToDatamart_copy1_copy1",
-							"description": "Log Start of Import to Datamart",
+							"name": "LogStartOfFinanceImportToDatamart",
+							"description": "Log Start of Finance Import to Datamart\n",
 							"type": "Lookup",
 							"dependsOn": [],
 							"policy": {
@@ -1166,11 +1166,11 @@
 							}
 						},
 						{
-							"name": "GetSourceColumnList_copy1_copy1",
+							"name": "GetFinanceSourceColumnList",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "LogStartOfImportToDatamart_copy1_copy1",
+									"activity": "LogStartOfFinanceImportToDatamart",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1205,12 +1205,12 @@
 							}
 						},
 						{
-							"name": "GetSourceColumnListToVariable_copy1_copy1",
+							"name": "GetFinanceSourceColumnListToVariable",
 							"description": "Get Source Column List to Variable ",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnList_copy1_copy1",
+									"activity": "GetFinanceSourceColumnList",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1226,11 +1226,11 @@
 							}
 						},
 						{
-							"name": "DetectAndLogSourceDbChanges_copy1_copy1",
+							"name": "DetectAndLogFinanceSourceDbChanges",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "GetSourceColumnListToVariable_copy1_copy1",
+									"activity": "GetFinanceSourceColumnListToVariable",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1280,11 +1280,11 @@
 							}
 						},
 						{
-							"name": "GetImportSelectQuery_copy1_copy1",
+							"name": "GetImportFinanceSelectQuery",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "DetectAndLogSourceDbChanges_copy1_copy1",
+									"activity": "DetectAndLogFinanceSourceDbChanges",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1319,11 +1319,11 @@
 							}
 						},
 						{
-							"name": "Copy Data_copy1_copy1",
+							"name": "Copy Finance Data",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
-									"activity": "GetImportSelectQuery_copy1_copy1",
+									"activity": "GetImportFinanceSelectQuery",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1369,11 +1369,11 @@
 							}
 						},
 						{
-							"name": "LogSuccessfulExecutionToStaging_copy1_copy1",
+							"name": "LogFinanceSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "Copy Data_copy1_copy1",
+									"activity": "Copy Finance Data",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1408,11 +1408,11 @@
 							}
 						},
 						{
-							"name": "LogError_copy1_copy1",
+							"name": "LogFinanceError",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Copy Data_copy1_copy1",
+									"activity": "Copy Finance Data",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -1455,12 +1455,12 @@
 							}
 						},
 						{
-							"name": "PresentationLayerFullRefresh_copy1_copy1",
+							"name": "FinancePresentationLayerFullRefresh",
 							"description": "Presentation Layer Full Refresh",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "LogSuccessfulExecutionToStaging_copy1_copy1",
+									"activity": "LogFinanceSuccessfulExecutionToStaging",
 									"dependencyConditions": [
 										"Succeeded"
 									]
