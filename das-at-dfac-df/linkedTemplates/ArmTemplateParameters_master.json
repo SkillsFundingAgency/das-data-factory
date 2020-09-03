@@ -8,11 +8,23 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "appred-dbconnectionstring"
+		},
 		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "avmsplus-dbconnectionstring"
 		},
+		"comt_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "comt-dbconnectionstring"
+		},
 		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "datamgmt-staging-dbconnectionstring"
+		},
+		"eas_acc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "eas-acc-dbconnectionstring"
+		},
+		"eas_fin_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "eas-fin-dbconnectionstring"
 		},
 		"empinc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "empinc-dbconnectionstring"
@@ -29,8 +41,14 @@
 		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "recruit"
 		},
+		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "users-dbconnectionstring"
+		},
 		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 			"value": "\"1\""
+		},
+		"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
+			"value": "1"
 		},
 		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
 			"value": "1"

@@ -11,13 +11,29 @@
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "appred-dbconnectionstring"
+		},
 		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "avmsplus-dbconnectionstring"
 		},
+		"comt_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "comt-dbconnectionstring"
+		},
 		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "datamgmt-staging-dbconnectionstring"
+		},
+		"eas_acc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "eas-acc-dbconnectionstring"
+		},
+		"eas_fin_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "eas-fin-dbconnectionstring"
 		},
 		"empinc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
@@ -39,9 +55,17 @@
 			"type": "string",
 			"defaultValue": "recruit"
 		},
+		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "users-dbconnectionstring"
+		},
 		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 			"type": "string",
 			"defaultValue": "\"1\""
+		},
+		"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
+			"type": "string",
+			"defaultValue": "1"
 		},
 		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
 			"type": "string",
@@ -85,11 +109,23 @@
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
+					"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('appred_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
+					"comt_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('comt_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"eas_acc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('eas_acc_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"eas_fin_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('eas_fin_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"empinc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('empinc_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
@@ -106,8 +142,8 @@
 					"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
 					},
-					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
+					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -126,6 +162,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
+						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
+					},
+					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
 					},
 					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
 						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
