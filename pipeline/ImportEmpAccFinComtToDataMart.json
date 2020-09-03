@@ -1444,7 +1444,7 @@
 										"type": "Int32"
 									},
 									"TaskType": {
-										"value": "ImportEmpAccountToDatamart",
+										"value": "ImportFinanceToDatamart",
 										"type": "String"
 									}
 								}
@@ -1485,6 +1485,7 @@
 										"type": "String"
 									},
 									"PLTableName": {
+										"value": "AsData_PL.Fin_@{item().TABLE_NAME}",
 										"type": "String"
 									},
 									"RunId": {
@@ -1496,7 +1497,7 @@
 									},
 									"StgTableName": {
 										"value": {
-											"value": "Stg.Acct_@{item().TABLE_NAME}",
+											"value": "Stg.Fin_@{item().TABLE_NAME}",
 											"type": "Expression"
 										},
 										"type": "String"
