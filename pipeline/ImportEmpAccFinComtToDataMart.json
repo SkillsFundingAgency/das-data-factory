@@ -954,8 +954,8 @@
 											"SchemaName": "dbo"
 										},
 										"sink1": {
-											"TableName": "Acct_@{item().TABLE_NAME}",
-											"SchemaName": "ASData_PL"
+											"TableName": "Comt_@{item().TABLE_NAME}",
+											"SchemaName": "Stg"
 										}
 									}
 								},
