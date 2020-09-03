@@ -498,8 +498,8 @@
 							}
 						},
 						{
-							"name": "PresentationLayerFullRefresh",
-							"description": "Presentation Layer Full Refresh",
+							"name": "AccountPresentationLayerFullRefresh",
+							"description": "Account Presentation Layer Full Refresh",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
