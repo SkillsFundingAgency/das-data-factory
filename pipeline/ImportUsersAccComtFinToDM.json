@@ -91,10 +91,10 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcEmpIncentive",
+									"referenceName": "SrcUsers",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "Accounts",
+										"TableName": "Users",
 										"SchemaName": "dbo"
 									}
 								}
