@@ -460,7 +460,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "SELECT @variables('K1')=CRYPT_GEN_RANDOM(4096)\n\nSELECT '1'\n\n",
+									"sqlReaderQuery": {
+										"value": "DECLARE @K1 Varbinary(4096)\nDECLARE @SQLCode Nvarchar(255)\n\nSELECT @SQLCode='SELECT @K1= '+SQLCode From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 Varbinary(4096) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1",
+										"type": "Expression"
+									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -496,7 +499,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "SELECT @variables('K2')=CRYPT_GEN_RANDOM(4096)\n\nSELECT '1'\n\n",
+									"sqlReaderQuery": "DECLARE @K2 Varbinary(4096)\nDECLARE @SQLCode Nvarchar(255)\n\nSELECT @SQLCode='SELECT @K2= '+SQLCode From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 Varbinary(4096) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 ",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
