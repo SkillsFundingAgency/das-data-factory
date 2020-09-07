@@ -105,7 +105,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "GenerateKeys_2",
+									"activity": "Set variable K2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -510,6 +510,46 @@
 										"TableName": "Users",
 										"SchemaName": "dbo"
 									}
+								}
+							}
+						},
+						{
+							"name": "Set variable K1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GenerateKeys_2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "K1",
+								"value": {
+									"value": "@activity('GenerateKeys').output",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable K2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable K1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "K1",
+								"value": {
+									"value": "@activity('GenerateKeys_2').output",
+									"type": "Expression"
 								}
 							}
 						}
