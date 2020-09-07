@@ -499,7 +499,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "DECLARE @K2 Varbinary(4096)\nDECLARE @SQLCode Nvarchar(255)\n\nSELECT @SQLCode='SELECT @K2= '+SQLCode From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 Varbinary(4096) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 ",
+									"sqlReaderQuery": "DECLARE @K2 Varbinary(4096)\nDECLARE @SQLCode Nvarchar(255)\n\nSELECT @SQLCode='SELECT @K2= '+SQLCode From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 Varbinary(4096) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -528,7 +528,7 @@
 							"typeProperties": {
 								"variableName": "K1",
 								"value": {
-									"value": "@activity('GenerateKeys').output",
+									"value": "@activity('GenerateKeys').output.firstRow.K1",
 									"type": "Expression"
 								}
 							}
@@ -548,7 +548,7 @@
 							"typeProperties": {
 								"variableName": "K1",
 								"value": {
-									"value": "@activity('GenerateKeys_2').output",
+									"value": "@activity('GenerateKeys_2').output.firstRow.K2",
 									"type": "Expression"
 								}
 							}
