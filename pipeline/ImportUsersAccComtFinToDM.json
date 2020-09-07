@@ -468,11 +468,11 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcUsers",
+									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
 										"TableName": "Users",
-										"SchemaName": "dbo"
+										"SchemaName": "Stg"
 									}
 								}
 							}
@@ -504,11 +504,11 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcUsers",
+									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
 										"TableName": "Users",
-										"SchemaName": "dbo"
+										"SchemaName": "Stg"
 									}
 								}
 							}
