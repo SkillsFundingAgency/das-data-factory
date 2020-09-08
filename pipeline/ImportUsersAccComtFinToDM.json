@@ -105,7 +105,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "Set variable K2",
+									"activity": "SetVariableK2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -123,7 +123,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode varchar(255)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n UNION\nSELECT replace(replace(replace(@SQLCode,'T1',Value),'K1','@{variables('K1')}'),'K2','@{variables('K2')}') + ' as ' + SUBSTRING(REPLACE(value,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(value,']','')),1,2) as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @Collist ColumnList\n\n",
+										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1',ConfigList),'K1','@{variables('K1')}'),'K2','@{variables('K2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n                 \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @Collist ColumnList",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -439,7 +439,7 @@
 							}
 						},
 						{
-							"name": "GenerateKeys",
+							"name": "GenerateKeys_1",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -460,10 +460,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "DECLARE @K1 Varbinary(4096)\nDECLARE @SQLCode Nvarchar(255)\n\nSELECT @SQLCode='SELECT @K1= '+SQLCode From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 Varbinary(4096) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1",
-										"type": "Expression"
-									},
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @key nvarchar(max)\n\nSELECT @SQLCode='SELECT @key=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@Key nvarchar(max) OUTPUT',@Key=@Key OUTPUT\n\nSELECT @Key as Key1\n",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -482,7 +479,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "GenerateKeys",
+									"activity": "GenerateKeys_1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -499,7 +496,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "DECLARE @K2 Varbinary(4096)\nDECLARE @SQLCode Nvarchar(255)\n\nSELECT @SQLCode='SELECT @K2= '+SQLCode From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 Varbinary(4096) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @key nvarchar(max)\n\nSELECT @SQLCode='SELECT @key=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@Key nvarchar(max) OUTPUT',@Key=@Key OUTPUT\n\n\nSELECT @Key as Key2\n",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -514,7 +511,7 @@
 							}
 						},
 						{
-							"name": "Set variable K1",
+							"name": "SetVariableK1",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -528,17 +525,17 @@
 							"typeProperties": {
 								"variableName": "K1",
 								"value": {
-									"value": "@activity('GenerateKeys').output.firstRow.K1",
+									"value": "@{activity('GenerateKeys_1').output.firstRow.Key1}",
 									"type": "Expression"
 								}
 							}
 						},
 						{
-							"name": "Set variable K2",
+							"name": "SetVariableK2",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Set variable K1",
+									"activity": "SetVariableK1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -546,25 +543,12 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "K1",
+								"variableName": "K2",
 								"value": {
-									"value": "@activity('GenerateKeys_2').output.firstRow.K2",
+									"value": "@{activity('GenerateKeys_2').output.firstRow.Key2}",
 									"type": "Expression"
 								}
 							}
-						},
-						{
-							"name": "GenerateKey",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": []
 						}
 					]
 				}
