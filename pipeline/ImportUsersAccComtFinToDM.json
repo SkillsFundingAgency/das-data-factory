@@ -333,29 +333,53 @@
 								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
 								"storedProcedureParameters": {
 									"ColumnList": {
+										"value": "",
+										"type": "String"
+									},
+									"ConfigSchema": {
+										"value": "@{item().SCHEMA_NAME}",
+										"type": "String"
+									},
+									"ConfigTable": {
+										"value": "@{item().TABLE_NAME}",
+										"type": "String"
+									},
+									"K1": {
 										"value": {
-											"value": "@activity('GetImportSelectQuery').output.firstRow.ColumnList",
+											"value": "@{variables('K1')}",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
+									"K2": {
+										"value": {
+											"value": "@{variables('K2')}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"KeyBased": {
+										"value": "1",
+										"type": "Boolean"
+									},
 									"PLTableName": {
 										"value": {
-											"value": "AsData_PL.EI_@{item().TABLE_NAME}",
+											"value": "AsData_PL.EAUser_@{item().TABLE_NAME}",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
 									"RunId": {
-										"value": {
-											"value": "@{variables('RunId')}",
-											"type": "Expression"
-										},
+										"value": "",
 										"type": "Int32"
+									},
+									"SourceDatabaseName": {
+										"value": "Users",
+										"type": "String"
 									},
 									"StgTableName": {
 										"value": {
-											"value": "Stg.EI_@{item().TABLE_NAME}",
+											"value": "Stg.EAUser_@{item().TABLE_NAME}",
 											"type": "Expression"
 										},
 										"type": "String"
