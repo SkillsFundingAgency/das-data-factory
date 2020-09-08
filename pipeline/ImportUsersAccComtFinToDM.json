@@ -360,7 +360,7 @@
 									},
 									"KeyBased": {
 										"value": "1",
-										"type": "Byte[]"
+										"type": "Int32"
 									},
 									"PLTableName": {
 										"value": {
