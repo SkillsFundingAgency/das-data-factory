@@ -333,7 +333,7 @@
 								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
 								"storedProcedureParameters": {
 									"ColumnList": {
-										"value": "''",
+										"value": null,
 										"type": "String"
 									},
 									"ConfigSchema": {
@@ -360,7 +360,7 @@
 									},
 									"KeyBased": {
 										"value": "1",
-										"type": "Boolean"
+										"type": "Byte[]"
 									},
 									"PLTableName": {
 										"value": {
