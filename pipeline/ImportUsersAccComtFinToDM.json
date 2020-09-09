@@ -283,6 +283,16 @@
 								"dataflow": {
 									"referenceName": "DataFlowUser",
 									"type": "DataFlowReference",
+									"parameters": {
+										"SourceQuery": {
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
+											"type": "Expression"
+										},
+										"ColumnList": {
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"source1": {
 											"TableName": "Users",
