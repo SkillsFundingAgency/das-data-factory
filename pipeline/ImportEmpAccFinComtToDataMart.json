@@ -1518,6 +1518,12 @@
 			},
 			"SourceColumnList": {
 				"type": "String"
+			},
+			"K1": {
+				"type": "String"
+			},
+			"K2": {
+				"type": "String"
 			}
 		},
 		"annotations": []
