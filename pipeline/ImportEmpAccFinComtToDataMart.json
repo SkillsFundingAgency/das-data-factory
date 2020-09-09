@@ -544,7 +544,7 @@
 										"type": "Boolean"
 									},
 									"PLTableName": {
-										"value": "AsData_PL.EAUser_@{item().TABLE_NAME}",
+										"value": "AsData_PL.Acct_@{item().TABLE_NAME}",
 										"type": "String"
 									},
 									"RunId": {
@@ -559,7 +559,7 @@
 										"type": "String"
 									},
 									"StgTableName": {
-										"value": "Stg.EAUser_@{item().TABLE_NAME}",
+										"value": "Stg.Acct_@{item().TABLE_NAME}",
 										"type": "String"
 									}
 								}
