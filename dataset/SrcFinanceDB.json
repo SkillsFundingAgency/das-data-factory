@@ -1,0 +1,13 @@
+{
+	"name": "SrcFinanceDB",
+	"properties": {
+		"description": "Finance database connection string",
+		"linkedServiceName": {
+			"referenceName": "eas_fin_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
