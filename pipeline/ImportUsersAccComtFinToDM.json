@@ -793,6 +793,9 @@
 			"DIU": {
 				"type": "int",
 				"defaultValue": 4
+			},
+			"k1": {
+				"type": "securestring"
 			}
 		},
 		"variables": {
