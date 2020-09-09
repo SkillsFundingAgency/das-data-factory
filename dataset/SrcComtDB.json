@@ -1,0 +1,13 @@
+{
+	"name": "SrcComtDB",
+	"properties": {
+		"description": "Commitment database connection string",
+		"linkedServiceName": {
+			"referenceName": "comt_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
