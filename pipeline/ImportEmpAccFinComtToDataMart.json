@@ -785,12 +785,8 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "DestDataMart",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Users",
-										"SchemaName": "Stg"
-									}
+									"referenceName": "SrcComtDB",
+									"type": "DatasetReference"
 								}
 							}
 						},
