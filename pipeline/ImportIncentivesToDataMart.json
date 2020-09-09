@@ -357,7 +357,7 @@
 									},
 									"KeyBased": {
 										"value": "0",
-										"type": "Boolean"
+										"type": "Int32"
 									},
 									"PLTableName": {
 										"value": "ASData_PL.EI_@{item().TABLE_NAME}",
