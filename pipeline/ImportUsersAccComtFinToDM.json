@@ -281,18 +281,8 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflow1",
+									"referenceName": "DataFlowUser",
 									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColList}'",
-											"type": "Expression"
-										}
-									},
 									"datasetParameters": {
 										"source1": {
 											"TableName": "Users",
