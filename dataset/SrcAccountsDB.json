@@ -1,6 +1,7 @@
 {
 	"name": "SrcAccountsDB",
 	"properties": {
+		"description": "Accounts database connection string",
 		"linkedServiceName": {
 			"referenceName": "eas_acc_dbconnectionstring",
 			"type": "LinkedServiceReference"
