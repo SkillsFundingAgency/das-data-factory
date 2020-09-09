@@ -427,7 +427,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportEmployerAccountsToDM-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportEmployerAccountsToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -514,17 +514,37 @@
 								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
 								"storedProcedureParameters": {
 									"ColumnList": {
+										"value": null,
+										"type": "String"
+									},
+									"ConfigSchema": {
+										"value": "@{item().SCHEMA_NAME}",
+										"type": "String"
+									},
+									"ConfigTable": {
+										"value": "@{item().TABLE_NAME}",
+										"type": "String"
+									},
+									"K1": {
 										"value": {
-											"value": "@activity('GetImportAccountSelectQuery').output.firstRow.ColumnList",
+											"value": "@{variables('K1')}",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
-									"PLTableName": {
+									"K2": {
+										"value": "@{variables('K2')}",
+										"type": "String"
+									},
+									"KeyBased": {
 										"value": {
-											"value": "AsData_PL.Acct_@{item().TABLE_NAME}",
+											"value": "1",
 											"type": "Expression"
 										},
+										"type": "Boolean"
+									},
+									"PLTableName": {
+										"value": "AsData_PL.EAUser_@{item().TABLE_NAME}",
 										"type": "String"
 									},
 									"RunId": {
@@ -534,11 +554,12 @@
 										},
 										"type": "Int32"
 									},
+									"SourceDatabaseName": {
+										"value": "Accounts",
+										"type": "String"
+									},
 									"StgTableName": {
-										"value": {
-											"value": "Stg.Acct_@{item().TABLE_NAME}",
-											"type": "Expression"
-										},
+										"value": "Stg.EAUser_@{item().TABLE_NAME}",
 										"type": "String"
 									}
 								}
