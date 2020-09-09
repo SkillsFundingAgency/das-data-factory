@@ -3,11 +3,11 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "GetUsersTableList",
+				"name": "GetTableList",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "LogStartOfImportUser",
+						"activity": "LogStartOfImport",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -47,7 +47,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "GetUsersTableList",
+						"activity": "GetTableList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -56,17 +56,17 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetUsersTableList').output.value",
+						"value": "@activity('GetTableList').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "GetUserSourceColumnList",
+							"name": "GetSourceColumnList",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "LogStartOfImportUserToStaging",
+									"activity": "LogStartOfImportToStaging",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -101,7 +101,7 @@
 							}
 						},
 						{
-							"name": "GetUserImportSelectQuery",
+							"name": "GetImportSelectQuery",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -123,7 +123,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('UserSourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('UK1')}'),'K2','0x'+'@{variables('UK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
+										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('UK1')}'),'K2','0x'+'@{variables('UK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -140,11 +140,11 @@
 							}
 						},
 						{
-							"name": "GetUserSourceColumnListToVariable",
+							"name": "GetSourceColumnListToVariable",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GetUserSourceColumnList",
+									"activity": "GetSourceColumnList",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -152,19 +152,19 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "UserSourceColumnList",
+								"variableName": "SourceColumnList",
 								"value": {
-									"value": "@{activity('GetUserSourceColumnList').output.firstRow.Columns}",
+									"value": "@{activity('GetSourceColumnList').output.firstRow.Columns}",
 									"type": "Expression"
 								}
 							}
 						},
 						{
-							"name": "DetectAndLogUserSourceDbChanges",
+							"name": "DetectAndLogSourceDbChanges",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "GetUserSourceColumnListToVariable",
+									"activity": "GetSourceColumnListToVariable",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -183,7 +183,7 @@
 								"storedProcedureParameters": {
 									"Cols": {
 										"value": {
-											"value": "@{variables('UserSourceColumnList')}",
+											"value": "@{variables('SourceColumnList')}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -214,11 +214,11 @@
 							}
 						},
 						{
-							"name": "LogUserError",
+							"name": "LogError",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyDataFromUsers",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -237,20 +237,20 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyDataFromUsers').Error.message}",
+											"value": "@{activity('CopyData').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
 									"RunId": {
 										"value": {
-											"value": "@{variables('URunId')}",
+											"value": "@{variables('RunId')}",
 											"type": "Expression"
 										},
 										"type": "Int32"
 									},
 									"TaskType": {
-										"value": "ImportAvmsToDM",
+										"value": "ImportUsersToDM",
 										"type": "String"
 									}
 								}
@@ -261,11 +261,11 @@
 							}
 						},
 						{
-							"name": "CopyDataFromUsers",
+							"name": "CopyData",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
-									"activity": "GetUserImportSelectQuery",
+									"activity": "GetImportSelectQuery",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -285,11 +285,11 @@
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
-											"value": "'@{activity('GetUserImportSelectQuery').output.firstRow.SourceQuery}'",
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
 											"type": "Expression"
 										},
 										"ColumnList": {
-											"value": "'@{activity('GetUserImportSelectQuery').output.firstRow.ColumnList}'",
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
 										}
 									},
@@ -311,11 +311,11 @@
 							}
 						},
 						{
-							"name": "UsersPresentationLayerFullRefresh",
+							"name": "PresentationLayerFullRefresh",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "LogUserSuccessfulExecutionToStaging",
+									"activity": "LogSuccessfulExecutionToStaging",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -377,7 +377,7 @@
 									},
 									"RunId": {
 										"value": {
-											"value": "@{variables('URunId')}",
+											"value": "@{variables('RunId')}",
 											"type": "Expression"
 										},
 										"type": "Int32"
@@ -401,7 +401,7 @@
 							}
 						},
 						{
-							"name": "LogStartOfImportUserToStaging",
+							"name": "LogStartOfImportToStaging",
 							"type": "Lookup",
 							"dependsOn": [],
 							"policy": {
@@ -416,7 +416,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('URunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportUsersToDMStaging-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportUsersToDMStaging-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -433,11 +433,11 @@
 							}
 						},
 						{
-							"name": "LogUserSuccessfulExecutionToStaging",
+							"name": "LogSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "CopyDataFromUsers",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -455,7 +455,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportUsersToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('URunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('URunId')}\n\nSELECT 1",
+										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportUsersToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -472,11 +472,11 @@
 							}
 						},
 						{
-							"name": "GenerateUserK1",
+							"name": "GenerateUK1",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "DetectAndLogUserSourceDbChanges",
+									"activity": "DetectAndLogSourceDbChanges",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -508,11 +508,11 @@
 							}
 						},
 						{
-							"name": "GenerateUserK2",
+							"name": "GenerateUK2",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "GenerateUserK1",
+									"activity": "GenerateUK1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -548,7 +548,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GenerateUserK2",
+									"activity": "GenerateUK2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -556,9 +556,9 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "UK1",
+								"variableName": "AK1",
 								"value": {
-									"value": "@{activity('GenerateUserK1').output.firstRow.K1}",
+									"value": "@{activity('GenerateUK1').output.firstRow.K1}",
 									"type": "Expression"
 								}
 							}
@@ -576,9 +576,9 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "UK2",
+								"variableName": "AK2",
 								"value": {
-									"value": "@{activity('GenerateUserK2').output.firstRow.K2}",
+									"value": "@{activity('GenerateUK2').output.firstRow.K2}",
 									"type": "Expression"
 								}
 							}
@@ -587,11 +587,11 @@
 				}
 			},
 			{
-				"name": "LogStartOfImportUser",
+				"name": "LogStartOfImport",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "SetRunIdUser",
+						"activity": "SetRunId",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -609,7 +609,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('URunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportUsersToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportUsersToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -626,7 +626,7 @@
 				}
 			},
 			{
-				"name": "LogUserSuccessfulExecution",
+				"name": "LogSuccessfulExecution",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -648,7 +648,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportEmployerIncentivesToDM'\n     AND RunId=@{variables('URunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('URunId')}\n\nSELECT 1",
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportEmployerIncentivesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -665,11 +665,11 @@
 				}
 			},
 			{
-				"name": "GetRunIdUser",
+				"name": "GetRunId",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "GenerateRunIdUser",
+						"activity": "GenerateRunId",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -702,7 +702,7 @@
 				}
 			},
 			{
-				"name": "GenerateRunIdUser",
+				"name": "GenerateRunId",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {
@@ -722,11 +722,11 @@
 				}
 			},
 			{
-				"name": "SetRunIdUser",
+				"name": "SetRunId",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "GetRunIdUser",
+						"activity": "GetRunId",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -736,17 +736,17 @@
 				"typeProperties": {
 					"variableName": "RunId",
 					"value": {
-						"value": "@activity('GetRunIdUser').output.firstRow.RunId",
+						"value": "@activity('GetRunId').output.firstRow.RunId",
 						"type": "Expression"
 					}
 				}
 			},
 			{
-				"name": "CompleteLoggingForUserImport",
+				"name": "CompleteLogging",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "LogUserSuccessfulExecution",
+						"activity": "LogSuccessfulExecution",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -764,7 +764,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{activity('GetRunIdUser').output.firstRow.RunId})\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{activity('GetRunIdUser').output.firstRow.RunId}\n\nSELECT 'na'",
+							"value": "/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{activity('GetRunId').output.firstRow.RunId})\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{activity('GetRunId').output.firstRow.RunId}\n\nSELECT 'na'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -796,7 +796,7 @@
 			}
 		},
 		"variables": {
-			"UserSourceColumnList": {
+			"SourceColumnList": {
 				"type": "String"
 			},
 			"RunId": {
