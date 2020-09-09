@@ -999,7 +999,14 @@
 						{
 							"name": "GetImportCommitSelectQuery",
 							"type": "Lookup",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "SetVar_ComtKeys_2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.00:30:00",
 								"retry": 0,
@@ -1223,9 +1230,16 @@
 							}
 						},
 						{
-							"name": "GenerateKeys_Comt_1",
+							"name": "Generate_ComtKeys_1",
 							"type": "Lookup",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "DetectAndLogCommitSourceDbChanges",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.00:10:00",
 								"retry": 0,
@@ -1252,11 +1266,11 @@
 							}
 						},
 						{
-							"name": "GenerateKeys_Comt_2",
+							"name": "Generate_ComtKeys_2",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "GenerateKeys_Comt_1",
+									"activity": "Generate_ComtKeys_1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1273,7 +1287,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @key nvarchar(max)\n\nSELECT @SQLCode='SELECT @key=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@Key nvarchar(max) OUTPUT',@Key=@Key OUTPUT\n\nSELECT @Key as Key2\n",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @key nvarchar(max)\n\nSELECT @SQLCode='SELECT @key=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@Key nvarchar(max) OUTPUT',@Key=@Key OUTPUT\n\n\nSELECT @Key as Key2\n",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -1288,11 +1302,11 @@
 							}
 						},
 						{
-							"name": "SetVariableComtKey1",
+							"name": "SetVar_ComtKeys_1",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GenerateKeys_Comt_2",
+									"activity": "Generate_ComtKeys_2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -1301,11 +1315,11 @@
 							"userProperties": []
 						},
 						{
-							"name": "SetVariableComtKey2",
+							"name": "SetVar_ComtKeys_2",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "SetVariableComtKey1",
+									"activity": "SetVar_ComtKeys_1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
