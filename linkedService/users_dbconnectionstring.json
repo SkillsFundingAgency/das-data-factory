@@ -1,9 +1,14 @@
 {
 	"name": "users_dbconnectionstring",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"K1": {
-				"type": "securestring"
+				"type": "securestring",
+				"defaultValue": {
+					"type": "SecureString",
+					"value": "**********"
+				}
 			}
 		},
 		"annotations": [],
