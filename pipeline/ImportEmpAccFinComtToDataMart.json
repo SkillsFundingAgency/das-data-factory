@@ -1625,7 +1625,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFinanceToDM-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFinanceToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -1712,31 +1712,43 @@
 								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
 								"storedProcedureParameters": {
 									"ColumnList": {
-										"value": {
-											"value": "@activity('GetImportFinanceSelectQuery').output.firstRow.ColumnList",
-											"type": "Expression"
-										},
+										"value": "",
 										"type": "String"
 									},
+									"ConfigSchema": {
+										"value": "",
+										"type": "String"
+									},
+									"ConfigTable": {
+										"value": "",
+										"type": "String"
+									},
+									"K1": {
+										"value": "",
+										"type": "String"
+									},
+									"K2": {
+										"value": "",
+										"type": "String"
+									},
+									"KeyBased": {
+										"value": "",
+										"type": "Boolean"
+									},
 									"PLTableName": {
-										"value": {
-											"value": "AsData_PL.Fin_@{item().TABLE_NAME}",
-											"type": "Expression"
-										},
+										"value": "",
 										"type": "String"
 									},
 									"RunId": {
-										"value": {
-											"value": "@{variables('RunId')}",
-											"type": "Expression"
-										},
+										"value": "",
 										"type": "Int32"
 									},
+									"SourceDatabaseName": {
+										"value": "",
+										"type": "String"
+									},
 									"StgTableName": {
-										"value": {
-											"value": "Stg.Fin_@{item().TABLE_NAME}",
-											"type": "Expression"
-										},
+										"value": "",
 										"type": "String"
 									}
 								}
