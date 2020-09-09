@@ -1288,7 +1288,7 @@
 							}
 						},
 						{
-							"name": "Set variable1",
+							"name": "SetVariableComtKey1",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -1301,11 +1301,11 @@
 							"userProperties": []
 						},
 						{
-							"name": "Set variable2",
+							"name": "SetVariableComtKey2",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Set variable1",
+									"activity": "SetVariableComtKey1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
