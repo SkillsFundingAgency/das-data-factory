@@ -1,5 +1,5 @@
 {
-	"name": "ImportUsersToDM",
+	"name": "ImportAccountsToDM",
 	"properties": {
 		"activities": [
 			{
@@ -734,7 +734,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "RunId",
+					"variableName": "URunId",
 					"value": {
 						"value": "@activity('GetRunIdUser').output.firstRow.RunId",
 						"type": "Expression"
@@ -799,7 +799,7 @@
 			"UserSourceColumnList": {
 				"type": "String"
 			},
-			"RunId": {
+			"URunId": {
 				"type": "String"
 			},
 			"UK1": {
