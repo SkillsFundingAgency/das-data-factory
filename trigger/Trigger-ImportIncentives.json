@@ -2,7 +2,7 @@
 	"name": "Trigger-ImportIncentives",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
