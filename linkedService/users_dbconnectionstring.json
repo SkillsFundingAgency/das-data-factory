@@ -1,6 +1,11 @@
 {
 	"name": "users_dbconnectionstring",
 	"properties": {
+		"parameters": {
+			"K1": {
+				"type": "securestring"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
