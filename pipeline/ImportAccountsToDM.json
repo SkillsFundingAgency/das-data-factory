@@ -1,0 +1,814 @@
+{
+	"name": "ImportAccountsToDM",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetTableList",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LogStartOfImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,PLTableName as PLTableName FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Accounts' and IsEnabled=1 and FullCopyToPL=1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachSourceTableInUser",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetTableList",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetTableList').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "GetSourceColumnList",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "LogStartOfImportToStaging",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "SrcAccounts",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Account",
+										"SchemaName": "Employer_Account"
+									}
+								}
+							}
+						},
+						{
+							"name": "GetImportSelectQuery",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "SetVariableUK2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Accounts'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AK1')}'),'K2','0x'+'@{variables('AK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Accounts'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "GetSourceColumnListToVariable",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GetSourceColumnList",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourceColumnList",
+								"value": {
+									"value": "@{activity('GetSourceColumnList').output.firstRow.Columns}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "DetectAndLogSourceDbChanges",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "GetSourceColumnListToVariable",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[DetectAndLogSourceDbChanges]",
+								"storedProcedureParameters": {
+									"Cols": {
+										"value": {
+											"value": "@{variables('SourceColumnList')}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SourceDatabaseName": {
+										"value": "Accounts",
+										"type": "String"
+									},
+									"SourceSchemaName": {
+										"value": {
+											"value": "@{item().SCHEMA_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SourceTableName": {
+										"value": {
+											"value": "@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "LogError",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopyData",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+								"storedProcedureParameters": {
+									"ErrorMessage": {
+										"value": {
+											"value": "@{activity('CopyData').Error.message}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RunId": {
+										"value": {
+											"value": "@{variables('RunId')}",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"TaskType": {
+										"value": "ImportAccountsToDM",
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "CopyData",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [
+								{
+									"activity": "GetImportSelectQuery",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "DataFlowAccounts",
+									"type": "DataFlowReference",
+									"parameters": {
+										"SourceQuery": {
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
+											"type": "Expression"
+										},
+										"ColumnList": {
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"source1": {
+											"TableName": "Users",
+											"SchemaName": "dbo"
+										},
+										"sink1": {
+											"TableName": "Acc_@{item().TABLE_NAME}",
+											"SchemaName": "Stg"
+										}
+									}
+								},
+								"integrationRuntime": {
+									"referenceName": "AzureIntegrationRunTime",
+									"type": "IntegrationRuntimeReference"
+								}
+							}
+						},
+						{
+							"name": "PresentationLayerFullRefresh",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "LogSuccessfulExecutionToStaging",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[PresentationLayerFullRefresh]",
+								"storedProcedureParameters": {
+									"ColumnList": {
+										"value": null,
+										"type": "String"
+									},
+									"ConfigSchema": {
+										"value": {
+											"value": "@{item().SCHEMA_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ConfigTable": {
+										"value": {
+											"value": "@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"K1": {
+										"value": {
+											"value": "@{variables('AK1')}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"K2": {
+										"value": {
+											"value": "@{variables('AK2')}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"KeyBased": {
+										"value": "1",
+										"type": "Int32"
+									},
+									"PLTableName": {
+										"value": {
+											"value": "AsData_PL.@{item().PLTABLENAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RunId": {
+										"value": {
+											"value": "@{variables('RunId')}",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"SourceDatabaseName": {
+										"value": "Accounts",
+										"type": "String"
+									},
+									"StgTableName": {
+										"value": {
+											"value": "Stg.Acc_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "LogStartOfImportToStaging",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAccountsToDMStaging-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "LogSuccessfulExecutionToStaging",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "CopyData",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAccountsToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "GenerateAK1",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "DetectAndLogSourceDbChanges",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @k1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1\n",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "GenerateAK2",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "GenerateAK1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K2 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K2=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 nvarchar(max) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2\n",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "SetVariableAK1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GenerateAK2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "AK1",
+								"value": {
+									"value": "@{activity('GenerateAK1').output.firstRow.K1}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "SetVariableUK2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "SetVariableAK1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "AK2",
+								"value": {
+									"value": "@{activity('GenerateAK2').output.firstRow.K2}",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "LogStartOfImport",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAccountsToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulExecution",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ForEachSourceTableInUser",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAccountsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetRunId",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GenerateRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Users"
+						}
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "GenerateRunId",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[GenerateRunId]"
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@activity('GetRunId').output.firstRow.RunId",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "CompleteLogging",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LogSuccessfulExecution",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{activity('GetRunId').output.firstRow.RunId})\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{activity('GetRunId').output.firstRow.RunId}\n\nSELECT 'na'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"RunId": {
+				"type": "string",
+				"defaultValue": "\"1\""
+			},
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
+		"variables": {
+			"SourceColumnList": {
+				"type": "String"
+			},
+			"RunId": {
+				"type": "String"
+			},
+			"AK1": {
+				"type": "String"
+			},
+			"AK2": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
