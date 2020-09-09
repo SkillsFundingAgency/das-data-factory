@@ -1745,6 +1745,105 @@
 								"referenceName": "datamgmt_staging_dbconnectionstring",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "Generate_FinKeyes_1",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @key nvarchar(max)\n\nSELECT @SQLCode='SELECT @key=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@Key nvarchar(max) OUTPUT',@Key=@Key OUTPUT\n\nSELECT @Key as Key1\n",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "Generate_FinKeyes_2",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Generate_FinKeyes_1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @key nvarchar(max)\n\nSELECT @SQLCode='SELECT @key=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@Key nvarchar(max) OUTPUT',@Key=@Key OUTPUT\n\n\nSELECT @Key as Key2",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "SetVar_FinKeys_1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Generate_FinKeyes_2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "K1",
+								"value": "@{activity('SetVar_FinKeys_1').output.firstRow.Key1}"
+							}
+						},
+						{
+							"name": "SetVar_FinKeys_2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "SetVar_FinKeys_1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "K2",
+								"value": "@{activity('SetVar_FinKeys_2').output.firstRow.Key2}"
+							}
 						}
 					]
 				}
