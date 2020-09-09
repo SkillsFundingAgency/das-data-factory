@@ -1501,6 +1501,16 @@
 				}
 			}
 		],
+		"parameters": {
+			"RunId": {
+				"type": "string",
+				"defaultValue": "\"1\""
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
 		"variables": {
 			"RunId": {
 				"type": "String",
