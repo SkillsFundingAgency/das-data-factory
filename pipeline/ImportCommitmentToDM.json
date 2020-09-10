@@ -648,6 +648,20 @@
 				}
 			}
 		],
+		"parameters": {
+			"RunId": {
+				"type": "string",
+				"defaultValue": "\"1\""
+			},
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
 		"annotations": []
 	}
 }
