@@ -77,7 +77,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Finance' and IsEnabled=1",
+						"sqlReaderQuery": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,PLTableName as PLTableName \nFROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Finance' and IsEnabled=1 and FullCopyToPL=1",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
