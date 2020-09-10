@@ -477,7 +477,7 @@
 										"type": "Boolean"
 									},
 									"PLTableName": {
-										"value": "AsData_PL.Fin_@{item().TABLE_NAME}",
+										"value": "AsData_PL.Fin_@{item().PL_TABLENAME}",
 										"type": "String"
 									},
 									"RunId": {
