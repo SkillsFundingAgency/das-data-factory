@@ -1,0 +1,32 @@
+{
+	"name": "SrcUsers",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "users_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "Users"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().SchemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TableName",
+				"type": "Expression"
+			}
+		}
+	}
+}
