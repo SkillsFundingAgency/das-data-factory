@@ -83,8 +83,7 @@
 							"type": "Expression"
 						},
 						"MaxConcurrentConnections": "4",
-						"DIU": "4",
-						"ErrorMessage": "123"
+						"DIU": "4"
 					}
 				}
 			},
