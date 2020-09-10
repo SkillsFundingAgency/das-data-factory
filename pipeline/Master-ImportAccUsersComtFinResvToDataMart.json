@@ -72,10 +72,6 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"pipeline": {
-						"referenceName": "ImportUsersToDM",
-						"type": "PipelineReference"
-					},
 					"waitOnCompletion": true,
 					"parameters": {
 						"RunId": {
@@ -118,14 +114,7 @@
 			{
 				"name": "CompleteLogging",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "ExecuteImportAccountsToDM",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.00:30:00",
 					"retry": 0,
@@ -152,6 +141,19 @@
 							"SchemaName": "Stg"
 						}
 					}
+				}
+			},
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportCommitmentToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],
