@@ -1,0 +1,7 @@
+{
+	"name": "ImportCommitmentToDM",
+	"properties": {
+		"description": "Import Commitments to datamart",
+		"annotations": []
+	}
+}
