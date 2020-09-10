@@ -662,6 +662,20 @@
 				"defaultValue": 4
 			}
 		},
+		"variables": {
+			"SourceColumnList": {
+				"type": "String"
+			},
+			"RunId": {
+				"type": "String"
+			},
+			"CK1": {
+				"type": "String"
+			},
+			"CK2": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
