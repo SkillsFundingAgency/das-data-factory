@@ -120,7 +120,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportAccountsToDM",
+						"activity": "ExecuteImportFinToDM",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -151,6 +151,54 @@
 							"TableName": "Users",
 							"SchemaName": "Stg"
 						}
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportComtTpDM",
+				"description": "Execute Import Commitment data to DM ",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportAccountsToDM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportCommitmentToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": "@{activity('GetRunId').output.firstRow.RunId}"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportFinToDM",
+				"description": "Execute Import Finance data to DM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportComtTpDM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportFinanceToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": "@{activity('GetRunId').output.firstRow.RunId}"
 					}
 				}
 			}
