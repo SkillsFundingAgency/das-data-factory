@@ -465,11 +465,11 @@
 										"type": "String"
 									},
 									"K1": {
-										"value": "@{variables('K1')}",
+										"value": "@{variables('FK1')}",
 										"type": "String"
 									},
 									"K2": {
-										"value": "@{variables('K2')}",
+										"value": "@{variables('FK2')}",
 										"type": "String"
 									},
 									"KeyBased": {
