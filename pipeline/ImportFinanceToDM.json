@@ -2,6 +2,34 @@
 	"name": "ImportFinanceToDM",
 	"properties": {
 		"description": "Import Finance to datamart",
+		"parameters": {
+			"RunId": {
+				"type": "string",
+				"defaultValue": "\"1\""
+			},
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
+		"variables": {
+			"SourceColumnList": {
+				"type": "String"
+			},
+			"RunId": {
+				"type": "String"
+			},
+			"FK1": {
+				"type": "String"
+			},
+			"Fk2": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
