@@ -1,0 +1,7 @@
+{
+	"name": "ImportFinanceToDM",
+	"properties": {
+		"description": "Import Finance to datamart",
+		"annotations": []
+	}
+}
