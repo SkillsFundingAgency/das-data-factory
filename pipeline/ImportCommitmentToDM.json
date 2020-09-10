@@ -623,8 +623,8 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "K1",
-								"value": "@{activity('Generate_ComtKeys_1').output.firstRow.Key1}"
+								"variableName": "CK1",
+								"value": "@{activity('Generate_ComtKeys_1').output.firstRow.K1}"
 							}
 						},
 						{
