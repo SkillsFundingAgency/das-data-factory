@@ -277,7 +277,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Users'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('K1')}'),'K2','0x'+'@{variables('K2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Finance'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColList",
+										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Finance'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('FK1')}'),'K2','0x'+'@{variables('FK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Finance'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColList",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -500,7 +500,7 @@
 							}
 						},
 						{
-							"name": "Generate_FinKeyes_1",
+							"name": "Generate_FinKeys_1",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -536,11 +536,11 @@
 							}
 						},
 						{
-							"name": "Generate_FinKeyes_2",
+							"name": "Generate_FinKeys_2",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "Generate_FinKeyes_1",
+									"activity": "Generate_FinKeys_1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -576,7 +576,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Generate_FinKeyes_2",
+									"activity": "Generate_FinKeys_2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -584,8 +584,8 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "K1",
-								"value": "@{activity('SetVar_FinKeys_1').output.firstRow.Key1}"
+								"variableName": "FK1",
+								"value": "@{activity('Generate_FinKeys_1').output.firstRow.K1}"
 							}
 						},
 						{
@@ -601,8 +601,8 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "K2",
-								"value": "@{activity('SetVar_FinKeys_2').output.firstRow.Key2}"
+								"variableName": "FK2",
+								"value": "@{activity('Generate_FinKeys_2').output.firstRow.K2}"
 							}
 						}
 					]
