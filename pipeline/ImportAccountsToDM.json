@@ -91,12 +91,8 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcAccounts",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Account",
-										"SchemaName": "Employer_Account"
-									}
+									"referenceName": "SrcAccountsDB",
+									"type": "DatasetReference"
 								}
 							}
 						},
@@ -280,30 +276,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataflow": {
-									"referenceName": "DataFlowAccounts",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"source1": {
-											"TableName": "Users",
-											"SchemaName": "dbo"
-										},
-										"sink1": {
-											"TableName": "Acc_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
 								"integrationRuntime": {
 									"referenceName": "AzureIntegrationRunTime",
 									"type": "IntegrationRuntimeReference"
