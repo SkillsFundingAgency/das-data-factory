@@ -127,7 +127,8 @@
 							"TableName": "Users",
 							"SchemaName": "Stg"
 						}
-					}
+					},
+					"firstRowOnly": false
 				}
 			},
 			{
