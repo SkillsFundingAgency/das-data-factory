@@ -88,7 +88,8 @@
 							"TableName": "Users",
 							"SchemaName": "Stg"
 						}
-					}
+					},
+					"firstRowOnly": false
 				}
 			},
 			{
@@ -457,19 +458,31 @@
 										"type": "String"
 									},
 									"ConfigSchema": {
-										"value": "@{item().SCHEMA_NAME}",
+										"value": {
+											"value": "@{item().SCHEMA_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"ConfigTable": {
-										"value": "@{item().TABLE_NAME}",
+										"value": {
+											"value": "@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"K1": {
-										"value": "@{variables('FK1')}",
+										"value": {
+											"value": "@{variables('FK1')}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"K2": {
-										"value": "@{variables('FK2')}",
+										"value": {
+											"value": "@{variables('FK2')}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"KeyBased": {
@@ -477,11 +490,17 @@
 										"type": "Boolean"
 									},
 									"PLTableName": {
-										"value": "AsData_PL.Fin_@{item().PL_TABLENAME}",
+										"value": {
+											"value": "AsData_PL.Fin_@{item().PL_TABLENAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"RunId": {
-										"value": "@{variables('RunId')}",
+										"value": {
+											"value": "@{variables('RunId')}",
+											"type": "Expression"
+										},
 										"type": "Int32"
 									},
 									"SourceDatabaseName": {
@@ -489,7 +508,10 @@
 										"type": "String"
 									},
 									"StgTableName": {
-										"value": "Stg.Fin_@{item().TABLE_NAME}",
+										"value": {
+											"value": "Stg.Fin_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -585,7 +607,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "FK1",
-								"value": "@{activity('Generate_FinKeys_1').output.firstRow.K1}"
+								"value": {
+									"value": "@{activity('Generate_FinKeys_1').output.firstRow.K1}",
+									"type": "Expression"
+								}
 							}
 						},
 						{
@@ -602,7 +627,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "FK2",
-								"value": "@{activity('Generate_FinKeys_2').output.firstRow.K2}"
+								"value": {
+									"value": "@{activity('Generate_FinKeys_2').output.firstRow.K2}",
+									"type": "Expression"
+								}
 							}
 						}
 					]
