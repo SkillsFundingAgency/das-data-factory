@@ -281,7 +281,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "DataFlowUser",
+									"referenceName": "dataflow1",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
