@@ -95,7 +95,7 @@
 				}
 			},
 			{
-				"name": "GetCommitmentTableList",
+				"name": "GetComtTableList",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -136,7 +136,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "GetCommitmentTableList",
+						"activity": "GetComtTableList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -145,7 +145,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetCommitmentTableList').output.value",
+						"value": "@activity('GetComtTableList').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -496,19 +496,31 @@
 										"type": "String"
 									},
 									"ConfigSchema": {
-										"value": "@{item().SCHEMA_NAME}",
+										"value": {
+											"value": "@{item().SCHEMA_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"ConfigTable": {
-										"value": "@{item().TABLE_NAME}",
+										"value": {
+											"value": "@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"K1": {
-										"value": "@{variables('CK1')}",
+										"value": {
+											"value": "@{variables('CK1')}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"K2": {
-										"value": "@{variables('CK2')}",
+										"value": {
+											"value": "@{variables('CK2')}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"KeyBased": {
@@ -516,11 +528,17 @@
 										"type": "Boolean"
 									},
 									"PLTableName": {
-										"value": "AsData_PL.Comt_@{item().PLTABLENAME}",
+										"value": {
+											"value": "AsData_PL.Comt_@{item().PLTABLENAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"RunId": {
-										"value": "@{variables('RunId')}",
+										"value": {
+											"value": "@{variables('RunId')}",
+											"type": "Expression"
+										},
 										"type": "Int32"
 									},
 									"SourceDatabaseName": {
@@ -528,7 +546,10 @@
 										"type": "String"
 									},
 									"StgTableName": {
-										"value": "Stg.Comt_@{item().TABLE_NAME}",
+										"value": {
+											"value": "Stg.Comt_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -624,7 +645,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "CK1",
-								"value": "@{activity('Generate_ComtKeys_1').output.firstRow.K1}"
+								"value": {
+									"value": "@{activity('Generate_ComtKeys_1').output.firstRow.K1}",
+									"type": "Expression"
+								}
 							}
 						},
 						{
@@ -641,7 +665,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "CK2",
-								"value": "@{activity('Generate_ComtKeys_2').output.firstRow.K2}"
+								"value": {
+									"value": "@{activity('Generate_ComtKeys_2').output.firstRow.K2}",
+									"type": "Expression"
+								}
 							}
 						}
 					]
