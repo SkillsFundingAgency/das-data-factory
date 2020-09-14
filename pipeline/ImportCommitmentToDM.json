@@ -356,6 +356,16 @@
 								"dataflow": {
 									"referenceName": "dataflowCommitment",
 									"type": "DataFlowReference",
+									"parameters": {
+										"SourceQuery": {
+											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.SourceQuery}'",
+											"type": "Expression"
+										},
+										"ColumnList": {
+											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.ColumnList}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"sink1": {
 											"TableName": "Comt_@{item().TABLE_NAME}",
