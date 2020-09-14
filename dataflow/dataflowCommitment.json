@@ -1,0 +1,13 @@
+{
+	"name": "dataflowCommitment",
+	"properties": {
+		"description": "Data flow commitment",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"script": ""
+		}
+	}
+}
