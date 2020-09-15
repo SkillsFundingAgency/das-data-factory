@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcAccounts",
+						"referenceName": "SrcAccountsDB",
 						"type": "DatasetReference"
 					},
 					"name": "source1"
