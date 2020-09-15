@@ -315,7 +315,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflow1",
+									"referenceName": "dataflowFinance",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
@@ -328,11 +328,7 @@
 										}
 									},
 									"datasetParameters": {
-										"source1": {
-											"TableName": "Accounts",
-											"SchemaName": "dbo"
-										},
-										"sink1": {
+										"FinanceSink": {
 											"TableName": "Fin_@{item().TABLE_NAME}",
 											"SchemaName": "Stg"
 										}
@@ -487,11 +483,11 @@
 									},
 									"KeyBased": {
 										"value": "1",
-										"type": "Boolean"
+										"type": "Int32"
 									},
 									"PLTableName": {
 										"value": {
-											"value": "AsData_PL.Fin_@{item().PL_TABLENAME}",
+											"value": "AsData_PL.@{item().PL_TABLENAME}",
 											"type": "Expression"
 										},
 										"type": "String"
