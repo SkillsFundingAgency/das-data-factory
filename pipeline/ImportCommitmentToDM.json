@@ -365,12 +365,6 @@
 											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
 										}
-									},
-									"datasetParameters": {
-										"sink1": {
-											"TableName": "Comt_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
 									}
 								},
 								"integrationRuntime": {
@@ -578,7 +572,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @k1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
