@@ -1,0 +1,13 @@
+{
+	"name": "dataflowFinance",
+	"properties": {
+		"description": "Dataflow Finance",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"script": ""
+		}
+	}
+}
