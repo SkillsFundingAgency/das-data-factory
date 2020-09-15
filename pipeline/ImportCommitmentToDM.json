@@ -526,7 +526,7 @@
 									},
 									"PLTableName": {
 										"value": {
-											"value": "AsData_PL.Comt_@{item().PLTABLENAME}",
+											"value": "AsData_PL.@{item().PLTABLENAME}",
 											"type": "Expression"
 										},
 										"type": "String"
