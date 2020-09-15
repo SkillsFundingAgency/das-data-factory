@@ -522,7 +522,7 @@
 									},
 									"KeyBased": {
 										"value": "1",
-										"type": "Boolean"
+										"type": "Int32"
 									},
 									"PLTableName": {
 										"value": {
