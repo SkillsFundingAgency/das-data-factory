@@ -365,6 +365,12 @@
 											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
 										}
+									},
+									"datasetParameters": {
+										"CommitSink": {
+											"TableName": "Comt_@{item().TABLE_NAME}",
+											"SchemaName": "Stg"
+										}
 									}
 								},
 								"integrationRuntime": {
