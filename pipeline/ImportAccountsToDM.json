@@ -28,8 +28,7 @@
 							"value": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,PLTableName as PLTableName FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Accounts' and IsEnabled=1 and FullCopyToPL=1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -76,8 +75,8 @@
 								"timeout": "0.00:30:00",
 								"retry": 0,
 								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
+								"secureOutput": true,
+								"secureInput": true
 							},
 							"userProperties": [],
 							"typeProperties": {
@@ -87,12 +86,15 @@
 										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"queryTimeout": "02:00:00"
 								},
 								"dataset": {
-									"referenceName": "SrcAccountsDB",
-									"type": "DatasetReference"
+									"referenceName": "SrcAccounts",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Account",
+										"SchemaName": "Employer_Account"
+									}
 								}
 							}
 						},
@@ -101,7 +103,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "SetVariableUK2",
+									"activity": "SetVariableAK2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -111,8 +113,8 @@
 								"timeout": "0.00:30:00",
 								"retry": 0,
 								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
+								"secureOutput": true,
+								"secureInput": true
 							},
 							"userProperties": [],
 							"typeProperties": {
@@ -122,8 +124,7 @@
 										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Accounts'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AK1')}'),'K2','0x'+'@{variables('AK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Accounts'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"queryTimeout": "02:00:00"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -277,7 +278,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflow1",
+									"referenceName": "DataFlowAccounts",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
@@ -321,8 +322,8 @@
 								"timeout": "0.01:00:00",
 								"retry": 0,
 								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
+								"secureOutput": true,
+								"secureInput": true
 							},
 							"userProperties": [],
 							"typeProperties": {
@@ -415,8 +416,7 @@
 										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAccountsToDMStaging-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"queryTimeout": "02:00:00"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -454,8 +454,7 @@
 										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAccountsToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 										"type": "Expression"
 									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"queryTimeout": "02:00:00"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -490,8 +489,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @k1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1\n",
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"queryTimeout": "02:00:00"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -526,8 +524,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K2 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K2=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 nvarchar(max) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2\n",
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
+									"queryTimeout": "02:00:00"
 								},
 								"dataset": {
 									"referenceName": "DestDataMart",
@@ -560,7 +557,7 @@
 							}
 						},
 						{
-							"name": "SetVariableUK2",
+							"name": "SetVariableAK2",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -608,8 +605,7 @@
 							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAccountsToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -647,8 +643,7 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAccountsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -693,8 +688,7 @@
 				"type": "String"
 			},
 			"RunId": {
-				"type": "String",
-				"defaultValue": "\"1\""
+				"type": "String"
 			},
 			"AK1": {
 				"type": "String"
