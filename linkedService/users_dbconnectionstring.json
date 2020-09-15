@@ -17,5 +17,6 @@
 			"referenceName": "AzureIntegrationRunTime",
 			"type": "IntegrationRuntimeReference"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }

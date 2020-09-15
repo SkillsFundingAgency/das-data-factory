@@ -1,12 +1,12 @@
 {
-	"name": "dataflow1",
+	"name": "DataFlowAccounts",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcEmpIncentive",
+						"referenceName": "SrcAccounts",
 						"type": "DatasetReference"
 					},
 					"name": "source1"
