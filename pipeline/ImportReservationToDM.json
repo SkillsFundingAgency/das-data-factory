@@ -39,7 +39,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportCommitmentToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportReservationToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -116,7 +116,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,PLTableName as PLTableName \nFROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Commitments' and IsEnabled=1 and FullCopyToPL=1",
+						"sqlReaderQuery": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,PLTableName as PLTableName \nFROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Reservation' and IsEnabled=1 and FullCopyToPL=1",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -146,7 +146,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetComtTableList').output.value",
+						"value": "@activity('GetResvTableList').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -168,7 +168,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportCommitmentToDMStaging-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportReservationToDMStaging-'+'@{item().TABLE_NAME}'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -235,7 +235,7 @@
 							"typeProperties": {
 								"variableName": "SourceColumnList",
 								"value": {
-									"value": "@{activity('GetCommitSourceColumnList').output.firstRow.Columns}",
+									"value": "@{activity('GetResvSourceColumnList').output.firstRow.Columns}",
 									"type": "Expression"
 								}
 							}
@@ -270,7 +270,7 @@
 										"type": "String"
 									},
 									"SourceDatabaseName": {
-										"value": "Commitments",
+										"value": "Reservation",
 										"type": "String"
 									},
 									"SourceSchemaName": {
@@ -317,7 +317,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Commitments'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('CK1')}'),'K2','0x'+'@{variables('CK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Commitments'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
+										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Reservation'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('RK1')}'),'K2','0x'+'@{variables('RK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Commitments'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -354,21 +354,21 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflowCommitment",
+									"referenceName": "dataflowReservation",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
-											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.SourceQuery}'",
+											"value": "'@{activity('GetImportResvSelectQuery').output.firstRow.SourceQuery}'",
 											"type": "Expression"
 										},
 										"ColumnList": {
-											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.ColumnList}'",
+											"value": "'@{activity('GetImportResvSelectQuery').output.firstRow.ColumnList}'",
 											"type": "Expression"
 										}
 									},
 									"datasetParameters": {
-										"CommitSink": {
-											"TableName": "Comt_@{item().TABLE_NAME}",
+										"ReservationSink": {
+											"TableName": "Users",
 											"SchemaName": "Stg"
 										}
 									}
@@ -641,9 +641,9 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "CK1",
+								"variableName": "RK1",
 								"value": {
-									"value": "@{activity('Generate_ComtKeys_1').output.firstRow.K1}",
+									"value": "@{activity('Generate_ResvKeys_1').output.firstRow.K1}",
 									"type": "Expression"
 								}
 							}
@@ -661,9 +661,9 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "CK2",
+								"variableName": "RK2",
 								"value": {
-									"value": "@{activity('Generate_ComtKeys_2').output.firstRow.K2}",
+									"value": "@{activity('Generate_ResvKeys_2').output.firstRow.K2}",
 									"type": "Expression"
 								}
 							}
