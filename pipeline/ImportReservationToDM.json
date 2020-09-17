@@ -13,6 +13,20 @@
 				"type": "int"
 			}
 		},
+		"variables": {
+			"SourceColumnList": {
+				"type": "String"
+			},
+			"RunId": {
+				"type": "String"
+			},
+			"RK1": {
+				"type": "String"
+			},
+			"RK2": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
