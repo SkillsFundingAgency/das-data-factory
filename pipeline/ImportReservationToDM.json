@@ -442,7 +442,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyCommitData').Error.message}",
+											"value": "@{activity('CopyResvData').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -455,7 +455,7 @@
 										"type": "Int32"
 									},
 									"TaskType": {
-										"value": "ImportCommitmentToDatamart",
+										"value": "ImportReservationToDatamart",
 										"type": "String"
 									}
 								}
