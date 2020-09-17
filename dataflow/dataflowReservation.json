@@ -1,0 +1,13 @@
+{
+	"name": "dataflowReservation",
+	"properties": {
+		"description": "Reservation Dataflow",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"script": ""
+		}
+	}
+}
