@@ -1,0 +1,7 @@
+{
+	"name": "ImportReservationToDM",
+	"properties": {
+		"description": "Import Reservation to Datamart",
+		"annotations": []
+	}
+}
