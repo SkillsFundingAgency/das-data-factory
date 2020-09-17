@@ -2,6 +2,17 @@
 	"name": "ImportReservationToDM",
 	"properties": {
 		"description": "Import Reservation to Datamart",
+		"parameters": {
+			"RunId": {
+				"type": "string"
+			},
+			"MaxConcurrentConnections": {
+				"type": "int"
+			},
+			"DIU": {
+				"type": "int"
+			}
+		},
 		"annotations": []
 	}
 }
