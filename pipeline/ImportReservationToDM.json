@@ -58,7 +58,14 @@
 			{
 				"name": "LogSuccessfulExecution",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "For Each Reservation Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:30:00",
 					"retry": 0,
@@ -125,10 +132,17 @@
 				}
 			},
 			{
-				"name": "For Each Commitment Table",
-				"description": "For Each Commitment Table",
+				"name": "For Each Reservation Table",
+				"description": "For Each Reservation Table",
 				"type": "ForEach",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetResvTableList",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
@@ -138,7 +152,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "LogStartOfCommitImportToDatamart",
+							"name": "LogStartOfResvImportToDatamart",
 							"description": "Log Start of Import to Datamart",
 							"type": "Lookup",
 							"dependsOn": [],
@@ -171,11 +185,11 @@
 							}
 						},
 						{
-							"name": "GetCommitSourceColumnList",
+							"name": "GetResvSourceColumnList",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "LogStartOfCommitImportToDatamart",
+									"activity": "LogStartOfResvImportToDatamart",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -206,12 +220,12 @@
 							}
 						},
 						{
-							"name": "GetCommitSourceColumnListToVariable",
+							"name": "GetResvSourceColumnListToVariable",
 							"description": "Get Commit Source Column List to Variable ",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GetCommitSourceColumnList",
+									"activity": "GetResvSourceColumnList",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -227,11 +241,11 @@
 							}
 						},
 						{
-							"name": "DetectAndLogCommitSourceDbChanges",
+							"name": "DetectAndLogResvSourceDbChanges",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "GetCommitSourceColumnListToVariable",
+									"activity": "GetResvSourceColumnListToVariable",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -281,11 +295,11 @@
 							}
 						},
 						{
-							"name": "GetImportCommitSelectQuery",
+							"name": "GetImportResvSelectQuery",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "SetVar_ComtKeys_2",
+									"activity": "SetVar_ResvKeys_2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -320,11 +334,11 @@
 							}
 						},
 						{
-							"name": "CopyCommitData",
+							"name": "CopyResvData",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
-									"activity": "GetImportCommitSelectQuery",
+									"activity": "GetImportResvSelectQuery",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -366,11 +380,11 @@
 							}
 						},
 						{
-							"name": "LogCommitSuccessfulExecutionToStaging",
+							"name": "LogResvSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "CopyCommitData",
+									"activity": "CopyResvData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -405,11 +419,11 @@
 							}
 						},
 						{
-							"name": "LogCommitError",
+							"name": "LogResvError",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyCommitData",
+									"activity": "CopyResvData",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -452,12 +466,12 @@
 							}
 						},
 						{
-							"name": "CommitPresentationLayerFullRefresh",
+							"name": "ResvPresentationLayerFullRefresh",
 							"description": "Presentation Layer Full Refresh",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "LogCommitSuccessfulExecutionToStaging",
+									"activity": "LogResvSuccessfulExecutionToStaging",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -543,11 +557,11 @@
 							}
 						},
 						{
-							"name": "Generate_ComtKeys_1",
+							"name": "Generate_ResvKeys_1",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "DetectAndLogCommitSourceDbChanges",
+									"activity": "DetectAndLogResvSourceDbChanges",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -579,11 +593,11 @@
 							}
 						},
 						{
-							"name": "Generate_ComtKeys_2",
+							"name": "Generate_ResvKeys_2",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "Generate_ComtKeys_1",
+									"activity": "Generate_ResvKeys_1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -615,11 +629,11 @@
 							}
 						},
 						{
-							"name": "SetVar_ComtKeys_1",
+							"name": "SetVar_ResvKeys_1",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Generate_ComtKeys_2",
+									"activity": "Generate_ResvKeys_2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -635,11 +649,11 @@
 							}
 						},
 						{
-							"name": "SetVar_ComtKeys_2",
+							"name": "SetVar_ResvKeys_2",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "SetVar_ComtKeys_1",
+									"activity": "SetVar_ResvKeys_1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
