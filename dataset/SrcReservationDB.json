@@ -1,0 +1,13 @@
+{
+	"name": "SrcReservationDB",
+	"properties": {
+		"description": "Reservation DB Connection String",
+		"linkedServiceName": {
+			"referenceName": "rsrv_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
