@@ -120,7 +120,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportReservationToDM",
+						"activity": "FullRefreshWithOtherTables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -235,6 +235,30 @@
 						"MaxConcurrentConnections": "4",
 						"DIU": "4"
 					}
+				}
+			},
+			{
+				"name": "FullRefreshWithOtherTables",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportReservationToDM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
