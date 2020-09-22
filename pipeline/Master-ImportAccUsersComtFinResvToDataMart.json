@@ -256,6 +256,35 @@
 					"secureInput": true
 				},
 				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[PresentationLayerFullRefreshWithOtherTables]",
+					"storedProcedureParameters": {
+						"ConfigSchema": {
+							"value": "Employer_Account",
+							"type": "String"
+						},
+						"ConfigTable": {
+							"value": "Account",
+							"type": "String"
+						},
+						"PLTableName": {
+							"value": "Acc_Account",
+							"type": "String"
+						},
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "String"
+						},
+						"SourceDatabaseName": {
+							"value": "Accounts",
+							"type": "String"
+						},
+						"StgTableName": {
+							"value": "Stg.Acc_Accounts",
+							"type": "String"
+						}
+					}
+				},
 				"linkedServiceName": {
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
