@@ -120,7 +120,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "FullRefreshWithOtherTables",
+						"activity": "FullRefreshWithModel",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -238,7 +238,7 @@
 				}
 			},
 			{
-				"name": "FullRefreshWithOtherTables",
+				"name": "FullRefreshWithModel",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
