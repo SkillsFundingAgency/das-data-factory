@@ -161,7 +161,7 @@
 					{
 						"activity": "ExecuteImportAccountsToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -173,7 +173,10 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"RunId": "@{activity('GetRunId').output.firstRow.RunId}",
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
 						"MaxConcurrentConnections": "4",
 						"DIU": "4"
 					}
