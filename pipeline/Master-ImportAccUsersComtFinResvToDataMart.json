@@ -94,7 +94,7 @@
 					{
 						"activity": "ExecuteImportUsersToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
