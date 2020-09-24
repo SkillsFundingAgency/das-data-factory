@@ -91,11 +91,11 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcAccounts",
+									"referenceName": "SrcAppRedundancy",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "Account",
-										"SchemaName": "Employer_Account"
+										"SchemaName": "dbo",
+										"TableName": "Employer"
 									}
 								}
 							}
@@ -283,6 +283,16 @@
 								"dataflow": {
 									"referenceName": "DataFlowAppRedundancy",
 									"type": "DataFlowReference",
+									"parameters": {
+										"SourceQuery": {
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
+											"type": "Expression"
+										},
+										"ColumnList": {
+											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"source1": {
 											"SchemaName": "dbo",
