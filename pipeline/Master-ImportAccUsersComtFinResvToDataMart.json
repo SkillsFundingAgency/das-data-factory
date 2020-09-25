@@ -120,9 +120,9 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportAppRedundancyToDM",
+						"activity": "BuildModelledPL",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -180,6 +180,39 @@
 						"MaxConcurrentConnections": "4",
 						"DIU": "4"
 					}
+				}
+			},
+			{
+				"name": "BuildModelledPL",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportAppRedundancyToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.03:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Build_Modelled_PL]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Int64"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
