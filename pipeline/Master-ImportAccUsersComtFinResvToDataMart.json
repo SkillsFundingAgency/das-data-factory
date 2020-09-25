@@ -64,9 +64,9 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "GetRunId",
+						"activity": "ExecuteImportAppRedundancyToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -120,7 +120,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportAppRedundancyToDM",
+						"activity": "ExecuteImportAccountsToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -159,9 +159,9 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportAccountsToDM",
+						"activity": "GetRunId",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
