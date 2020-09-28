@@ -257,31 +257,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[PresentationLayerFullRefreshModel]",
+					"storedProcedureName": "[dbo].[ImportAccountsToPL]",
 					"storedProcedureParameters": {
-						"ConfigSchema": {
-							"value": "Employer_Account",
-							"type": "String"
-						},
-						"ConfigTable": {
-							"value": "Account",
-							"type": "String"
-						},
-						"PLTableName": {
-							"value": "ASData_PL.Acc_Account",
-							"type": "String"
-						},
 						"RunId": {
 							"value": "@{activity('GetRunId').output.firstRow.RunId}",
 							"type": "Int32"
-						},
-						"SourceDatabaseName": {
-							"value": "Accounts",
-							"type": "String"
-						},
-						"StgTableName": {
-							"value": "stg.Acc_Account",
-							"type": "String"
 						}
 					}
 				},
