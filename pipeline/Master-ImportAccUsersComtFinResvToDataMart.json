@@ -177,7 +177,9 @@
 						"RunId": {
 							"value": "@{activity('GetRunId').output.firstRow.RunId}",
 							"type": "Expression"
-						}
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
 					}
 				}
 			},
@@ -204,7 +206,9 @@
 						"RunId": {
 							"value": "@{activity('GetRunId').output.firstRow.RunId}",
 							"type": "Expression"
-						}
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
 					}
 				}
 			},
