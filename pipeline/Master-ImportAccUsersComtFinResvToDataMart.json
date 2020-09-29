@@ -94,7 +94,7 @@
 					{
 						"activity": "ExecuteImportUsersToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -120,7 +120,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "FullRefreshWithModel",
+						"activity": "BuildModelledPL",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -162,7 +162,7 @@
 					{
 						"activity": "ExecuteImportAccountsToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -189,7 +189,7 @@
 					{
 						"activity": "ExecuteImportComtTpDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -216,7 +216,7 @@
 					{
 						"activity": "ExecuteImportFinToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -238,13 +238,13 @@
 				}
 			},
 			{
-				"name": "FullRefreshWithModel",
+				"name": "BuildModelledPL",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
 						"activity": "ExecuteImportReservationToDM",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -257,10 +257,13 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[ImportAccountsToPL]",
+					"storedProcedureName": "[dbo].[Build_Modelled_PL]",
 					"storedProcedureParameters": {
 						"RunId": {
-							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"value": {
+								"value": "@{activity('GetRunId').output.firstRow.RunId}",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						}
 					}
