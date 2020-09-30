@@ -281,7 +281,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflow1",
+									"referenceName": "DataFlowIncentives",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
@@ -339,11 +339,28 @@
 										},
 										"type": "String"
 									},
+									"ConfigSchema": {
+										"value": "@{item().SCHEMA_NAME}",
+										"type": "String"
+									},
+									"ConfigTable": {
+										"value": "@{item().TABLE_NAME}",
+										"type": "String"
+									},
+									"K1": {
+										"value": null,
+										"type": "String"
+									},
+									"K2": {
+										"value": null,
+										"type": "String"
+									},
+									"KeyBased": {
+										"value": "0",
+										"type": "Int32"
+									},
 									"PLTableName": {
-										"value": {
-											"value": "AsData_PL.EI_@{item().TABLE_NAME}",
-											"type": "Expression"
-										},
+										"value": "ASData_PL.EI_@{item().TABLE_NAME}",
 										"type": "String"
 									},
 									"RunId": {
@@ -353,11 +370,12 @@
 										},
 										"type": "Int32"
 									},
+									"SourceDatabaseName": {
+										"value": "EmpInc",
+										"type": "String"
+									},
 									"StgTableName": {
-										"value": {
-											"value": "Stg.EI_@{item().TABLE_NAME}",
-											"type": "Expression"
-										},
+										"value": "Stg.EI_@{item().TABLE_NAME}",
 										"type": "String"
 									}
 								}
