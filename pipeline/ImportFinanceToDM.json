@@ -315,7 +315,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflowFinance",
+									"referenceName": "DataFlowFinance",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
