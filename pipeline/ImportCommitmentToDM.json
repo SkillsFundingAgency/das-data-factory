@@ -354,7 +354,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "dataflowCommitment",
+									"referenceName": "DataFlowCommitment",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
