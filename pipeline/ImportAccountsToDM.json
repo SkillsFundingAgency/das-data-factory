@@ -91,7 +91,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcAccountsDB",
+									"referenceName": "SrcAccounts",
 									"type": "DatasetReference"
 								}
 							}
