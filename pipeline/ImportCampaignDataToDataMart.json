@@ -1,0 +1,53 @@
+{
+	"name": "ImportCampaignDataToDataMart",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetAccessToken",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"linkedServices": [
+						{
+							"referenceName": "marketo_restservice",
+							"type": "LinkedServiceReference"
+						}
+					],
+					"datasets": [
+						{
+							"referenceName": "SrcRestCampaign",
+							"type": "DatasetReference"
+						}
+					],
+					"authentication": {
+						"type": "Basic",
+						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
+						"password": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVault1",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "marketo-clientsecret"
+						}
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
