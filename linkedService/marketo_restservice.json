@@ -1,6 +1,16 @@
 {
 	"name": "marketo_restservice",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
+		"parameters": {
+			"URL": {
+				"type": "securestring",
+				"defaultValue": {
+					"type": "SecureString",
+					"value": "**********"
+				}
+			}
+		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
@@ -21,6 +31,5 @@
 			"referenceName": "AzureIntegrationRunTime",
 			"type": "IntegrationRuntimeReference"
 		}
-	},
-	"type": "Microsoft.DataFactory/factories/linkedservices"
+	}
 }
