@@ -70,14 +70,17 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com",
+					"url": {
+						"value": "https://665-CPW-432.mktorest.com/bulk/v1/leads/export/create.json?access_token=@{activity('GetAccessToken').output.access_token}",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AzureIntegrationRunTime",
 						"type": "IntegrationRuntimeReference"
 					},
 					"method": "POST",
 					"headers": {
-						"access_token": {
+						"Authorization": {
 							"value": "'bearer '+@{activity('GetAccessToken').output.access_token}",
 							"type": "Expression"
 						}
@@ -99,19 +102,10 @@
 						"filter": {
 							"createdAt": {
 								"startAt": "2020-08-31T23:59:59-00:00",
-								"endAt": "2020-09-31T23:59:59-00:00"
+								"endAt": "2020-09-30T23:59:59-00:00"
 							}
 						}
-					},
-					"datasets": [
-						{
-							"referenceName": "SrcRestCampaign",
-							"type": "DatasetReference",
-							"parameters": {
-								"RelativePath": "/bulk/v1/leads/export/create.json"
-							}
-						}
-					]
+					}
 				}
 			},
 			{
@@ -134,25 +128,621 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com",
+					"url": {
+						"value": "https://665-CPW-432.mktorest.com/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessToken').output.access_token}",
+						"type": "Expression"
+					},
 					"method": "POST",
-					"headers": {
-						"access_token": {
-							"value": "'bearer '+@{activity('GetAccessToken').output.access_token}",
-							"type": "Expression"
+					"body": "v1"
+				}
+			},
+			{
+				"name": "Wait2MinForJobToComplete",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "StartExportJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 120
+				}
+			},
+			{
+				"name": "CopyLeads",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Wait2MinForJobToComplete",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
 						}
 					},
-					"body": "v1",
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeads' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeads]",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "FirstName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "FirstName",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "LastName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LastName",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "LeadId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LeadId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "EmailAddress",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "EmailAddress",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcHttpCampaign",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/bulk/v1/leads/export/eb2bbbdf-d700-4c94-b984-2d182d711219/file.json?access_token=3e0d43d9-aa1c-4615-aa45-55b0102df97e:lon",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoLeads",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetAccessTokenForActivities",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"linkedServices": [
+						{
+							"referenceName": "marketo_restservice",
+							"type": "LinkedServiceReference"
+						}
+					],
 					"datasets": [
 						{
 							"referenceName": "SrcRestCampaign",
 							"type": "DatasetReference",
 							"parameters": {
-								"RelativePath": "/bulk/v1/leads/export/f7ed3c2a-778f-40ac-94b7-e528fb7f59c7/enqueue.json"
+								"RelativePath": "/rest/v1/leads.json"
 							}
 						}
-					]
+					],
+					"authentication": {
+						"type": "Basic",
+						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
+						"password": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVault1",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "marketo-clientsecret"
+						}
+					}
 				}
+			},
+			{
+				"name": "CreateActivitiesExtractJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForActivities",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://665-CPW-432.mktorest.com/bulk/v1/activities/export/create.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "'bearer '+@{activity('GetAccessTokenForActivities').output.access_token}",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"fields": [
+							"marketoGUID",
+							"leadId",
+							"activityDate",
+							"activityTypeId",
+							"campaignId",
+							"primaryAttributeValueId",
+							"primaryAttributeValue",
+							"attributes"
+						],
+						"format": "TSV",
+						"columnHeaderNames": {
+							"marketoGUID": "MarketoGUID",
+							"leadId": "LeadId",
+							"activityDate": "ActivityDate",
+							"activityTypeId": "ActivityTypeId",
+							"campaignId": "CampaignId",
+							"primaryAttributeValueId": "PrimaryAttributeValueId",
+							"primaryAttributeValue": "primaryAttributeValue",
+							"attributes": "Attributes"
+						},
+						"filter": {
+							"createdAt": {
+								"startAt": "2020-08-31T23:59:59-00:00",
+								"endAt": "2020-09-30T23:59:59-00:00"
+							}
+						}
+					}
+				}
+			},
+			{
+				"name": "StartExportJobForActivities",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CreateActivitiesExtractJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://665-CPW-432.mktorest.com/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": "v1"
+				}
+			},
+			{
+				"name": "Wait2MinForActivitiesJobToComplete",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "StartExportJobForActivities",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 120
+				}
+			},
+			{
+				"name": "CopyActivities",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Wait2MinForActivitiesJobToComplete",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivities' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivities]",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "MarketoGUID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "MarketoGUID",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "LeadId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LeadId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ActivityDate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ActivityDate",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ActivityTypeId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ActivityTypeId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CampaignId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CampaignId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "PrimaryAttributeValueId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PrimaryAttributeValueId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "primaryAttributeValue",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PrimaryAttributeValue",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Attributes",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Attributes",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcHttpCampaign",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/bulk/v1/activities/export/56c3137b-4aa4-46de-90f7-f08a04caae56/file.json?access_token=99713bd7-4d9f-4a25-a4d3-19fc7951526e:lon",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoActivities",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetAccessTokenForPrograms",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"linkedServices": [
+						{
+							"referenceName": "marketo_restservice",
+							"type": "LinkedServiceReference"
+						}
+					],
+					"datasets": [
+						{
+							"referenceName": "SrcRestCampaign",
+							"type": "DatasetReference",
+							"parameters": {
+								"RelativePath": "/rest/v1/leads.json"
+							}
+						}
+					],
+					"authentication": {
+						"type": "Basic",
+						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
+						"password": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVault1",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "marketo-clientsecret"
+						}
+					}
+				}
+			},
+			{
+				"name": "CreateProgramsExtractJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForPrograms",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://665-CPW-432.mktorest.com/bulk/v1/program/members/export/create.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "'bearer '+@{activity('GetAccessTokenForPrograms').output.access_token}",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"format": "TSV",
+						"fields": [
+							"firstName",
+							"lastName",
+							"email",
+							"Member Date",
+							"Program",
+							"Status",
+							"Lead Id",
+							"Success"
+						],
+						"filter": {
+							"programId": 1044
+						}
+					}
+				}
+			},
+			{
+				"name": "StartExportJobForPrograms",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CreateProgramsExtractJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://665-CPW-432.mktorest.com/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": "v1"
+				}
+			},
+			{
+				"name": "Wait2MinForActivitiesJobToComplete_copy1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "StartExportJobForPrograms",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 120
+				}
+			},
+			{
+				"name": "GetActivityTypeIds",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
 			}
 		],
 		"annotations": []

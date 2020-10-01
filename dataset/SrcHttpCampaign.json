@@ -1,0 +1,31 @@
+{
+	"name": "SrcHttpCampaign",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "marketo_httpservice",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"RelativePath": {
+				"type": "string",
+				"defaultValue": "/bulk/v1/leads.json"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().RelativePath",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "{"
+		},
+		"schema": []
+	}
+}
