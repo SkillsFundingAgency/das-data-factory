@@ -220,11 +220,11 @@
 								}
 							],
 							"policy": {
-								"timeout": "7.00:00:00",
+								"timeout": "0.00:10:00",
 								"retry": 0,
 								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
+								"secureOutput": true,
+								"secureInput": true
 							},
 							"userProperties": [],
 							"typeProperties": {
@@ -377,30 +377,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataflow": {
-									"referenceName": "dataflow1",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportAccountSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportAccountSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"source1": {
-											"TableName": "Accounts",
-											"SchemaName": "dbo"
-										},
-										"sink1": {
-											"TableName": "Acct_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
 								"integrationRuntime": {
 									"referenceName": "AzureIntegrationRunTime",
 									"type": "IntegrationRuntimeReference"
@@ -1079,30 +1055,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataflow": {
-									"referenceName": "dataflow1",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"source1": {
-											"TableName": "Accounts",
-											"SchemaName": "dbo"
-										},
-										"sink1": {
-											"TableName": "Comt_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
 								"integrationRuntime": {
 									"referenceName": "AzureIntegrationRunTime",
 									"type": "IntegrationRuntimeReference"
@@ -1623,30 +1575,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataflow": {
-									"referenceName": "dataflow1",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportFinanceSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportFinanceSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"source1": {
-											"TableName": "Accounts",
-											"SchemaName": "dbo"
-										},
-										"sink1": {
-											"TableName": "Fin_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
 								"compute": {
 									"coreCount": 8,
 									"computeType": "General"
