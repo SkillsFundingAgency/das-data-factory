@@ -7,7 +7,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcComtDB",
+						"referenceName": "SrcComts",
 						"type": "DatasetReference"
 					},
 					"name": "CommitSource"

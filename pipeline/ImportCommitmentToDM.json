@@ -214,7 +214,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcComtDB",
+									"referenceName": "SrcComts",
 									"type": "DatasetReference"
 								}
 							}
