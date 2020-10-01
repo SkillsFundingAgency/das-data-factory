@@ -6,6 +6,16 @@
 			"referenceName": "eas_fin_dbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "AccountTransfers"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "employer_financial"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": []
