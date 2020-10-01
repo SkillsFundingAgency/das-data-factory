@@ -1,5 +1,5 @@
 {
-	"name": "SrcComtDB",
+	"name": "SrcComts",
 	"properties": {
 		"description": "Commitment database connection string",
 		"linkedServiceName": {
