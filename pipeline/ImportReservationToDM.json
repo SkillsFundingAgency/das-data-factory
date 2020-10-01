@@ -214,7 +214,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcReservationDB",
+									"referenceName": "SrcReservation",
 									"type": "DatasetReference"
 								}
 							}

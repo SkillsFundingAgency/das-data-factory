@@ -7,7 +7,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcReservationDB",
+						"referenceName": "SrcReservation",
 						"type": "DatasetReference"
 					},
 					"name": "ReservationSource"
