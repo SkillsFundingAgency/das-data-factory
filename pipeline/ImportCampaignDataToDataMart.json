@@ -251,7 +251,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/bulk/v1/leads/export/eb2bbbdf-d700-4c94-b984-2d182d711219/file.json?access_token=3e0d43d9-aa1c-4615-aa45-55b0102df97e:lon",
+								"value": "/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessToken').output.access_token}",
 								"type": "Expression"
 							}
 						}
@@ -569,7 +569,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/bulk/v1/activities/export/56c3137b-4aa4-46de-90f7-f08a04caae56/file.json?access_token=99713bd7-4d9f-4a25-a4d3-19fc7951526e:lon",
+								"value": "@/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
 								"type": "Expression"
 							}
 						}
