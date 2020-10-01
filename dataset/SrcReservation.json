@@ -1,5 +1,5 @@
 {
-	"name": "SrcReservationDB",
+	"name": "SrcReservation",
 	"properties": {
 		"description": "Reservation DB Connection String",
 		"linkedServiceName": {
