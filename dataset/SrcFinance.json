@@ -1,5 +1,5 @@
 {
-	"name": "SrcFinanceDB",
+	"name": "SrcFinance",
 	"properties": {
 		"description": "Finance database connection string",
 		"linkedServiceName": {
