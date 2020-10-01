@@ -1,0 +1,24 @@
+{
+	"name": "RestResource1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "marketo_restservice",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"RelativePath": {
+				"type": "string",
+				"defaultValue": "/rest/v1/leads.json"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().RelativePath",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}
