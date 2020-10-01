@@ -46,6 +46,50 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "CreateLeadsExtractJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://665-CPW-432.mktorest.com",
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"access_token": {
+							"value": "'bearer '+@{activity('GetAccessToken').output.access_token}",
+							"type": "Expression"
+						}
+					},
+					"body": "{\n   \"fields\": [\n      \"firstName\",\n      \"lastName\",\n      \"id\",\n      \"email\"\n   ],\n   \"format\": \"CSV\",\n   \"columnHeaderNames\": {\n      \"firstName\": \"FirstName\",\n      \"lastName\": \"LastName\",\n      \"id\": \"LeadId\",\n      \"email\": \"EmailAddress\"\n   },\n   \"filter\":{\n   \"fields\": [\n      \"firstName\",\n      \"lastName\",\n      \"id\",\n      \"marketoGUID\",\n      \"email\"\n   ],\n   \"format\": \"CSV\",\n   \"columnHeaderNames\": {\n      \"firstName\": \"FirstName\",\n      \"lastName\": \"LastName\",\n      \"id\": \"LeadId\",\n      \"email\": \"EmailAddress\"\n   },\n   \"filter\": {\n    \"createdAt\": { \n         \"startAt\": \"2020-08-31T23:59:59-00:00\",\n         \"endAt\": \"2020-09-31T23:59:59-00:00\"\n      }\n   }\n}",
+					"datasets": [
+						{
+							"referenceName": "SrcRestCampaign",
+							"type": "DatasetReference",
+							"parameters": {
+								"RelativePath": "/bulk/v1/leads/export/create.json"
+							}
+						}
+					]
+				}
 			}
 		],
 		"annotations": []
