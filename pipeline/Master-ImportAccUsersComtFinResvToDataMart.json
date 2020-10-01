@@ -155,7 +155,7 @@
 				}
 			},
 			{
-				"name": "ExecuteImportComtTpDM",
+				"name": "ExecuteImportComtToDM",
 				"description": "Execute Import Commitment data to DM ",
 				"type": "ExecutePipeline",
 				"dependsOn": [
@@ -189,7 +189,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportComtTpDM",
+						"activity": "ExecuteImportComtToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
