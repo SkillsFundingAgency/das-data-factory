@@ -6,6 +6,16 @@
 			"referenceName": "comt_dbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "Apprenticeship"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": []
