@@ -1,6 +1,16 @@
 {
 	"name": "marketo_restservice",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
+		"parameters": {
+			"ID": {
+				"type": "securestring",
+				"defaultValue": {
+					"type": "SecureString",
+					"value": "**********"
+				}
+			}
+		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
