@@ -7,7 +7,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcFinanceDB",
+						"referenceName": "SrcFinance",
 						"type": "DatasetReference"
 					},
 					"name": "Financesource"

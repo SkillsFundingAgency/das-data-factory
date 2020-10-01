@@ -175,7 +175,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcFinanceDB",
+									"referenceName": "SrcFinance",
 									"type": "DatasetReference"
 								}
 							}
