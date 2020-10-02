@@ -5,12 +5,8 @@
 			"referenceName": "marketo_restservice",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"MarketoRestUrl": {
-					"value": "@dataset().RestUrl",
-					"type": "Expression"
-				},
-				"MarketoUserName": {
-					"value": "@dataset().UserName",
+				"MarketoBaseUrl": {
+					"value": "@dataset().BaseUrl",
 					"type": "Expression"
 				}
 			}
@@ -20,10 +16,7 @@
 				"type": "string",
 				"defaultValue": "/rest/v1/leads.json"
 			},
-			"RestUrl": {
-				"type": "string"
-			},
-			"UserName": {
+			"BaseUrl": {
 				"type": "string"
 			}
 		},
