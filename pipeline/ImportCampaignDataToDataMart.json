@@ -7,7 +7,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "GetBaseUrl",
+						"activity": "SetKey",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -280,7 +280,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "GetBaseUrl",
+						"activity": "SetKey",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -605,7 +605,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "GetBaseUrl",
+						"activity": "SetKey",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -833,7 +833,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "GetBaseUrl",
+						"activity": "SetKey",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -888,7 +888,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "GetBaseUrl",
+						"activity": "SetKey",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -903,39 +903,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secrect=@{variables('Key')}",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AzureIntegrationRunTime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"method": "GET",
-					"linkedServices": [
-						{
-							"referenceName": "marketo_restservice",
-							"type": "LinkedServiceReference"
-						}
-					],
-					"datasets": [
-						{
-							"referenceName": "SrcRestMarketo",
-							"type": "DatasetReference",
-							"parameters": {
-								"RelativePath": "/rest/v1/leads.json"
-							}
-						}
-					],
-					"authentication": {
-						"type": "Basic",
-						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
-						"password": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "AzureKeyVault1",
-								"type": "LinkedServiceReference"
-							},
-							"secretName": "marketo-clientsecret"
-						}
-					}
+					"method": "GET"
 				}
 			},
 			{
@@ -1223,41 +1199,6 @@
 				]
 			},
 			{
-				"name": "GetBaseUrl",
-				"type": "WebActivity",
-				"dependsOn": [
-					{
-						"activity": "GetVaultUrl",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"url": {
-						"value": "https://das-at-dfac-kv.vault.azure.net/secrets/marketo-baseurl",
-						"type": "Expression"
-					},
-					"connectVia": {
-						"referenceName": "AzureIntegrationRunTime",
-						"type": "IntegrationRuntimeReference"
-					},
-					"method": "GET",
-					"authentication": {
-						"type": "MSI",
-						"resource": "https://vault.azure.net"
-					}
-				}
-			},
-			{
 				"name": "GetVaultUrl",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -1288,8 +1229,207 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "SetVaultUrl",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "VaultUrl",
+					"value": {
+						"value": "@activity('GetVaultUrl').output.firstRow.VaultUrl",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetBaseUrl",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-baseurl?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetBaseUrl",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BaseUrl",
+					"value": {
+						"value": "@activity('GetBaseUrl').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetUserName",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetBaseUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-clientid?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetUserName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetUserName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Name",
+					"value": {
+						"value": "@activity('GetUserName').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetKey",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetUserName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-clientsecret?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetKey",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Name",
+					"value": {
+						"value": "@activity('GetKey').output.value",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"VaultUrl": {
+				"type": "String"
+			},
+			"BaseUrl": {
+				"type": "String"
+			},
+			"Name": {
+				"type": "String"
+			},
+			"Key": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
