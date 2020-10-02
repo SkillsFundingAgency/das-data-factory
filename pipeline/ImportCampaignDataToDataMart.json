@@ -75,7 +75,7 @@
 							"id",
 							"email"
 						],
-						"format": "CSV",
+						"format": "TSV",
 						"columnHeaderNames": {
 							"firstName": "FirstName",
 							"lastName": "LastName",
@@ -1097,6 +1097,15 @@
 								"sink": {
 									"name": "Success",
 									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Program Id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ProgramId"
 								}
 							}
 						],
