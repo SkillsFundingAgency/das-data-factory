@@ -1,10 +1,15 @@
 {
 	"name": "marketo_restservice",
 	"properties": {
+		"parameters": {
+			"MarketoRestUrl": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://665-CPW-432.mktorest.com",
+			"url": "@{linkedService().MarketoRestUrl}",
 			"enableServerCertificateValidation": false,
 			"authenticationType": "Basic",
 			"userName": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
