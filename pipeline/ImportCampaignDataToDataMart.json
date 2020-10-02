@@ -7,9 +7,9 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "SetKey",
+						"activity": "CopyLeadPrograms",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -260,9 +260,9 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "SetKey",
+						"activity": "CopyLeads",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -565,9 +565,9 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "SetKey",
+						"activity": "GetActivityTypeIds",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -612,7 +612,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "@{variables('Key')}/bulk/v1/program/members/export/create.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"value": "@{variables('BaseUrl')}/bulk/v1/program/members/export/create.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
 						"type": "Expression"
 					},
 					"connectVia": {
