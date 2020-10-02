@@ -1,5 +1,5 @@
 {
-	"name": "SrcHttpCampaign",
+	"name": "SrcHttpMarketo",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "marketo_httpservice",

@@ -254,7 +254,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcHttpCampaign",
+						"referenceName": "SrcHttpMarketo",
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
@@ -579,7 +579,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcHttpCampaign",
+						"referenceName": "SrcHttpMarketo",
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
@@ -1201,7 +1201,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcHttpCampaign",
+						"referenceName": "SrcHttpMarketo",
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
