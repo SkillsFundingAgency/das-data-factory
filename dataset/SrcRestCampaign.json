@@ -3,12 +3,28 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "marketo_restservice",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"MarketoRestUrl": {
+					"value": "@dataset().RestUrl",
+					"type": "Expression"
+				},
+				"MarketoUserName": {
+					"value": "@dataset().UserName",
+					"type": "Expression"
+				}
+			}
 		},
 		"parameters": {
 			"RelativePath": {
 				"type": "string",
 				"defaultValue": "/rest/v1/leads.json"
+			},
+			"RestUrl": {
+				"type": "string"
+			},
+			"UserName": {
+				"type": "string"
 			}
 		},
 		"annotations": [],

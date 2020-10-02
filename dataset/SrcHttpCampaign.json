@@ -3,12 +3,21 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "marketo_httpservice",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"MarketoBaseUrl": {
+					"value": "@dataset().MarketoBaseUrl",
+					"type": "Expression"
+				}
+			}
 		},
 		"parameters": {
 			"RelativePath": {
 				"type": "string",
 				"defaultValue": "/bulk/v1/leads.json"
+			},
+			"MarketoBaseUrl": {
+				"type": "string"
 			}
 		},
 		"annotations": [],

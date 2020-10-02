@@ -619,19 +619,7 @@
 								"RelativePath": "/rest/v1/leads.json"
 							}
 						}
-					],
-					"authentication": {
-						"type": "Basic",
-						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
-						"password": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "AzureKeyVault1",
-								"type": "LinkedServiceReference"
-							},
-							"secretName": "marketo-clientsecret"
-						}
-					}
+					]
 				}
 			},
 			{
@@ -677,6 +665,7 @@
 							"email",
 							"Member Date",
 							"Program",
+							"Program Id",
 							"Status",
 							"Lead Id",
 							"Success"
