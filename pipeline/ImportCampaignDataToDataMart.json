@@ -1186,6 +1186,38 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "GetVaultUrl",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "SrcHttpCampaign",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": "/bulk/v1/leads.json"
+						}
+					}
+				}
 			}
 		],
 		"annotations": []
