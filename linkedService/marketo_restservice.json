@@ -2,28 +2,16 @@
 	"name": "marketo_restservice",
 	"properties": {
 		"parameters": {
-			"MarketoRestUrl": {
-				"type": "String"
-			},
-			"MarketoUserName": {
+			"MarketoBaseUrl": {
 				"type": "String"
 			}
 		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "@{linkedService().MarketoRestUrl}",
-			"enableServerCertificateValidation": false,
-			"authenticationType": "Basic",
-			"userName": "@{linkedService().MarketoUserName}",
-			"password": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "AzureKeyVault1",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "marketo-clientsecret"
-			}
+			"url": "@{linkedService().MarketoBaseUrl}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
 		},
 		"connectVia": {
 			"referenceName": "AzureIntegrationRunTime",
