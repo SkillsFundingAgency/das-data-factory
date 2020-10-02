@@ -1344,7 +1344,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Name",
+					"variableName": "Key",
 					"value": {
 						"value": "@activity('GetKey').output.value",
 						"type": "Expression"
