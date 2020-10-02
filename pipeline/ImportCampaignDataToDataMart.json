@@ -733,16 +733,313 @@
 			},
 			{
 				"name": "GetActivityTypeIds",
-				"type": "WebActivity",
-				"dependsOn": [],
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForActivityIds",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
-					"timeout": "0.00:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivityTypes' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivityTypes]",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "name"
+								}
+							},
+							{
+								"source": {
+									"path": "['description']"
+								},
+								"sink": {
+									"name": "description"
+								}
+							}
+						],
+						"collectionReference": "$['result']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRestCampaign",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/rest/v1/activities/types.json?access_token=@{activity('GetAccessTokenForActivityIds').output.access_token}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoActivityTypes",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetAccessTokenForActivityIds",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"linkedServices": [
+						{
+							"referenceName": "marketo_restservice",
+							"type": "LinkedServiceReference"
+						}
+					],
+					"datasets": [
+						{
+							"referenceName": "SrcRestCampaign",
+							"type": "DatasetReference",
+							"parameters": {
+								"RelativePath": "/rest/v1/leads.json"
+							}
+						}
+					],
+					"authentication": {
+						"type": "Basic",
+						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
+						"password": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVault1",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "marketo-clientsecret"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetAccessTokenForProgramTypesNames",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"linkedServices": [
+						{
+							"referenceName": "marketo_restservice",
+							"type": "LinkedServiceReference"
+						}
+					],
+					"datasets": [
+						{
+							"referenceName": "SrcRestCampaign",
+							"type": "DatasetReference",
+							"parameters": {
+								"RelativePath": "/rest/v1/leads.json"
+							}
+						}
+					],
+					"authentication": {
+						"type": "Basic",
+						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
+						"password": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVault1",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "marketo-clientsecret"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetProgramNames",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForProgramTypesNames",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoPrograms]",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "name"
+								}
+							},
+							{
+								"source": {
+									"path": "['description']"
+								},
+								"sink": {
+									"name": "description"
+								}
+							},
+							{
+								"source": {
+									"path": "['createdAt']"
+								},
+								"sink": {
+									"name": "createdAt"
+								}
+							},
+							{
+								"source": {
+									"path": "['updatedAt']"
+								},
+								"sink": {
+									"name": "updatedAt"
+								}
+							},
+							{
+								"source": {
+									"path": "['url']"
+								},
+								"sink": {
+									"name": "url"
+								}
+							},
+							{
+								"source": {
+									"path": "['type']"
+								},
+								"sink": {
+									"name": "type"
+								}
+							},
+							{
+								"source": {
+									"path": "['channel']"
+								},
+								"sink": {
+									"name": "channel"
+								}
+							}
+						],
+						"collectionReference": "$['result']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRestCampaign",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/rest/asset/v1/programs.json?access_token=701a9cdb-386a-4da7-bf86-377f144a6c6d:lon",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoPrograms",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"annotations": []
