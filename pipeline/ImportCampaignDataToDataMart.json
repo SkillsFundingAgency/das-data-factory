@@ -36,7 +36,7 @@
 					],
 					"datasets": [
 						{
-							"referenceName": "SrcRestCampaign",
+							"referenceName": "SrcRestMarketo",
 							"type": "DatasetReference",
 							"parameters": {
 								"RelativePath": "/rest/v1/leads.json"
@@ -309,7 +309,7 @@
 					],
 					"datasets": [
 						{
-							"referenceName": "SrcRestCampaign",
+							"referenceName": "SrcRestMarketo",
 							"type": "DatasetReference",
 							"parameters": {
 								"RelativePath": "/rest/v1/leads.json"
@@ -634,7 +634,7 @@
 					],
 					"datasets": [
 						{
-							"referenceName": "SrcRestCampaign",
+							"referenceName": "SrcRestMarketo",
 							"type": "DatasetReference",
 							"parameters": {
 								"RelativePath": "/rest/v1/leads.json"
@@ -807,7 +807,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRestCampaign",
+						"referenceName": "SrcRestMarketo",
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
@@ -862,7 +862,7 @@
 					],
 					"datasets": [
 						{
-							"referenceName": "SrcRestCampaign",
+							"referenceName": "SrcRestMarketo",
 							"type": "DatasetReference",
 							"parameters": {
 								"RelativePath": "/rest/v1/leads.json"
@@ -917,7 +917,7 @@
 					],
 					"datasets": [
 						{
-							"referenceName": "SrcRestCampaign",
+							"referenceName": "SrcRestMarketo",
 							"type": "DatasetReference",
 							"parameters": {
 								"RelativePath": "/rest/v1/leads.json"
@@ -1044,7 +1044,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRestCampaign",
+						"referenceName": "SrcRestMarketo",
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {

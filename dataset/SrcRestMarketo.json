@@ -1,5 +1,5 @@
 {
-	"name": "SrcRestCampaign",
+	"name": "SrcRestMarketo",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "marketo_restservice",
