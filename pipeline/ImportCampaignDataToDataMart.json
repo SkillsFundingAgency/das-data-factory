@@ -5,7 +5,14 @@
 			{
 				"name": "GetAccessToken",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -271,7 +278,14 @@
 			{
 				"name": "GetAccessTokenForActivities",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -589,7 +603,14 @@
 			{
 				"name": "GetAccessTokenForPrograms",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -810,7 +831,14 @@
 			{
 				"name": "GetAccessTokenForActivityIds",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -858,7 +886,14 @@
 			{
 				"name": "GetAccessTokenForProgramTypesNames",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -1188,6 +1223,41 @@
 				]
 			},
 			{
+				"name": "GetBaseUrl",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://das-at-dfac-kv.vault.azure.net/secrets/marketo-baseurl",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
 				"name": "GetVaultUrl",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -1198,26 +1268,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "HttpReadSettings",
-							"requestMethod": "GET"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"dataset": {
-						"referenceName": "SrcHttpCampaign",
-						"type": "DatasetReference",
-						"parameters": {
-							"RelativePath": "/bulk/v1/leads.json"
-						}
-					}
-				}
+				"userProperties": []
 			}
 		],
 		"annotations": []
