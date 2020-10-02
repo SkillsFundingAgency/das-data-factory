@@ -1268,7 +1268,26 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-dfac-kv.vault.azure.net'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-test-dfac-kv.vault.azure.net'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-pp-dfac-kv.vault.azure.net'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-dfac-kv.vault.azure.net'\n                      ELSE 'Unknown'\n           END VaultUrl\n                ",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
 			}
 		],
 		"annotations": []
