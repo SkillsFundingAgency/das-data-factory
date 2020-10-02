@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-dfac-kv.vault.azure.net'\n              END",
+							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-dfac-kv.vault.azure.net'\n              END as KeyVault",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
