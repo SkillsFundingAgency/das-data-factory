@@ -1024,7 +1024,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/rest/asset/v1/programs.json?access_token=701a9cdb-386a-4da7-bf86-377f144a6c6d:lon",
+								"value": "/rest/asset/v1/programs.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}",
 								"type": "Expression"
 							}
 						}
