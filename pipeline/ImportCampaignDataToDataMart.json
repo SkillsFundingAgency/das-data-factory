@@ -682,7 +682,7 @@
 							"Success"
 						],
 						"filter": {
-							"programId": 1044
+							"programId": 1010
 						}
 					}
 				}
@@ -1036,6 +1036,163 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"TableName": "MarketoPrograms",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "CopyLeadPrograms",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Wait2MinForActivitiesJobToComplete_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "firstName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "firstName",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "lastName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "lastName",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "email",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "email",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Member Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "MemberDate",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Program",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Program",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Lead Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LeadId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Success",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Success",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcHttpCampaign",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoLeadPrograms",
 							"SchemaName": "Stg"
 						}
 					}
