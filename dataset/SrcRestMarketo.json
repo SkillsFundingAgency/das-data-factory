@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"MarketoBaseUrl": {
-					"value": "@dataset().BaseUrl",
+					"value": "@dataset().MarketoBaseUrl",
 					"type": "Expression"
 				}
 			}
@@ -16,7 +16,7 @@
 				"type": "string",
 				"defaultValue": "/rest/v1/leads.json"
 			},
-			"BaseUrl": {
+			"MarketoBaseUrl": {
 				"type": "string"
 			}
 		},
