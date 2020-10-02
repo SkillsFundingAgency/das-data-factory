@@ -1,6 +1,11 @@
 {
 	"name": "marketo_httpservice",
 	"properties": {
+		"parameters": {
+			"MarketoBaseUrl": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
