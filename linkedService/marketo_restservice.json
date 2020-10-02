@@ -5,17 +5,8 @@
 		"type": "RestService",
 		"typeProperties": {
 			"url": "https://665-CPW-432.mktorest.com",
-			"enableServerCertificateValidation": true,
-			"authenticationType": "Basic",
-			"userName": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
-			"password": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "AzureKeyVault1",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "marketo-clientsecret"
-			}
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Anonymous"
 		},
 		"connectVia": {
 			"referenceName": "AzureIntegrationRunTime",
