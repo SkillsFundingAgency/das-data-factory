@@ -54,7 +54,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://665-CPW-432.mktorest.com/bulk/v1/leads/export/create.json?access_token=@{activity('GetAccessToken').output.access_token}",
+						"value": "@{variables('BaseUrl')}/bulk/v1/leads/export/create.json?access_token=@{activity('GetAccessToken').output.access_token}",
 						"type": "Expression"
 					},
 					"connectVia": {
@@ -112,7 +112,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://665-CPW-432.mktorest.com/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessToken').output.access_token}",
+						"value": "@{variables('BaseUrl')}/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessToken').output.access_token}",
 						"type": "Expression"
 					},
 					"method": "POST",
@@ -236,6 +236,10 @@
 							"RelativePath": {
 								"value": "/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessToken').output.access_token}",
 								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
 							}
 						}
 					}
@@ -303,7 +307,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://665-CPW-432.mktorest.com/bulk/v1/activities/export/create.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+						"value": "@{variables('BaseUrl')}/bulk/v1/activities/export/create.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
 						"type": "Expression"
 					},
 					"connectVia": {
@@ -369,7 +373,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://665-CPW-432.mktorest.com/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+						"value": "@{variables('BaseUrl')}/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
 						"type": "Expression"
 					},
 					"method": "POST",
@@ -537,6 +541,10 @@
 							"RelativePath": {
 								"value": "@/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
 								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
 							}
 						}
 					}
@@ -604,7 +612,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://665-CPW-432.mktorest.com/bulk/v1/program/members/export/create.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"value": "@{variables('Key')}/bulk/v1/program/members/export/create.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
 						"type": "Expression"
 					},
 					"connectVia": {
@@ -658,7 +666,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://665-CPW-432.mktorest.com/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"value": "@{variables('BaseUrl')}/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
 						"type": "Expression"
 					},
 					"method": "POST",
@@ -752,6 +760,10 @@
 						"parameters": {
 							"RelativePath": {
 								"value": "/rest/v1/activities/types.json?access_token=@{activity('GetAccessTokenForActivityIds').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
 								"type": "Expression"
 							}
 						}
@@ -942,6 +954,10 @@
 							"RelativePath": {
 								"value": "/rest/asset/v1/programs.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}",
 								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
 							}
 						}
 					}
@@ -1098,6 +1114,10 @@
 						"parameters": {
 							"RelativePath": {
 								"value": "/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
 								"type": "Expression"
 							}
 						}
