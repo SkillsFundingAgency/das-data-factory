@@ -1005,7 +1005,9 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"tableOption": "autoCreate"
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeadPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeadPrograms]",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -1101,8 +1103,7 @@
 							},
 							{
 								"source": {
-									"name": "Program Id",
-									"type": "String"
+									"name": "Program Id"
 								},
 								"sink": {
 									"name": "ProgramId"
