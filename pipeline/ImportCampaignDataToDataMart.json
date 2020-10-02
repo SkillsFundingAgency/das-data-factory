@@ -132,7 +132,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 120
+					"waitTimeInSeconds": 300
 				}
 			},
 			{
@@ -393,7 +393,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 120
+					"waitTimeInSeconds": 300
 				}
 			},
 			{
@@ -686,7 +686,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 120
+					"waitTimeInSeconds": 300
 				}
 			},
 			{
