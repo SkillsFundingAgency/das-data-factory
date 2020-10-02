@@ -22,39 +22,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AzureIntegrationRunTime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"method": "GET",
-					"linkedServices": [
-						{
-							"referenceName": "marketo_restservice",
-							"type": "LinkedServiceReference"
-						}
-					],
-					"datasets": [
-						{
-							"referenceName": "SrcRestMarketo",
-							"type": "DatasetReference",
-							"parameters": {
-								"RelativePath": "/rest/v1/leads.json"
-							}
-						}
-					],
-					"authentication": {
-						"type": "Basic",
-						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
-						"password": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "AzureKeyVault1",
-								"type": "LinkedServiceReference"
-							},
-							"secretName": "marketo-clientsecret"
-						}
-					}
+					"method": "GET"
 				}
 			},
 			{
@@ -295,39 +271,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AzureIntegrationRunTime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"method": "GET",
-					"linkedServices": [
-						{
-							"referenceName": "marketo_restservice",
-							"type": "LinkedServiceReference"
-						}
-					],
-					"datasets": [
-						{
-							"referenceName": "SrcRestMarketo",
-							"type": "DatasetReference",
-							"parameters": {
-								"RelativePath": "/rest/v1/leads.json"
-							}
-						}
-					],
-					"authentication": {
-						"type": "Basic",
-						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
-						"password": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "AzureKeyVault1",
-								"type": "LinkedServiceReference"
-							},
-							"secretName": "marketo-clientsecret"
-						}
-					}
+					"method": "GET"
 				}
 			},
 			{
@@ -620,27 +572,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AzureIntegrationRunTime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"method": "GET",
-					"linkedServices": [
-						{
-							"referenceName": "marketo_restservice",
-							"type": "LinkedServiceReference"
-						}
-					],
-					"datasets": [
-						{
-							"referenceName": "SrcRestMarketo",
-							"type": "DatasetReference",
-							"parameters": {
-								"RelativePath": "/rest/v1/leads.json"
-							}
-						}
-					]
+					"method": "GET"
 				}
 			},
 			{
@@ -848,39 +788,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://665-CPW-432.mktorest.com/identity/oauth/token?grant_type=client_credentials",
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AzureIntegrationRunTime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"method": "GET",
-					"linkedServices": [
-						{
-							"referenceName": "marketo_restservice",
-							"type": "LinkedServiceReference"
-						}
-					],
-					"datasets": [
-						{
-							"referenceName": "SrcRestMarketo",
-							"type": "DatasetReference",
-							"parameters": {
-								"RelativePath": "/rest/v1/leads.json"
-							}
-						}
-					],
-					"authentication": {
-						"type": "Basic",
-						"username": "fe80b247-329c-4f29-8fb9-0159f2978f4c",
-						"password": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "AzureKeyVault1",
-								"type": "LinkedServiceReference"
-							},
-							"secretName": "marketo-clientsecret"
-						}
-					}
+					"method": "GET"
 				}
 			},
 			{
@@ -904,7 +820,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secrect=@{variables('Key')}",
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
 						"type": "Expression"
 					},
 					"connectVia": {
