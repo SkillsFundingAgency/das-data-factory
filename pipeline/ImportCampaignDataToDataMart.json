@@ -168,7 +168,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeads' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeads]\n\n/*Start Logging */\n\nDECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeads' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeads]\n\n/*Start Logging */\n\nDECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+							"type": "Expression"
+						},
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -429,7 +432,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivities' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivities]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoActivitiesToDMStaging'\n\t   ,getdate()\n\t   ,0\n\n\n",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivities' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivities]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoActivitiesToDMStaging'\n\t   ,getdate()\n\t   ,0\n\n\n",
+							"type": "Expression"
+						},
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -717,7 +723,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivityTypes' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivityTypes]\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoActivityTypeIdsToDMStaging'\n\t   ,getdate()\n\t   ,0\n",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivityTypes' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivityTypes]\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoActivityTypeIdsToDMStaging'\n\t   ,getdate()\n\t   ,0\n",
+							"type": "Expression"
+						},
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -870,7 +879,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoPrograms]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoProgramsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoPrograms]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoProgramsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -1005,7 +1017,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeadPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeadPrograms]\n\n/* Start Logging */\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoLeadProgramsToDMStaging'\n\t   ,getdate()\n\t   ,0\n",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeadPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeadPrograms]\n\n/* Start Logging */\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoLeadProgramsToDMStaging'\n\t   ,getdate()\n\t   ,0\n",
+							"type": "Expression"
+						},
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
@@ -1149,7 +1164,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "LogStartOfImport",
+						"activity": "SetRunId",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1369,112 +1384,9 @@
 				}
 			},
 			{
-				"name": "LogStartOfImport",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "SetRunId",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportCampaignMarketoDataToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "GetRunId",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "GenerateRunId",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:30:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Stg",
-							"SchemaName": "Users"
-						}
-					},
-					"firstRowOnly": true
-				}
-			},
-			{
-				"name": "GenerateRunId",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.00:30:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[GenerateRunId]"
-				},
-				"linkedServiceName": {
-					"referenceName": "datamgmt_staging_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
 				"name": "SetRunId",
 				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "GetRunId",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "RunId",
@@ -1506,7 +1418,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadProgramsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadProgramsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -1542,7 +1457,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivityTypeIdsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivityTypeIdsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -1578,7 +1496,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -1614,7 +1535,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivitiesToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivitiesToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -1650,7 +1574,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoProgramsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoProgramsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -1686,7 +1613,248 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "jj",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('GetProgramNames').Error.message}\n",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoProgramsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorActivityTypeIdsCopyError",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetActivityTypeIds",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": "@{activity('GetActivityTypeIds').Error.message}"
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoActivityTypeIdsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorCopyLeadPrograms",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyLeadPrograms",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('CopyLeadPrograms').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoLeadProgramsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorCopyLeads",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyLeads",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('CopyLeads').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": {
+									"value": "ImportMarketoLeadsToDMStaging",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorCopyActivities",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyActivities",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": "@{activity('CopyActivities').Error.message}"
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoCopyActivitiesToDMStaging"
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -1701,6 +1869,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"RunId": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"VaultUrl": {
 				"type": "String"
