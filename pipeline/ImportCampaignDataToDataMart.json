@@ -1391,7 +1391,7 @@
 				"typeProperties": {
 					"variableName": "RunId",
 					"value": {
-						"value": "@activity('GetRunId').output.firstRow.RunId",
+						"value": "@pipeline().parameters.RunId",
 						"type": "Expression"
 					}
 				}
