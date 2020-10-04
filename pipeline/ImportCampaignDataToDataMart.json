@@ -1397,7 +1397,7 @@
 				}
 			},
 			{
-				"name": "LogSuccessfulActivityIdsCopy",
+				"name": "LogSuccessfulLeadProgramsCopy",
 				"type": "Lookup",
 				"dependsOn": [
 					{
