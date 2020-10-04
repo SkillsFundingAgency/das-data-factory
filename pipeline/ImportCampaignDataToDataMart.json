@@ -9,7 +9,7 @@
 					{
 						"activity": "CopyLeadPrograms",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -265,7 +265,7 @@
 					{
 						"activity": "CopyLeads",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -573,7 +573,7 @@
 					{
 						"activity": "GetActivityTypeIds",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
