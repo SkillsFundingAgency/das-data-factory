@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportRedundancyToDataMart",
+						"activity": "ExecuteImportRedundancyToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -278,7 +278,7 @@
 				}
 			},
 			{
-				"name": "ExecuteImportRedundancyToDataMart",
+				"name": "ExecuteImportRedundancyToDM",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -291,7 +291,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportAppRedundancyToDataMart",
+						"referenceName": "ImportAppRedundancyToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

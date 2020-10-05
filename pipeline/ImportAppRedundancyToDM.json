@@ -1,5 +1,5 @@
 {
-	"name": "ImportAppRedundancyToDataMart",
+	"name": "ImportAppRedundancyToDM",
 	"properties": {
 		"activities": [
 			{
