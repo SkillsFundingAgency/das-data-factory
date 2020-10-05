@@ -1,0 +1,21 @@
+{
+	"name": "marketo_httpservice",
+	"properties": {
+		"parameters": {
+			"MarketoBaseUrl": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "@{linkedService().MarketoBaseUrl}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

@@ -155,7 +155,8 @@
 				}
 			},
 			{
-				"name": "ExecuteImportAppRedundancyToDM",
+				"name": "ExecuteImportComtToDM",
+				"description": "Execute Import Commitment data to DM ",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -168,7 +169,65 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportAppRedundancyToDataMart",
+						"referenceName": "ImportCommitmentToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportFinToDM",
+				"description": "Execute Import Finance data to DM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportComtToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportFinanceToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportReservationToDM",
+				"description": "Import Reservation to DM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportFinToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportReservationToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
@@ -187,14 +246,14 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportAppRedundancyToDM",
+						"activity": "ExecuteImportReservationToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
 					}
 				],
 				"policy": {
-					"timeout": "0.03:00:00",
+					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": true,
@@ -205,8 +264,11 @@
 					"storedProcedureName": "[dbo].[Build_Modelled_PL]",
 					"storedProcedureParameters": {
 						"RunId": {
-							"value": "@{activity('GetRunId').output.firstRow.RunId}",
-							"type": "Int64"
+							"value": {
+								"value": "@{activity('GetRunId').output.firstRow.RunId}",
+								"type": "Expression"
+							},
+							"type": "Int32"
 						}
 					}
 				},
