@@ -35,11 +35,20 @@
 		"faa_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "findapprenticeship"
 		},
+		"marketo_httpservice_properties_typeProperties_url": {
+			"value": "@{linkedService().MarketoBaseUrl}"
+		},
+		"marketo_restservice_properties_typeProperties_url": {
+			"value": "@{linkedService().MarketoBaseUrl}"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "rcrt-cdbconnectionstring"
 		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "recruit"
+		},
+		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "rsrv-dbconnectionstring"
 		},
 		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "users-dbconnectionstring"

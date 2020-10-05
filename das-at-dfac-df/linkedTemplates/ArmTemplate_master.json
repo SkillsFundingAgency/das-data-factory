@@ -47,6 +47,14 @@
 			"type": "string",
 			"defaultValue": "findapprenticeship"
 		},
+		"marketo_httpservice_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().MarketoBaseUrl}"
+		},
+		"marketo_restservice_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().MarketoBaseUrl}"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rcrt-cdbconnectionstring"
@@ -54,6 +62,10 @@
 		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "recruit"
+		},
+		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "rsrv-dbconnectionstring"
 		},
 		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
@@ -136,11 +148,20 @@
 					"faa_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('faa_cdbconnectionstring_properties_typeProperties_database')]"
 					},
+					"marketo_httpservice_properties_typeProperties_url": {
+						"value": "[parameters('marketo_httpservice_properties_typeProperties_url')]"
+					},
+					"marketo_restservice_properties_typeProperties_url": {
+						"value": "[parameters('marketo_restservice_properties_typeProperties_url')]"
+					},
 					"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
+					},
+					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
@@ -157,6 +178,26 @@
 				"mode": "incremental",
 				"templateLink": {
 					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "das-at-dfac-df_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -181,7 +222,7 @@
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_0')]"
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_1')]"
 			]
 		}
 	]
