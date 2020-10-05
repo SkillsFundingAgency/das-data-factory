@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportReservationToDM",
+						"activity": "ExecuteImportRedundancyToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -275,6 +275,31 @@
 				"linkedServiceName": {
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ExecuteImportRedundancyToDM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportReservationToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportAppRedundancyToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": "@{activity('GetRunId').output.firstRow.RunId}",
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
 				}
 			}
 		],
