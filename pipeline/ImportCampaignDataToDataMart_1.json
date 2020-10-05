@@ -142,7 +142,7 @@
 					"timeout": "0.00:10:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
+					"secureOutput": true,
 					"secureInput": true
 				},
 				"userProperties": [],
@@ -846,11 +846,11 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/rest/v1/campaigns.json?access_token=ebe4d8b1-d3ea-470c-b6ea-5fc2fb590842:lon",
+								"value": "/rest/v1/campaigns.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}",
 								"type": "Expression"
 							},
 							"MarketoBaseUrl": {
-								"value": "https://665-CPW-432.mktorest.com",
+								"value": "@variables('BaseUrl')",
 								"type": "Expression"
 							}
 						}
