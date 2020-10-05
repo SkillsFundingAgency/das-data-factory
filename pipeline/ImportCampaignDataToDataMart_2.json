@@ -581,7 +581,7 @@
 					"timeout": "0.00:10:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
+					"secureOutput": false,
 					"secureInput": true
 				},
 				"userProperties": [],
@@ -718,7 +718,8 @@
 								},
 								"sink": {
 									"name": "firstName",
-									"physicalType": "int"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -729,7 +730,8 @@
 								},
 								"sink": {
 									"name": "lastName",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -740,7 +742,8 @@
 								},
 								"sink": {
 									"name": "email",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -751,7 +754,8 @@
 								},
 								"sink": {
 									"name": "MemberDate",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -762,7 +766,8 @@
 								},
 								"sink": {
 									"name": "Program",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -773,7 +778,8 @@
 								},
 								"sink": {
 									"name": "Status",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -784,7 +790,8 @@
 								},
 								"sink": {
 									"name": "LeadId",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -795,22 +802,27 @@
 								},
 								"sink": {
 									"name": "Success",
-									"physicalType": "varchar"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "Program Id",
-									"type": "String"
+									"type": "String",
+									"physicalType": "String"
 								},
 								"sink": {
-									"name": "ProgramId"
+									"name": "ProgramId",
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "Id",
-									"type": "String"
+									"type": "String",
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "Id"
@@ -819,7 +831,8 @@
 							{
 								"source": {
 									"name": "Program Type Id",
-									"type": "String"
+									"type": "String",
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "ProgramTypeId"
@@ -827,7 +840,9 @@
 							},
 							{
 								"source": {
-									"name": "Status Id"
+									"name": "Status Id",
+									"type": "String",
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "StatusId"
@@ -1408,7 +1423,7 @@
 					"timeout": "0.00:10:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
+					"secureOutput": false,
 					"secureInput": true
 				},
 				"userProperties": [],
