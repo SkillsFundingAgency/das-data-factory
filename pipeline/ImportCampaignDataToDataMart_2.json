@@ -571,7 +571,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "SetKey",
+						"activity": "GetAccessTokenForPrograms",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1361,6 +1361,37 @@
 							"SchemaName": "Stg"
 						}
 					}
+				}
+			},
+			{
+				"name": "GetAccessTokenForPrograms",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
 				}
 			}
 		],
