@@ -73,12 +73,15 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportCampaignDataToDataMart",
+						"referenceName": "ImportCampaignDataToDataMart_2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"RunId": "@activity('GetRunId').output.firstRow.RunId"
+						"RunId": {
+							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"type": "Expression"
+						}
 					}
 				}
 			},
@@ -104,7 +107,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{activity('GetRunId').output.firstRow.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportMarketoCampaignDataToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+						"sqlReaderQuery": {
+							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{activity('GetRunId').output.firstRow.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportMarketoCampaignDataToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
