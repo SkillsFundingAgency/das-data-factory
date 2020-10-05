@@ -800,10 +800,37 @@
 							},
 							{
 								"source": {
-									"name": "Program Id"
+									"name": "Program Id",
+									"type": "String"
 								},
 								"sink": {
 									"name": "ProgramId"
+								}
+							},
+							{
+								"source": {
+									"name": "Id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Id"
+								}
+							},
+							{
+								"source": {
+									"name": "Program Type Id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ProgramTypeId"
+								}
+							},
+							{
+								"source": {
+									"name": "Status Id"
+								},
+								"sink": {
+									"name": "StatusId"
 								}
 							}
 						],
