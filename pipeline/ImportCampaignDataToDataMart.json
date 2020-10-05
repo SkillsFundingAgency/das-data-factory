@@ -1673,7 +1673,10 @@
 						"storedProcedureParameters": {
 							"ErrorMessage": {
 								"type": "String",
-								"value": "@{activity('GetActivityTypeIds').Error.message}"
+								"value": {
+									"value": "@{activity('GetActivityTypeIds').Error.message}",
+									"type": "Expression"
+								}
 							},
 							"RunId": {
 								"type": "Int32",
@@ -1841,7 +1844,10 @@
 						"storedProcedureParameters": {
 							"ErrorMessage": {
 								"type": "String",
-								"value": "@{activity('CopyActivities').Error.message}"
+								"value": {
+									"value": "@{activity('CopyActivities').Error.message}",
+									"type": "Expression"
+								}
 							},
 							"RunId": {
 								"type": "Int32",
@@ -1867,6 +1873,67 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "CopyCampaigns",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetProgramNames",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRestMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/rest/v1/campaigns.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoCampaigns",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
