@@ -604,6 +604,7 @@
 					"body": {
 						"format": "TSV",
 						"fields": [
+							"Id",
 							"firstName",
 							"lastName",
 							"email",
@@ -611,7 +612,9 @@
 							"Program",
 							"Program Id",
 							"Status",
+							"Status Id",
 							"Lead Id",
+							"Program Type Id",
 							"Success"
 						],
 						"filter": {
