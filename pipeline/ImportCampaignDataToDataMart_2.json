@@ -433,7 +433,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivities' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivities]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoActivitiesToDMStaging'\n\t   ,getdate()\n\t   ,0\n\n\n",
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeadActivities' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeadActivities]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoLeadActivitiesToDMStaging'\n\t   ,getdate()\n\t   ,0\n\n\n",
 							"type": "Expression"
 						},
 						"tableOption": "autoCreate",
@@ -560,7 +560,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "MarketoActivities",
+							"TableName": "MarketoLeadActivities",
 							"SchemaName": "Stg"
 						}
 					}
@@ -1221,7 +1221,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivitiesToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadActivitiesToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -1392,7 +1392,7 @@
 							},
 							"TaskType": {
 								"type": "String",
-								"value": "ImportMarketoCopyActivitiesToDMStaging"
+								"value": "ImportMarketoLeadActivitiesToDMStaging"
 							}
 						},
 						"queryTimeout": "02:00:00",
