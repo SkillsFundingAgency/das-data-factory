@@ -60,7 +60,7 @@
 				}
 			},
 			{
-				"name": "ExecuteImportCampaignDataToDataMart",
+				"name": "ExecuteImportCampaignDataToDataMart_1",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -73,7 +73,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportCampaignDataToDataMart_2",
+						"referenceName": "ImportCampaignDataToDataMart_1",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
@@ -129,7 +129,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportCampaignDataToDataMart",
+						"activity": "ExecuteImportCampaignDataToDataMart_2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -159,6 +159,32 @@
 						"parameters": {
 							"TableName": "Users",
 							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportCampaignDataToDataMart_2",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportCampaignDataToDataMart_1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportCampaignDataToDataMart_2",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"type": "Expression"
 						}
 					}
 				}
