@@ -69,7 +69,7 @@
 						}
 					},
 					"body": {
-						"value": "{\"fields\":[\"firstName\",\"lastName\",\"id\",\"email\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"firstName\":\"FirstName\",\"lastName\":\"LastName\",\"id\":\"LeadId\",\"email\":\"EmailAddress\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterEndDate}\"}}}}",
+						"value": "{\"fields\":[\"firstName\",\"lastName\",\"id\",\"email\",\"createdAt\",\"updatedAt\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"firstName\":\"FirstName\",\"lastName\":\"LastName\",\"id\":\"LeadId\",\"email\":\"EmailAddress\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterEndDate}\"}}}}",
 						"type": "Expression"
 					}
 				}
@@ -205,6 +205,24 @@
 									"name": "EmailAddress",
 									"physicalType": "varchar"
 								}
+							},
+							{
+								"source": {
+									"name": "CreatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CreatedAt"
+								}
+							},
+							{
+								"source": {
+									"name": "UpdatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "UpdatedAt"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -308,7 +326,7 @@
 						}
 					},
 					"body": {
-						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
+						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\",\"createdAt\",\"updatedAt\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
 						"type": "Expression"
 					}
 				}
@@ -488,6 +506,24 @@
 									"name": "Attributes",
 									"physicalType": "varchar"
 								}
+							},
+							{
+								"source": {
+									"name": "CreatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CreatedAt"
+								}
+							},
+							{
+								"source": {
+									"name": "UpdatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "UpdatedAt"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -560,7 +596,7 @@
 						}
 					},
 					"body": {
-						"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\"],\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
+						"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\",\"createdAt\",\"updatedAt\"],\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
 						"type": "Expression"
 					}
 				}
@@ -788,6 +824,24 @@
 								},
 								"sink": {
 									"name": "StatusId"
+								}
+							},
+							{
+								"source": {
+									"name": "createdAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CreatedAt"
+								}
+							},
+							{
+								"source": {
+									"name": "updatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "UpdatedAt"
 								}
 							}
 						],
