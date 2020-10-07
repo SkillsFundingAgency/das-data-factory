@@ -164,49 +164,11 @@
 				}
 			},
 			{
-				"name": "ExecuteImportCampaignDataToDataMart_2",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "GetProgramFilterValues",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "ImportCampaignDataToDataMart_2",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"RunId": {
-							"value": "@activity('GetRunId').output.firstRow.RunId",
-							"type": "Expression"
-						},
-						"FilterStartDate": {
-							"value": "@activity('GetDateFilterValues').output.StartDateFilter",
-							"type": "Expression"
-						},
-						"FilterEndDate": {
-							"value": "@activity('GetDateFilterValues').output.EndDateFilter",
-							"type": "Expression"
-						},
-						"ParameterId": {
-							"value": "@activity('GetProgramFilterValues').output.ProgramId",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			{
 				"name": "ExecuteCampaignPresentationBuild",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportCampaignDataToDataMart_2",
+						"activity": "CheckIfImportIsLatestOrHistory",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -259,7 +221,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfig WHERE ImportStatus=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'createdAt' as FilterParmeter\n  FROM Mtd.MarketoFilterConfig\n  WHERE MFC_Id IN (\n  SELECT min(mfc_id)\n    FROM Mtd.MarketoFilterConfig\n   WHERE ImportStatus=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFC_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'updatedAt' as FilterParmeter\n   END",
+						"sqlReaderQuery": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfig WHERE ImportStatus=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfig\n  WHERE MFC_Id IN (\n  SELECT min(mfc_id)\n    FROM Mtd.MarketoFilterConfig\n   WHERE ImportStatus=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFC_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -310,6 +272,97 @@
 							"SchemaName": "Stg"
 						}
 					}
+				}
+			},
+			{
+				"name": "CheckIfImportIsLatestOrHistory",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetProgramFilterValues",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('GetDateFilterValues').output.FilterType,'History')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "ExecuteImportCampaignDataToDataMart_2_Latest",
+							"description": "ExecuteImportCampaignDataToDataMart_2_LatestFilterByCreatedDate",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ImportCampaignDataToDataMart_2",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"RunId": "@activity('GetRunId').output.firstRow.RunId",
+									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
+									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
+									"ParameterId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"FilterParameter": "createdAt"
+								}
+							}
+						},
+						{
+							"name": "ExecuteImportCampaignDataToDataMart_2_updatedAt",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "ExecuteImportCampaignDataToDataMart_2_Latest",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ImportCampaignDataToDataMart_2",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"RunId": "@activity('GetRunId').output.firstRow.RunId",
+									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
+									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
+									"ParameterId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"FilterParameter": "updatedAt"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "ExecuteImportCampaignDataToDataMart_2_History",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "ImportCampaignDataToDataMart_2",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"RunId": "@activity('GetRunId').output.firstRow.RunId",
+									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
+									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
+									"ParameterId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"FilterParameter": "createdAt"
+								}
+							}
+						}
+					]
 				}
 			}
 		],

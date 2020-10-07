@@ -1452,6 +1452,9 @@
 			},
 			"ParameterId": {
 				"type": "string"
+			},
+			"FilterParameter": {
+				"type": "string"
 			}
 		},
 		"variables": {
