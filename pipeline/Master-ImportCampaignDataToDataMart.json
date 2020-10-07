@@ -285,7 +285,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(activity('GetDateFilterValues').output.FilterType,'History')",
+						"value": "@equals(activity('GetDateFilterValues').output.firstRow.FilterType,'History')",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -303,9 +303,9 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"RunId": "@activity('GetRunId').output.firstRow.RunId",
-									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
-									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
-									"ProgramId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
+									"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
+									"ProgramId": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
 									"FilterParameter": "createdAt"
 								}
 							}
@@ -330,9 +330,9 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"RunId": "@activity('GetRunId').output.firstRow.RunId",
-									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
-									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
-									"ProgramId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
+									"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
+									"ProgramId": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
 									"FilterParameter": "updatedAt"
 								}
 							}
@@ -352,10 +352,10 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"RunId": "@activity('GetRunId').output.firstRow.RunId",
-									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
-									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
+									"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
+									"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
 									"ProgramId": {
-										"value": "@activity('GetProgramFilterValues').output.ProgramId",
+										"value": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
 										"type": "Expression"
 									},
 									"FilterParameter": "createdAt"
