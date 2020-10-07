@@ -69,25 +69,8 @@
 						}
 					},
 					"body": {
-						"fields": [
-							"firstName",
-							"lastName",
-							"id",
-							"email"
-						],
-						"format": "TSV",
-						"columnHeaderNames": {
-							"firstName": "FirstName",
-							"lastName": "LastName",
-							"id": "LeadId",
-							"email": "EmailAddress"
-						},
-						"filter": {
-							"createdAt": {
-								"startAt": "2020-08-31T23:59:59-00:00",
-								"endAt": "2020-09-30T23:59:59-00:00"
-							}
-						}
+						"value": "{\"fields\":[\"firstName\",\"lastName\",\"id\",\"email\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"firstName\":\"FirstName\",\"lastName\":\"LastName\",\"id\":\"LeadId\",\"email\":\"EmailAddress\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterEndDate}\"}}}}",
+						"type": "Expression"
 					}
 				}
 			},
@@ -325,33 +308,8 @@
 						}
 					},
 					"body": {
-						"fields": [
-							"marketoGUID",
-							"leadId",
-							"activityDate",
-							"activityTypeId",
-							"campaignId",
-							"primaryAttributeValueId",
-							"primaryAttributeValue",
-							"attributes"
-						],
-						"format": "TSV",
-						"columnHeaderNames": {
-							"marketoGUID": "MarketoGUID",
-							"leadId": "LeadId",
-							"activityDate": "ActivityDate",
-							"activityTypeId": "ActivityTypeId",
-							"campaignId": "CampaignId",
-							"primaryAttributeValueId": "PrimaryAttributeValueId",
-							"primaryAttributeValue": "primaryAttributeValue",
-							"attributes": "Attributes"
-						},
-						"filter": {
-							"createdAt": {
-								"startAt": "2020-08-31T23:59:59-00:00",
-								"endAt": "2020-09-30T23:59:59-00:00"
-							}
-						}
+						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
+						"type": "Expression"
 					}
 				}
 			},
@@ -602,24 +560,8 @@
 						}
 					},
 					"body": {
-						"format": "TSV",
-						"fields": [
-							"Id",
-							"firstName",
-							"lastName",
-							"email",
-							"Member Date",
-							"Program",
-							"Program Id",
-							"Status",
-							"Status Id",
-							"Lead Id",
-							"Program Type Id",
-							"Success"
-						],
-						"filter": {
-							"programId": 1010
-						}
+						"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\"],\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
+						"type": "Expression"
 					}
 				}
 			},
