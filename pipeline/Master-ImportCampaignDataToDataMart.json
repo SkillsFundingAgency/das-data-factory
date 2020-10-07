@@ -255,7 +255,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE LeadProgramImportStatus=0)\n  BEGIN\n  SELECT max(ProgramId)\n    FROM ASData_PL.MarketoPrograms\n   WHERE LeadProgramImportStatus=0\n   END\n   ELSE \n   BEGIN\n   SELECT ProgramId\n     FROM ASData_PL.MarketoPrograms\n\tWHERE UpdatedAt = (select max(updatedAt) from AsData_PL.MarketoPrograms)\n    END",
+							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE LeadProgramImportStatus=0)\n  BEGIN\n  SELECT max(ProgramId)\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0\n   END\n   ELSE \n   BEGIN\n   SELECT ProgramId\n     FROM ASData_PL.MarketoPrograms\n\tWHERE UpdatedAt = (select max(updatedAt) from AsData_PL.MarketoPrograms)\n    END",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
