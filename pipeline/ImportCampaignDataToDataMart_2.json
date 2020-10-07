@@ -1443,6 +1443,15 @@
 		"parameters": {
 			"RunId": {
 				"type": "string"
+			},
+			"FilterStartDate": {
+				"type": "string"
+			},
+			"FilterEndDate": {
+				"type": "string"
+			},
+			"ParameterId": {
+				"type": "string"
 			}
 		},
 		"variables": {
