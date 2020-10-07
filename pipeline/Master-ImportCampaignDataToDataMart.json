@@ -168,7 +168,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "CheckIfImportIsLatestOrHistory",
+						"activity": "ExecuteImportCampaignDataToDataMart_2_History",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -258,7 +258,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE LeadProgramImportStatus=0)\n  BEGIN\n  SELECT max(ProgramId)\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0\n   END\n   ELSE \n   BEGIN\n   SELECT ProgramId\n     FROM ASData_PL.MarketoPrograms\n\tWHERE UpdatedAt = (select max(updatedAt) from AsData_PL.MarketoPrograms)\n    END",
+							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE ISNULL(LeadProgramImportStatus,0)=0)\n  BEGIN\n  SELECT max(ProgramId)\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0\n   END\n   ELSE \n   BEGIN\n   UPDATE AsData_PL.MarketoPrograms\n         SET LeadProgramImportStatus=0\n\n  SELECT max(ProgramId)\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0\n    END",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -272,100 +272,6 @@
 							"SchemaName": "Stg"
 						}
 					}
-				}
-			},
-			{
-				"name": "CheckIfImportIsLatestOrHistory",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "GetProgramFilterValues",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@equals(activity('GetDateFilterValues').output.firstRow.FilterType,'History')",
-						"type": "Expression"
-					},
-					"ifFalseActivities": [
-						{
-							"name": "ExecuteImportCampaignDataToDataMart_2_Latest",
-							"description": "ExecuteImportCampaignDataToDataMart_2_LatestFilterByCreatedDate",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ImportCampaignDataToDataMart_2",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"RunId": "@activity('GetRunId').output.firstRow.RunId",
-									"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
-									"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
-									"ProgramId": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
-									"FilterParameter": "createdAt"
-								}
-							}
-						},
-						{
-							"name": "ExecuteImportCampaignDataToDataMart_2_updatedAt",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "ExecuteImportCampaignDataToDataMart_2_Latest",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ImportCampaignDataToDataMart_2",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"RunId": "@activity('GetRunId').output.firstRow.RunId",
-									"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
-									"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
-									"ProgramId": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
-									"FilterParameter": "updatedAt"
-								}
-							}
-						}
-					],
-					"ifTrueActivities": [
-						{
-							"name": "ExecuteImportCampaignDataToDataMart_2_History",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "ImportCampaignDataToDataMart_2",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"RunId": "@activity('GetRunId').output.firstRow.RunId",
-									"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
-									"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
-									"ProgramId": {
-										"value": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
-										"type": "Expression"
-									},
-									"FilterParameter": "createdAt"
-								}
-							}
-						}
-					]
 				}
 			},
 			{
@@ -437,6 +343,36 @@
 							"TableName": "Users",
 							"SchemaName": "Stg"
 						}
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportCampaignDataToDataMart_2_History",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "GetProgramFilterValues",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportCampaignDataToDataMart_2",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": "@activity('GetRunId').output.firstRow.RunId",
+						"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
+						"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
+						"ProgramId": {
+							"value": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
+							"type": "Expression"
+						},
+						"FilterParameter": "createdAt"
 					}
 				}
 			}
