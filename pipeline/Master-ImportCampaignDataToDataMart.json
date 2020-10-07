@@ -129,7 +129,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteCampaignPresentationBuild",
+						"activity": "UpdateImportStatusInConfig",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -164,7 +164,7 @@
 				}
 			},
 			{
-				"name": "ExecuteCampaignPresentationBuild",
+				"name": "ExecuteImportMarketoBulkExtractTablesToPL",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -183,13 +183,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[ImportMarketoDataToPL]",
+					"storedProcedureName": "[dbo].[ImportMarketoBulkExtractTablesToPL]",
 					"storedProcedureParameters": {
 						"RunId": {
-							"value": {
-								"value": "@activity('GetRunId').output.firstRow.RunId",
-								"type": "Expression"
-							},
+							"value": "@activity('GetRunId').output.firstRow.RunId",
 							"type": "Int32"
 						}
 					}
@@ -204,7 +201,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportCampaignDataToDataMart_1",
+						"activity": "ExecuteImportMarketoReferenceTablesToPL",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -366,6 +363,78 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "ExecuteImportMarketoReferenceTablesToPL",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportCampaignDataToDataMart_1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[ImportMarketoReferenceTablesToPL]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "UpdateImportStatusInConfig",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportMarketoBulkExtractTablesToPL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "/* Update Config Status */\nIF (@{activity('GetDateFilterValues').output.FilterType}='History')\nBEGIN\n\tUPDATE Mtd.MarketoFilterConfig\n\t   SET ImportStatus=1\n\t      ,ImportDate=GETDATE()\n\t WHERE MFC_Id=@{activity('GetDateFilterValues').output.MFC_ID}\nEND \n\n/* Update Program Status */\n\nUPDATE ASData_PL.MarketoPrograms\n\t   SET LeadProgramImportStatus=1\n\t      ,LeadProgramImportDate=GETDATE()\n\t WHERE ProgramId=@{activity('GetProgramFilterValues').output.ProgramId}\n\nSELECT 1\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
 				}
 			}
 		],
