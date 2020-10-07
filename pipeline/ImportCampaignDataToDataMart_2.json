@@ -506,15 +506,6 @@
 									"name": "Attributes",
 									"physicalType": "varchar"
 								}
-							},
-							{
-								"source": {
-									"name": "CreatedAt",
-									"type": "String"
-								},
-								"sink": {
-									"name": "CreatedAt"
-								}
 							}
 						],
 						"typeConversion": true,
