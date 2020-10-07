@@ -326,7 +326,7 @@
 						}
 					},
 					"body": {
-						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\",\"createdAt\",\"updatedAt\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
+						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\",\"createdAt\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\",\"createdAt\":\"CreatedAt\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
 						"type": "Expression"
 					}
 				}
@@ -514,15 +514,6 @@
 								},
 								"sink": {
 									"name": "CreatedAt"
-								}
-							},
-							{
-								"source": {
-									"name": "UpdatedAt",
-									"type": "String"
-								},
-								"sink": {
-									"name": "UpdatedAt"
 								}
 							}
 						],
