@@ -1450,7 +1450,7 @@
 			"FilterEndDate": {
 				"type": "string"
 			},
-			"ParameterId": {
+			"ProgramId": {
 				"type": "string"
 			},
 			"FilterParameter": {

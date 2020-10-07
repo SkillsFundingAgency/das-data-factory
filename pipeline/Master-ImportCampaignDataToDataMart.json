@@ -308,7 +308,7 @@
 									"RunId": "@activity('GetRunId').output.firstRow.RunId",
 									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
 									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
-									"ParameterId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"ProgramId": "@activity('GetProgramFilterValues').output.ProgramId",
 									"FilterParameter": "createdAt"
 								}
 							}
@@ -335,7 +335,7 @@
 									"RunId": "@activity('GetRunId').output.firstRow.RunId",
 									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
 									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
-									"ParameterId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"ProgramId": "@activity('GetProgramFilterValues').output.ProgramId",
 									"FilterParameter": "updatedAt"
 								}
 							}
@@ -357,7 +357,10 @@
 									"RunId": "@activity('GetRunId').output.firstRow.RunId",
 									"FilterStartDate": "@activity('GetDateFilterValues').output.StartDateFilter",
 									"FilterEndDate": "@activity('GetDateFilterValues').output.EndDateFilter",
-									"ParameterId": "@activity('GetProgramFilterValues').output.ProgramId",
+									"ProgramId": {
+										"value": "@activity('GetProgramFilterValues').output.ProgramId",
+										"type": "Expression"
+									},
 									"FilterParameter": "createdAt"
 								}
 							}
