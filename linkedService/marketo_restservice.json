@@ -1,21 +1,21 @@
 {
-  "name": "marketo_restservice",
-  "properties": {
-    "parameters": {
-      "MarketoBaseUrl": {
-        "type": "String"
-      }
-    },
-    "annotations": [],
-    "type": "RestService",
-    "typeProperties": {
-      "url": "@{linkedService().MarketoBaseUrl}",
-      "enableServerCertificateValidation": true,
-      "authenticationType": "Anonymous"
-    },
-    "connectVia": {
-      "referenceName": "AzureIntegrationRunTime",
-      "type": "IntegrationRuntimeReference"
-    }
-  }
-}
+	"name": "marketo_restservice",
+	"properties": {
+		"parameters": {
+			"MarketoBaseUrl": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().MarketoBaseUrl}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+} 
