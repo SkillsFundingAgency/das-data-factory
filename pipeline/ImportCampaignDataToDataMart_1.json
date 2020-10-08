@@ -734,8 +734,8 @@
 					"timeout": "0.01:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -747,7 +747,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
