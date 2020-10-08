@@ -3951,7 +3951,7 @@
 								}
 							},
 							"body": {
-								"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\",\"createdAt\",\"updatedAt\"],\"columnHeaderNames\":{\"Id\":\"Id\",\"firstName\":\"FirstName\",\"email\":\"Email\",\"Member Date\":\"MemberDate\",\"Program Id\":\"ProgramId\",\"Status\":\"Status\",\"Lead Id\":\"LeadId\",\"Program Type Id\":\"ProgramTypeId\",\"Success\":\"Success\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
+								"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\",\"createdAt\",\"updatedAt\"],\"columnHeaderNames\":{\"Id\":\"Id\",\"firstName\":\"FirstName\",\"email\":\"Email\",\"Member Date\":\"MemberDate\",\"Program\":\"Program\",\"Program Id\":\"ProgramId\",\"Status\":\"Status\",\"Status Id\":\"StatusId\",\"Lead Id\":\"LeadId\",\"Program Type Id\":\"ProgramTypeId\",\"Success\":\"Success\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
 								"type": "Expression"
 							}
 						}
