@@ -33,7 +33,7 @@
 			"columnDelimiter": "\t",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
-			"quoteChar": "{"
+			"quoteChar": "\""
 		},
 		"schema": []
 	}
