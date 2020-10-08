@@ -1,0 +1,993 @@
+{
+	"name": "ImportCampaignDataToDataMart_1",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetActivityTypeIds",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForActivityIds",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoActivityTypes' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoActivityTypes]\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoActivityTypeIdsToDMStaging'\n\t   ,getdate()\n\t   ,0\n",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "name"
+								}
+							},
+							{
+								"source": {
+									"path": "['description']"
+								},
+								"sink": {
+									"name": "description"
+								}
+							}
+						],
+						"collectionReference": "$['result']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRestMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/rest/v1/activities/types.json?access_token=@{activity('GetAccessTokenForActivityIds').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoActivityTypes",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetAccessTokenForActivityIds",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetKey",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "GetAccessTokenForProgramTypesNames",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetKey",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "GetProgramNames",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForProgramTypesNames",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoPrograms]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoProgramsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "name"
+								}
+							},
+							{
+								"source": {
+									"path": "['description']"
+								},
+								"sink": {
+									"name": "description"
+								}
+							},
+							{
+								"source": {
+									"path": "['createdAt']"
+								},
+								"sink": {
+									"name": "createdAt"
+								}
+							},
+							{
+								"source": {
+									"path": "['updatedAt']"
+								},
+								"sink": {
+									"name": "updatedAt"
+								}
+							},
+							{
+								"source": {
+									"path": "['url']"
+								},
+								"sink": {
+									"name": "url"
+								}
+							},
+							{
+								"source": {
+									"path": "['type']"
+								},
+								"sink": {
+									"name": "type"
+								}
+							},
+							{
+								"source": {
+									"path": "['channel']"
+								},
+								"sink": {
+									"name": "channel"
+								}
+							}
+						],
+						"collectionReference": "$['result']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRestMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/rest/asset/v1/programs.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoPrograms",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetVaultUrl",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-dfac-kv.vault.azure.net'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-test-dfac-kv.vault.azure.net'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-pp-dfac-kv.vault.azure.net'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-dfac-kv.vault.azure.net'\n                      ELSE 'Unknown'\n           END VaultUrl\n                ",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "SetVaultUrl",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "VaultUrl",
+					"value": {
+						"value": "@activity('GetVaultUrl').output.firstRow.VaultUrl",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetBaseUrl",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-baseurl?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetBaseUrl",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BaseUrl",
+					"value": {
+						"value": "@activity('GetBaseUrl').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetUserName",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetBaseUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-clientid?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetUserName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetUserName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Name",
+					"value": {
+						"value": "@activity('GetUserName').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetKey",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetUserName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-clientsecret?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetKey",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Key",
+					"value": {
+						"value": "@activity('GetKey').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@pipeline().parameters.RunId",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulActivityTypeCopy",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetActivityTypeIds",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivityTypeIdsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulProgramNamesCopy",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetProgramNames",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoProgramsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogProgramNamesCopyError",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetProgramNames",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('GetProgramNames').Error.message}\n",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoProgramsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorActivityTypeIdsCopyError",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetActivityTypeIds",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('GetActivityTypeIds').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoActivityTypeIdsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetCampaigns",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetProgramNames",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['requestId']"
+								},
+								"sink": {
+									"name": "requestId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "name"
+								}
+							},
+							{
+								"source": {
+									"path": "['type']"
+								},
+								"sink": {
+									"name": "type"
+								}
+							},
+							{
+								"source": {
+									"path": "['programName']"
+								},
+								"sink": {
+									"name": "programName"
+								}
+							},
+							{
+								"source": {
+									"path": "['programId']"
+								},
+								"sink": {
+									"name": "programId"
+								}
+							},
+							{
+								"source": {
+									"path": "['workspaceName']"
+								},
+								"sink": {
+									"name": "workspaceName"
+								}
+							},
+							{
+								"source": {
+									"path": "['createdAt']"
+								},
+								"sink": {
+									"name": "createdAt"
+								}
+							},
+							{
+								"source": {
+									"path": "['updatedAt']"
+								},
+								"sink": {
+									"name": "updatedAt"
+								}
+							},
+							{
+								"source": {
+									"path": "['active']"
+								},
+								"sink": {
+									"name": "active"
+								}
+							}
+						],
+						"collectionReference": "$['result']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRestMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/rest/v1/campaigns.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoCampaigns",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "LogSuccessfulCampaignCopy",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetCampaigns",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoCampaignsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogCampaignsCopyError",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetCampaigns",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('GetCampaigns').Error.message}\n",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportCampaignsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"RunId": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"VaultUrl": {
+				"type": "String"
+			},
+			"BaseUrl": {
+				"type": "String"
+			},
+			"Name": {
+				"type": "String"
+			},
+			"Key": {
+				"type": "String"
+			},
+			"RunId": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}

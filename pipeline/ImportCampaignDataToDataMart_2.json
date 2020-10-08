@@ -1,0 +1,1457 @@
+{
+	"name": "ImportCampaignDataToDataMart_2",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetAccessToken",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CopyLeadPrograms",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "CreateLeadsExtractJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/bulk/v1/leads/export/create.json?access_token=@{activity('GetAccessToken').output.access_token}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "'bearer '+@{activity('GetAccessToken').output.access_token}",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "{\"fields\":[\"firstName\",\"lastName\",\"id\",\"email\",\"createdAt\",\"updatedAt\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"firstName\":\"FirstName\",\"lastName\":\"LastName\",\"id\":\"LeadId\",\"email\":\"EmailAddress\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterEndDate}\"}}}}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "StartExportJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CreateLeadsExtractJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessToken').output.access_token}",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": "v1"
+				}
+			},
+			{
+				"name": "Wait5MinForJobToComplete",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "StartExportJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 300
+				}
+			},
+			{
+				"name": "CopyLeads",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Wait5MinForJobToComplete",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeads' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeads]\n\n/*Start Logging */\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoLeadsToDMStaging'\n\t   ,getdate()\n\t   ,0\n\n",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "FirstName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "FirstName",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "LastName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LastName",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "LeadId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LeadId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "EmailAddress",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "EmailAddress",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CreatedAt"
+								}
+							},
+							{
+								"source": {
+									"name": "UpdatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "UpdatedAt"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcHttpMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessToken').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoLeads",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetAccessTokenForActivities",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CopyLeads",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			},
+			{
+				"name": "CreateActivitiesExtractJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForActivities",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/bulk/v1/activities/export/create.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "'bearer '+@{activity('GetAccessTokenForActivities').output.access_token}",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "StartExportJobForActivities",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CreateActivitiesExtractJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": "v1"
+				}
+			},
+			{
+				"name": "Wait5MinForActivitiesJobToComplete",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "StartExportJobForActivities",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 300
+				}
+			},
+			{
+				"name": "CopyActivities",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Wait5MinForActivitiesJobToComplete",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeadActivities' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeadActivities]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoLeadActivitiesToDMStaging'\n\t   ,getdate()\n\t   ,0\n\n\n",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "MarketoGUID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "MarketoGUID",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "LeadId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LeadId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ActivityDate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ActivityDate",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ActivityTypeId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ActivityTypeId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CampaignId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CampaignId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "PrimaryAttributeValueId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PrimaryAttributeValueId",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "primaryAttributeValue",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PrimaryAttributeValue",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Attributes",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Attributes",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcHttpMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoLeadActivities",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "CreateProgramsExtractJob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessTokenForPrograms",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/bulk/v1/program/members/export/create.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "'bearer '+@{activity('GetAccessTokenForPrograms').output.access_token}",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\",\"createdAt\",\"updatedAt\"],\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "StartExportJobForPrograms",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "CreateProgramsExtractJob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": "v1"
+				}
+			},
+			{
+				"name": "Wait5MinForActivitiesJobToComplete_copy1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "StartExportJobForPrograms",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 300
+				}
+			},
+			{
+				"name": "CopyLeadPrograms",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Wait5MinForActivitiesJobToComplete_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoLeadPrograms' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoLeadPrograms]\n\n/* Start Logging */\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoLeadProgramsToDMStaging'\n\t   ,getdate()\n\t   ,0\n",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "firstName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "firstName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "lastName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "lastName",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "email",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "email",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Member Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "MemberDate",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Program",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Program",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Lead Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LeadId",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Success",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Success",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Program Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ProgramId",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Id"
+								}
+							},
+							{
+								"source": {
+									"name": "Program Type Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ProgramTypeId"
+								}
+							},
+							{
+								"source": {
+									"name": "Status Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "StatusId"
+								}
+							},
+							{
+								"source": {
+									"name": "createdAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CreatedAt"
+								}
+							},
+							{
+								"source": {
+									"name": "updatedAt",
+									"type": "String"
+								},
+								"sink": {
+									"name": "UpdatedAt"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcHttpMarketo",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativePath": {
+								"value": "/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/file.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
+								"type": "Expression"
+							},
+							"MarketoBaseUrl": {
+								"value": "@variables('BaseUrl')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "MarketoLeadPrograms",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "GetVaultUrl",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-dfac-kv.vault.azure.net'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-test-dfac-kv.vault.azure.net'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-pp-dfac-kv.vault.azure.net'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-dfac-kv.vault.azure.net'\n                      ELSE 'Unknown'\n           END VaultUrl\n                ",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "SetVaultUrl",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "VaultUrl",
+					"value": {
+						"value": "@activity('GetVaultUrl').output.firstRow.VaultUrl",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetBaseUrl",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetVaultUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-baseurl?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetBaseUrl",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetBaseUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BaseUrl",
+					"value": {
+						"value": "@activity('GetBaseUrl').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetUserName",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetBaseUrl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-clientid?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetUserName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetUserName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Name",
+					"value": {
+						"value": "@activity('GetUserName').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetKey",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetUserName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://@{variables('VaultUrl')}/secrets/marketo-clientsecret?api-version=7.0",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SetKey",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Key",
+					"value": {
+						"value": "@activity('GetKey').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@pipeline().parameters.RunId",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulLeadProgramsCopy",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyLeadPrograms",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadProgramsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulLeadsCopy",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyLeads",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulActivitiesCopy",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyActivities",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoLeadActivitiesToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorCopyLeadPrograms",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyLeadPrograms",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('CopyLeadPrograms').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoLeadProgramsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorCopyLeads",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyLeads",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('CopyLeads').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": {
+									"value": "ImportMarketoLeadsToDMStaging",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorCopyActivities",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyActivities",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('CopyActivities').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoLeadActivitiesToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetAccessTokenForPrograms",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SetKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{variables('BaseUrl')}/identity/oauth/token?grant_type=client_credentials&client_id=@{variables('Name')}&client_secret=@{variables('Key')}",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AzureIntegrationRunTime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET"
+				}
+			}
+		],
+		"parameters": {
+			"RunId": {
+				"type": "string"
+			},
+			"FilterStartDate": {
+				"type": "string"
+			},
+			"FilterEndDate": {
+				"type": "string"
+			},
+			"ProgramId": {
+				"type": "string"
+			},
+			"FilterParameter": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"VaultUrl": {
+				"type": "String"
+			},
+			"BaseUrl": {
+				"type": "String"
+			},
+			"Name": {
+				"type": "String"
+			},
+			"Key": {
+				"type": "String"
+			},
+			"RunId": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
