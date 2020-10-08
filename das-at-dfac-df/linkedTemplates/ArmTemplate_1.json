@@ -2339,6 +2339,10 @@
 								"value": "@{variables('BaseUrl')}/bulk/v1/leads/export/@{activity('CreateLeadsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessToken').output.access_token}",
 								"type": "Expression"
 							},
+							"connectVia": {
+								"referenceName": "AzureIntegrationRunTime",
+								"type": "IntegrationRuntimeReference"
+							},
 							"method": "POST",
 							"headers": {},
 							"body": "v1"
@@ -2403,70 +2407,6 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "FirstName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "FirstName",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "LastName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LastName",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LeadId",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LeadId",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "EmailAddress",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedAt",
-											"type": "String"
-										},
-										"sink": {
-											"name": "CreatedAt"
-										}
-									},
-									{
-										"source": {
-											"name": "UpdatedAt",
-											"type": "String"
-										},
-										"sink": {
-											"name": "UpdatedAt"
-										}
-									}
-								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
@@ -2598,6 +2538,10 @@
 								"value": "@{variables('BaseUrl')}/bulk/v1/activities/export/@{activity('CreateActivitiesExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForActivities').output.access_token}",
 								"type": "Expression"
 							},
+							"connectVia": {
+								"referenceName": "AzureIntegrationRunTime",
+								"type": "IntegrationRuntimeReference"
+							},
 							"method": "POST",
 							"headers": {},
 							"body": "v1"
@@ -2662,96 +2606,6 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "MarketoGUID",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MarketoGUID",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "LeadId",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LeadId",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ActivityDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ActivityDate",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ActivityTypeId",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ActivityTypeId",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CampaignId",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CampaignId",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PrimaryAttributeValueId",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PrimaryAttributeValueId",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "primaryAttributeValue",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PrimaryAttributeValue",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Attributes",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Attributes",
-											"physicalType": "varchar"
-										}
-									}
-								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
@@ -2822,7 +2676,7 @@
 								}
 							},
 							"body": {
-								"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\",\"createdAt\",\"updatedAt\"],\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
+								"value": "{\"format\":\"TSV\",\"fields\":[\"Id\",\"firstName\",\"lastName\",\"email\",\"Member Date\",\"Program\",\"Program Id\",\"Status\",\"Status Id\",\"Lead Id\",\"Program Type Id\",\"Success\",\"createdAt\",\"updatedAt\"],\"columnHeaderNames\":{\"Id\":\"Id\",\"firstName\":\"FirstName\",\"email\":\"Email\",\"Member Date\":\"MemberDate\",\"Program Id\":\"ProgramId\",\"Status\":\"Status\",\"Lead Id\":\"LeadId\",\"Program Type Id\":\"ProgramTypeId\",\"Success\":\"Success\",\"createdAt\":\"CreatedAt\",\"updatedAt\":\"UpdatedAt\"},\"filter\":{\"programId\":@{pipeline().parameters.ProgramId}}}",
 								"type": "Expression"
 							}
 						}
@@ -2850,6 +2704,10 @@
 							"url": {
 								"value": "@{variables('BaseUrl')}/bulk/v1/program/members/export/@{activity('CreateProgramsExtractJob').output.result[0].exportId}/enqueue.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}",
 								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AzureIntegrationRunTime",
+								"type": "IntegrationRuntimeReference"
 							},
 							"method": "POST",
 							"headers": {},
@@ -2914,164 +2772,6 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "firstName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "firstName",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "lastName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "lastName",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "email",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "email",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Member Date",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MemberDate",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Program",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Program",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Status",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Lead Id",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LeadId",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Success",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Success",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Program Id",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ProgramId",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Id",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Id"
-										}
-									},
-									{
-										"source": {
-											"name": "Program Type Id",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ProgramTypeId"
-										}
-									},
-									{
-										"source": {
-											"name": "Status Id",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "StatusId"
-										}
-									},
-									{
-										"source": {
-											"name": "createdAt",
-											"type": "String"
-										},
-										"sink": {
-											"name": "CreatedAt"
-										}
-									},
-									{
-										"source": {
-											"name": "updatedAt",
-											"type": "String"
-										},
-										"sink": {
-											"name": "UpdatedAt"
-										}
-									}
-								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
