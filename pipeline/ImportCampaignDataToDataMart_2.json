@@ -267,7 +267,7 @@
 						}
 					},
 					"body": {
-						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.FilterStartDate}\",\"endAt\":\"@{pipeline().parameters.FilterStartDate}\"}}}",
+						"value": "{\"fields\":[\"marketoGUID\",\"leadId\",\"activityDate\",\"activityTypeId\",\"campaignId\",\"primaryAttributeValueId\",\"primaryAttributeValue\",\"attributes\"],\"format\":\"TSV\",\"columnHeaderNames\":{\"marketoGUID\":\"MarketoGUID\",\"leadId\":\"LeadId\",\"activityDate\":\"ActivityDate\",\"activityTypeId\":\"ActivityTypeId\",\"campaignId\":\"CampaignId\",\"primaryAttributeValueId\":\"PrimaryAttributeValueId\",\"primaryAttributeValue\":\"primaryAttributeValue\",\"attributes\":\"Attributes\"},\"filter\":{\"@{pipeline().parameters.FilterParameter}\":{\"startAt\":\"@{pipeline().parameters.ActivityFilterStartDate}\",\"endAt\":\"@{pipeline().parameters.ActivityFilterEndDate}\"}}}",
 						"type": "Expression"
 					}
 				}
