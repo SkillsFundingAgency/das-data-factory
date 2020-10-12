@@ -1136,6 +1136,12 @@
 			},
 			"FilterParameter": {
 				"type": "string"
+			},
+			"ActivityFilterStartDate": {
+				"type": "string"
+			},
+			"ActivityFilterEndDate": {
+				"type": "string"
 			}
 		},
 		"variables": {
