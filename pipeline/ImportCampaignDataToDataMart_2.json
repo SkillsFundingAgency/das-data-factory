@@ -1250,7 +1250,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/rest/v1/campaigns.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}&programName=OP-Bounce Activity&maxReturn=200",
+								"value": "/rest/v1/campaigns.json?access_token=@{activity('GetAccessTokenForPrograms').output.access_token}&programName=@{pipeline().parameters.ProgramName}&maxReturn=200",
 								"type": "Expression"
 							},
 							"MarketoBaseUrl": {
@@ -1387,6 +1387,9 @@
 				"type": "string"
 			},
 			"ActivityFilterEndDate": {
+				"type": "string"
+			},
+			"ProgramName": {
 				"type": "string"
 			}
 		},
