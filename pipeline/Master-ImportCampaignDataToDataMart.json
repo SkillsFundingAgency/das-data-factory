@@ -64,7 +64,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "LogStartOfCampaignImport",
+						"activity": "GetDateFilterValuesForPrograms",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -415,6 +415,45 @@
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
 							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfig WHERE ImportStatus=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfig\n  WHERE MFC_Id IN (\n  SELECT min(mfc_id)\n    FROM Mtd.MarketoFilterConfig\n   WHERE Isnull(ActivityImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFC_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetDateFilterValuesForPrograms",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LogStartOfCampaignImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfigForPrograms WHERE ISNULL(ImportStatus,0)=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfigForPrograms\n  WHERE MFCP_Id IN (\n  SELECT min(mfcp_id)\n    FROM Mtd.MarketoFilterConfigForPrograms\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFCP_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",

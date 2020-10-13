@@ -271,7 +271,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/rest/asset/v1/programs.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}&maxReturn=200",
+								"value": "/rest/asset/v1/programs.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}&earliestUpdatedAt=@{pipeline().parameters.StartDateFilter}&latestUpdatedAt=@{pipeline().parameters.EndDateFilter}&maxReturn=200",
 								"type": "Expression"
 							},
 							"MarketoBaseUrl": {
@@ -968,6 +968,12 @@
 		],
 		"parameters": {
 			"RunId": {
+				"type": "string"
+			},
+			"StartDateFilter": {
+				"type": "string"
+			},
+			"EndDateFilter": {
 				"type": "string"
 			}
 		},
