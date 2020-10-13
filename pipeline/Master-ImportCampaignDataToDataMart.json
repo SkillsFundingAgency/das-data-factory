@@ -64,7 +64,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "LogStartOfCampaignImport",
+						"activity": "GetDateFilterValuesForPrograms",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -80,6 +80,14 @@
 					"parameters": {
 						"RunId": {
 							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"type": "Expression"
+						},
+						"StartDateFilter": {
+							"value": "@{activity('GetDateFilterValuesForPrograms').output.firstRow.StartDateFilter}",
+							"type": "Expression"
+						},
+						"EndDateFilter": {
+							"value": "@{activity('GetDateFilterValuesForPrograms').output.firstRow.EndDateFilter}",
 							"type": "Expression"
 						}
 					}
@@ -186,7 +194,10 @@
 					"storedProcedureName": "[dbo].[ImportMarketoBulkExtractTablesToPL]",
 					"storedProcedureParameters": {
 						"RunId": {
-							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"value": {
+								"value": "@activity('GetRunId').output.firstRow.RunId",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						}
 					}
@@ -197,7 +208,7 @@
 				}
 			},
 			{
-				"name": "GetDateFilterValues",
+				"name": "GetDateFilterValuesForLeads",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -219,7 +230,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfig WHERE ImportStatus=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfig\n  WHERE MFC_Id IN (\n  SELECT min(mfc_id)\n    FROM Mtd.MarketoFilterConfig\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFC_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
+							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfig WHERE ISNULL(ImportStatus,0)=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfig\n  WHERE MFC_Id IN (\n  SELECT min(mfc_id)\n    FROM Mtd.MarketoFilterConfig\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFC_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -240,7 +251,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "GetDateFilterValues",
+						"activity": "GetDateFilterValuesForActivities",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -258,7 +269,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE ISNULL(LeadProgramImportStatus,0)=0)\n  BEGIN\n  SELECT max(ProgramId) as ProgramId\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0\n   END\n   ELSE \n   BEGIN\n   UPDATE AsData_PL.MarketoPrograms\n         SET LeadProgramImportStatus=0\n\n  SELECT max(ProgramId) as ProgramId\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0\n    END",
+							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE ISNULL(LeadProgramImportStatus,0)=0)\n  BEGIN\n  IF ((SELECT isnull(LeadProgramImportStatus,0) from AsData_PL.MarketoPrograms WHERE ProgramId=1187) =0) -- Get Redundancy First\n  BEGIN\n  SELECT ProgramId,ProgramName\n    FROM ASData_PL.MarketoPrograms\n   WHERE ProgramId=1187\n  END\n  ELSE BEGIN\n SELECT ProgramId,ProgramName\n FROM AsData_PL.MarketoPrograms\nWHERE ProgramId in \n  (SELECT max(ProgramId) as ProgramId\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0)\n   END\n   END\n   ELSE \n   BEGIN\n   UPDATE AsData_PL.MarketoPrograms\n         SET LeadProgramImportStatus=0\n\n  SELECT ProgramId,ProgramName\n    FROM AsData_PL.MarketoPrograms\nWHERE ProgramId in \n  (SELECT max(ProgramId) as ProgramId\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0)\n    END\n\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -297,7 +308,10 @@
 					"storedProcedureName": "[dbo].[ImportMarketoReferenceTablesToPL]",
 					"storedProcedureParameters": {
 						"RunId": {
-							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"value": {
+								"value": "@activity('GetRunId').output.firstRow.RunId",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						}
 					}
@@ -330,7 +344,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "/* Update Config Status */\nIF ('@{activity('GetDateFilterValues').output.firstRow.FilterType}'='History')\nBEGIN\n\tUPDATE Mtd.MarketoFilterConfig\n\t   SET ImportStatus=1\n\t      ,ImportDate=GETDATE()\n\t WHERE MFC_Id=@{activity('GetDateFilterValues').output.firstRow.MFC_ID}\nEND \n\n/* Update Program Status */\n\nUPDATE ASData_PL.MarketoPrograms\n\t   SET LeadProgramImportStatus=1\n\t      ,LeadProgramImportDate=GETDATE()\n\t WHERE ProgramId=@{activity('GetProgramFilterValues').output.firstRow.ProgramId}\n\nSELECT 1\n",
+							"value": "/* Update Config Status */\nIF ('@{activity('GetDateFilterValuesForLeads').output.firstRow.FilterType}'='History')\nBEGIN\n\tUPDATE Mtd.MarketoFilterConfig\n\t   SET ImportStatus=1\n\t      ,ImportDate=GETDATE()\n\t WHERE MFC_Id=@{activity('GetDateFilterValuesForLeads').output.firstRow.MFC_ID}\nEND \n\n/* Update Config Status For Activities */\nIF ('@{activity('GetDateFilterValuesForActivities').output.firstRow.FilterType}'='History')\nBEGIN\n\tUPDATE Mtd.MarketoFilterConfig\n\t   SET ActivityImportStatus=1\n\t      ,ActivityImportDate=GETDATE()\n\t WHERE MFC_Id=@{activity('GetDateFilterValuesForActivities').output.firstRow.MFC_ID}\nEND \n\n/* Update Program Status */\n\nIF ('@{activity('GetDateFilterValuesForPrograms').output.firstRow.FilterType}'='History')\nBEGIN\n\tUPDATE Mtd.MarketoFilterConfigForPrograms\n\t   SET ImportStatus=1\n\t      ,ImportDate=GETDATE()\n\t WHERE MFCP_Id=@{activity('GetDateFilterValuesForPrograms').output.firstRow.MFCP_ID}\nEND \n\n/* Update Program Members Export Status */\n\nUPDATE ASData_PL.MarketoPrograms\n\t   SET LeadProgramImportStatus=1\n\t      ,LeadProgramImportDate=GETDATE()\n\t WHERE ProgramId=@{activity('GetProgramFilterValues').output.firstRow.ProgramId}\n\nSELECT 1\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -365,14 +379,113 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"RunId": "@activity('GetRunId').output.firstRow.RunId",
-						"FilterStartDate": "@activity('GetDateFilterValues').output.firstRow.StartDateFilter",
-						"FilterEndDate": "@activity('GetDateFilterValues').output.firstRow.EndDateFilter",
+						"RunId": {
+							"value": "@activity('GetRunId').output.firstRow.RunId",
+							"type": "Expression"
+						},
+						"FilterStartDate": {
+							"value": "@activity('GetDateFilterValuesForLeads').output.firstRow.StartDateFilter",
+							"type": "Expression"
+						},
+						"FilterEndDate": {
+							"value": "@activity('GetDateFilterValuesForLeads').output.firstRow.EndDateFilter",
+							"type": "Expression"
+						},
 						"ProgramId": {
 							"value": "@activity('GetProgramFilterValues').output.firstRow.ProgramId",
 							"type": "Expression"
 						},
-						"FilterParameter": "createdAt"
+						"FilterParameter": "createdAt",
+						"ActivityFilterStartDate": {
+							"value": "@activity('GetDateFilterValuesForActivities').output.firstRow.StartDateFilter",
+							"type": "Expression"
+						},
+						"ActivityFilterEndDate": {
+							"value": "@activity('GetDateFilterValuesForActivities').output.firstRow.EndDateFilter",
+							"type": "Expression"
+						},
+						"ProgramName": {
+							"value": "@activity('GetProgramFilterValues').output.firstRow.ProgramName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetDateFilterValuesForActivities",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetDateFilterValuesForLeads",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfig WHERE ISNULL(ActivityImportStatus,0)=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfig\n  WHERE MFC_Id IN (\n  SELECT min(mfc_id)\n    FROM Mtd.MarketoFilterConfig\n   WHERE Isnull(ActivityImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFC_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetDateFilterValuesForPrograms",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LogStartOfCampaignImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfigForPrograms WHERE ISNULL(ImportStatus,0)=0)\n  BEGIN\n  SELECT MFCP_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfigForPrograms\n  WHERE MFCP_Id IN (\n  SELECT min(mfcp_id)\n    FROM Mtd.MarketoFilterConfigForPrograms\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFCP_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
 					}
 				}
 			}
