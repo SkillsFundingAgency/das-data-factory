@@ -462,7 +462,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfigForPrograms WHERE ISNULL(ImportStatus,0)=0)\n  BEGIN\n  SELECT MFC_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfigForPrograms\n  WHERE MFCP_Id IN (\n  SELECT min(mfcp_id)\n    FROM Mtd.MarketoFilterConfigForPrograms\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFCP_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
+							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfigForPrograms WHERE ISNULL(ImportStatus,0)=0)\n  BEGIN\n  SELECT MFCP_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfigForPrograms\n  WHERE MFCP_Id IN (\n  SELECT min(mfcp_id)\n    FROM Mtd.MarketoFilterConfigForPrograms\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFCP_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
