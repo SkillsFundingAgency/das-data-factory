@@ -473,7 +473,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "IF EXISTS (SELECT * FROM ASData_PL.MarketoPrograms WHERE ISNULL(LeadProgramImportStatus,0)=0)\n  BEGIN\n  IF ((SELECT isnull(LeadProgramImportStatus,0) from AsData_PL.MarketoPrograms WHERE ProgramId=1187) =0) -- Get Redundancy First\n  BEGIN\n  SELECT ProgramId,ProgramName\n    FROM ASData_PL.MarketoPrograms\n   WHERE ProgramId=1187\n  END\n  ELSE BEGIN\n SELECT ProgramId,ProgramName\n FROM AsData_PL.MarketoPrograms\nWHERE ProgramId in \n  (SELECT max(ProgramId) as ProgramId\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0)\n   END\n   END\n   ELSE \n   BEGIN\n   UPDATE AsData_PL.MarketoPrograms\n         SET LeadProgramImportStatus=0\n\n  SELECT ProgramId,ProgramName\n    FROM AsData_PL.MarketoPrograms\nWHERE ProgramId in \n  (SELECT max(ProgramId) as ProgramId\n    FROM ASData_PL.MarketoPrograms\n   WHERE ISNULL(LeadProgramImportStatus,0)=0)\n    END",
+							"value": "IF EXISTS (SELECT * FROM Mtd.MarketoFilterConfigForPrograms WHERE ISNULL(ImportStatus,0)=0)\n  BEGIN\n  SELECT MFCP_ID,StartDateFilter,EndDateFilter,'History' as FilterType\n  FROM Mtd.MarketoFilterConfigForPrograms\n  WHERE MFCP_Id IN (\n  SELECT min(mfcp_id)\n    FROM Mtd.MarketoFilterConfigForPrograms\n   WHERE Isnull(ImportStatus,0)=0)\n   END\n   ELSE \n   BEGIN\n   select -1 as MFCP_ID\n         ,convert(varchar,cast(getdate()-1 as date))+'T00:00:00Z' as StartDateFilter\n\t\t ,convert(varchar,cast(getdate() as date))+'T00:00:00Z' as EndDateFilter\n\t\t ,'Latest' as FilterType\n   END",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
