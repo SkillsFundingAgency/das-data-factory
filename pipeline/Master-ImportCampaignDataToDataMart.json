@@ -81,6 +81,14 @@
 						"RunId": {
 							"value": "@activity('GetRunId').output.firstRow.RunId",
 							"type": "Expression"
+						},
+						"StartDateFilter": {
+							"value": "@{activity('GetDateFilterValuesForPrograms').output.firstRow.StartDateFilter}",
+							"type": "Expression"
+						},
+						"EndDateFilter": {
+							"value": "@{activity('GetDateFilterValuesForPrograms').output.firstRow.EndDateFilter}",
+							"type": "Expression"
 						}
 					}
 				}
@@ -396,7 +404,10 @@
 							"value": "@activity('GetDateFilterValuesForActivities').output.firstRow.EndDateFilter",
 							"type": "Expression"
 						},
-						"ProgramName": "@activity('GetProgramFilterValues').output.firstRow.ProgramName"
+						"ProgramName": {
+							"value": "@activity('GetProgramFilterValues').output.firstRow.ProgramName",
+							"type": "Expression"
+						}
 					}
 				}
 			},
