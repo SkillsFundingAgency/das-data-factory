@@ -178,7 +178,7 @@
 					{
 						"activity": "ExecuteImportCampaignDataToDataMart_2_History",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -292,7 +292,7 @@
 					{
 						"activity": "ExecuteImportCampaignDataToDataMart_1",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
