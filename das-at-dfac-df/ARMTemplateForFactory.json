@@ -2712,7 +2712,8 @@
 											"path": "[['id']"
 										},
 										"sink": {
-											"name": "id"
+											"name": "id",
+											"type": "String"
 										}
 									},
 									{
@@ -2720,7 +2721,8 @@
 											"path": "[['name']"
 										},
 										"sink": {
-											"name": "name"
+											"name": "name",
+											"type": "String"
 										}
 									},
 									{
@@ -2728,7 +2730,8 @@
 											"path": "[['description']"
 										},
 										"sink": {
-											"name": "description"
+											"name": "description",
+											"type": "String"
 										}
 									},
 									{
@@ -2736,7 +2739,8 @@
 											"path": "[['createdAt']"
 										},
 										"sink": {
-											"name": "createdAt"
+											"name": "createdAt",
+											"type": "String"
 										}
 									},
 									{
@@ -2744,7 +2748,8 @@
 											"path": "[['updatedAt']"
 										},
 										"sink": {
-											"name": "updatedAt"
+											"name": "updatedAt",
+											"type": "String"
 										}
 									},
 									{
@@ -2752,7 +2757,8 @@
 											"path": "[['url']"
 										},
 										"sink": {
-											"name": "url"
+											"name": "url",
+											"type": "String"
 										}
 									},
 									{
@@ -2760,7 +2766,8 @@
 											"path": "[['type']"
 										},
 										"sink": {
-											"name": "type"
+											"name": "type",
+											"type": "String"
 										}
 									},
 									{
@@ -2768,7 +2775,8 @@
 											"path": "[['channel']"
 										},
 										"sink": {
-											"name": "channel"
+											"name": "channel",
+											"type": "String"
 										}
 									}
 								],
@@ -3217,6 +3225,271 @@
 									"TaskType": {
 										"type": "String",
 										"value": "ImportMarketoActivityTypeIdsToDMStaging"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "GetSmartCampaigns",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "GetProgramNames",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoSmartCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoSmartCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoSmartCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['id']"
+										},
+										"sink": {
+											"name": "id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"name": "name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['description']"
+										},
+										"sink": {
+											"name": "description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['createdAt']"
+										},
+										"sink": {
+											"name": "createdAt",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['updatedAt']"
+										},
+										"sink": {
+											"name": "updatedAt",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['status']"
+										},
+										"sink": {
+											"name": "status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['type']"
+										},
+										"sink": {
+											"name": "type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isActive']"
+										},
+										"sink": {
+											"name": "isActive",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['workspace']"
+										},
+										"sink": {
+											"name": "workspace",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['smartListId']"
+										},
+										"sink": {
+											"name": "smartListId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['parentProgramId']"
+										},
+										"sink": {
+											"name": "parentProgramId",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "$['result']",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcRestMarketo",
+								"type": "DatasetReference",
+								"parameters": {
+									"RelativePath": {
+										"value": "/rest/asset/v1/smartCampaigns.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}&earliestUpdatedAt=@{pipeline().parameters.StartDateFilter}&latestUpdatedAt=@{pipeline().parameters.EndDateFilter}&maxReturn=200",
+										"type": "Expression"
+									},
+									"MarketoBaseUrl": {
+										"value": "@variables('BaseUrl')",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "MarketoSmartCampaigns",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogSuccessfulCampaignCopy",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "GetSmartCampaigns",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoSmartCampaignsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogCampaignsCopyError",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "GetSmartCampaigns",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[InsertLogErrorDetails]",
+								"storedProcedureParameters": {
+									"ErrorMessage": {
+										"type": "String",
+										"value": {
+											"value": "@{activity('GetSmartCampaigns').Error.message}\n",
+											"type": "Expression"
+										}
+									},
+									"RunId": {
+										"type": "Int32",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									},
+									"TaskType": {
+										"type": "String",
+										"value": "ImportMarketoSmartCampaignsToDMStaging"
 									}
 								},
 								"queryTimeout": "02:00:00",
@@ -4455,7 +4728,8 @@
 											"path": "[['id']"
 										},
 										"sink": {
-											"name": "id"
+											"name": "id",
+											"type": "string"
 										}
 									},
 									{
@@ -4463,7 +4737,8 @@
 											"path": "[['name']"
 										},
 										"sink": {
-											"name": "name"
+											"name": "name",
+											"type": "String"
 										}
 									},
 									{
@@ -4471,7 +4746,8 @@
 											"path": "[['type']"
 										},
 										"sink": {
-											"name": "type"
+											"name": "type",
+											"type": "String"
 										}
 									},
 									{
@@ -4479,7 +4755,8 @@
 											"path": "[['programName']"
 										},
 										"sink": {
-											"name": "programName"
+											"name": "programName",
+											"type": "String"
 										}
 									},
 									{
@@ -4487,7 +4764,8 @@
 											"path": "[['programId']"
 										},
 										"sink": {
-											"name": "programId"
+											"name": "programId",
+											"type": "string"
 										}
 									},
 									{
@@ -4495,7 +4773,8 @@
 											"path": "[['workspaceName']"
 										},
 										"sink": {
-											"name": "workspaceName"
+											"name": "workspaceName",
+											"type": "String"
 										}
 									},
 									{
@@ -4503,7 +4782,8 @@
 											"path": "[['createdAt']"
 										},
 										"sink": {
-											"name": "createdAt"
+											"name": "createdAt",
+											"type": "String"
 										}
 									},
 									{
@@ -4511,7 +4791,8 @@
 											"path": "[['updatedAt']"
 										},
 										"sink": {
-											"name": "updatedAt"
+											"name": "updatedAt",
+											"type": "String"
 										}
 									},
 									{
@@ -4519,7 +4800,8 @@
 											"path": "[['active']"
 										},
 										"sink": {
-											"name": "active"
+											"name": "active",
+											"type": "string"
 										}
 									}
 								],
