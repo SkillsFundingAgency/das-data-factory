@@ -201,65 +201,75 @@
 								"source": {
 									"path": "['id']"
 								},
-								"sink": {
-									"name": "id"
-								}
+                "sink": {
+                  "name": "id",
+                  "type": "bigint"
+
+                }
 							},
 							{
 								"source": {
 									"path": "['name']"
 								},
-								"sink": {
-									"name": "name"
-								}
+                "sink": {
+                  "name": "name",
+                  "type": "String"
+
+                }
 							},
 							{
 								"source": {
 									"path": "['description']"
 								},
-								"sink": {
-									"name": "description"
-								}
+                "sink": {
+                  "name": "description",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['createdAt']"
 								},
-								"sink": {
-									"name": "createdAt"
-								}
+                "sink": {
+                  "name": "createdAt",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['updatedAt']"
 								},
-								"sink": {
-									"name": "updatedAt"
-								}
+                "sink": {
+                  "name": "updatedAt",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['url']"
 								},
-								"sink": {
-									"name": "url"
-								}
+                "sink": {
+                  "name": "url",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['type']"
 								},
-								"sink": {
-									"name": "type"
-								}
+                "sink": {
+                  "name": "type",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['channel']"
 								},
-								"sink": {
-									"name": "channel"
-								}
+                "sink": {
+                  "name": "channel",
+                  "type": "String"
+                }
 							}
 						],
 						"collectionReference": "$['result']"
