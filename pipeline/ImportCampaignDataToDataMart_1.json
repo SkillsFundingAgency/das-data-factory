@@ -857,11 +857,11 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/rest/asset/v1/smartCampaigns.json?access_token=619e80c7-f702-47be-9a3a-2dbc70c76638:lon&earliestUpdatedAt=2020-07-31T00:00:00Z&latestUpdatedAt=2020-10-31T00:00:00Z&maxReturn=200",
+								"value": "/rest/asset/v1/smartCampaigns.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}&earliestUpdatedAt=@{pipeline().parameters.StartDateFilter}&latestUpdatedAt=@{pipeline().parameters.EndDateFilter}&maxReturn=200",
 								"type": "Expression"
 							},
 							"MarketoBaseUrl": {
-								"value": "https://665-CPW-432.mktorest.com",
+								"value": "@variables('BaseUrl')",
 								"type": "Expression"
 							}
 						}
