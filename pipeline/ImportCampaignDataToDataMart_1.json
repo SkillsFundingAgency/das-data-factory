@@ -842,9 +842,10 @@
 								"source": {
 									"path": "['parentProgramId']"
 								},
-								"sink": {
-									"name": "parentProgramId"
-								}
+                "sink": {
+                  "name": "parentProgramId",
+                  "type": "String"
+                }
 							}
 						],
 						"collectionReference": "$['result']",
