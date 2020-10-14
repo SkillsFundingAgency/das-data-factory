@@ -119,7 +119,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 300
+					"waitTimeInSeconds": 600
 				}
 			},
 			{
@@ -317,7 +317,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 300
+					"waitTimeInSeconds": 600
 				}
 			},
 			{
@@ -1172,82 +1172,82 @@
 								"source": {
 									"path": "['id']"
 								},
-                "sink": {
-                  "name": "id",
-                  "type": "string"
-                }
+								"sink": {
+									"name": "id",
+									"type": "string"
+								}
 							},
 							{
 								"source": {
 									"path": "['name']"
 								},
-                "sink": {
-                  "name": "name",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "name",
+									"type": "String"
+								}
 							},
 							{
 								"source": {
 									"path": "['type']"
 								},
-                "sink": {
-                  "name": "type",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "type",
+									"type": "String"
+								}
 							},
 							{
 								"source": {
 									"path": "['programName']"
 								},
-                "sink": {
-                  "name": "programName",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "programName",
+									"type": "String"
+								}
 							},
 							{
 								"source": {
 									"path": "['programId']"
 								},
-                "sink": {
-                  "name": "programId",
-                  "type": "string"
-                }
+								"sink": {
+									"name": "programId",
+									"type": "string"
+								}
 							},
 							{
 								"source": {
 									"path": "['workspaceName']"
 								},
-                "sink": {
-                  "name": "workspaceName",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "workspaceName",
+									"type": "String"
+								}
 							},
 							{
 								"source": {
 									"path": "['createdAt']"
 								},
-                "sink": {
-                  "name": "createdAt",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "createdAt",
+									"type": "String"
+								}
 							},
 							{
 								"source": {
 									"path": "['updatedAt']"
 								},
-                "sink": {
-                  "name": "updatedAt",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "updatedAt",
+									"type": "String"
+								}
 							},
 							{
 								"source": {
 									"path": "['active']"
 								},
-                "sink": {
-                  "name": "active",
-                  "type": "string"
-                }
+								"sink": {
+									"name": "active",
+									"type": "string"
+								}
 							}
 						],
 						"collectionReference": "$['result']"
