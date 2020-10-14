@@ -1172,73 +1172,82 @@
 								"source": {
 									"path": "['id']"
 								},
-								"sink": {
-									"name": "id"
-								}
+                "sink": {
+                  "name": "id",
+                  "type": "string"
+                }
 							},
 							{
 								"source": {
 									"path": "['name']"
 								},
-								"sink": {
-									"name": "name"
-								}
+                "sink": {
+                  "name": "name",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['type']"
 								},
-								"sink": {
-									"name": "type"
-								}
+                "sink": {
+                  "name": "type",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['programName']"
 								},
-								"sink": {
-									"name": "programName"
-								}
+                "sink": {
+                  "name": "programName",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['programId']"
 								},
-								"sink": {
-									"name": "programId"
-								}
+                "sink": {
+                  "name": "programId",
+                  "type": "string"
+                }
 							},
 							{
 								"source": {
 									"path": "['workspaceName']"
 								},
-								"sink": {
-									"name": "workspaceName"
-								}
+                "sink": {
+                  "name": "workspaceName",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['createdAt']"
 								},
-								"sink": {
-									"name": "createdAt"
-								}
+                "sink": {
+                  "name": "createdAt",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['updatedAt']"
 								},
-								"sink": {
-									"name": "updatedAt"
-								}
+                "sink": {
+                  "name": "updatedAt",
+                  "type": "String"
+                }
 							},
 							{
 								"source": {
 									"path": "['active']"
 								},
-								"sink": {
-									"name": "active"
-								}
+                "sink": {
+                  "name": "active",
+                  "type": "string"
+                }
 							}
 						],
 						"collectionReference": "$['result']"
