@@ -6314,10 +6314,10 @@
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [
-								0
+								35
 							],
 							"hours": [
-								6
+								5
 							]
 						}
 					}

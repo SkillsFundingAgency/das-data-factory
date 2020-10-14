@@ -3667,7 +3667,7 @@
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 300
+							"waitTimeInSeconds": 600
 						}
 					},
 					{
@@ -3867,7 +3867,7 @@
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 300
+							"waitTimeInSeconds": 600
 						}
 					},
 					{
@@ -13338,10 +13338,10 @@
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [
-								0
+								35
 							],
 							"hours": [
-								6
+								5
 							]
 						}
 					}
