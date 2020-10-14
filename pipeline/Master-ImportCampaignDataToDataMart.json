@@ -178,7 +178,7 @@
 					{
 						"activity": "ExecuteImportCampaignDataToDataMart_2_History",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -214,7 +214,7 @@
 					{
 						"activity": "ExecuteImportMarketoReferenceTablesToPL",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -292,7 +292,7 @@
 					{
 						"activity": "ExecuteImportCampaignDataToDataMart_1",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -328,7 +328,7 @@
 					{
 						"activity": "ExecuteImportMarketoBulkExtractTablesToPL",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
