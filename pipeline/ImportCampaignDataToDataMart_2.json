@@ -1174,7 +1174,7 @@
 								},
                 "sink": {
                   "name": "id",
-                  "type": "bigint"
+                  "type": "string"
                 }
 							},
 							{
@@ -1210,7 +1210,7 @@
 								},
                 "sink": {
                   "name": "programId",
-                  "type": "bigint"
+                  "type": "string"
                 }
 							},
 							{
@@ -1246,7 +1246,7 @@
 								},
                 "sink": {
                   "name": "active",
-                  "type": "bit"
+                  "type": "string"
                 }
 							}
 						],
