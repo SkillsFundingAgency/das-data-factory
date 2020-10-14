@@ -748,7 +748,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MarketoSmartCampaigns' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[MarketoSmartCampaigns]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportMarketoCampaignsToDMStaging'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"tableOption": "autoCreate",
@@ -758,15 +758,6 @@
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
-							{
-								"source": {
-									"path": "$['requestId']"
-								},
-								"sink": {
-									"name": "requestId",
-									"type": "String"
-								}
-							},
 							{
 								"source": {
 									"path": "['id']"
@@ -785,34 +776,10 @@
 							},
 							{
 								"source": {
-									"path": "['type']"
+									"path": "['description']"
 								},
 								"sink": {
-									"name": "type"
-								}
-							},
-							{
-								"source": {
-									"path": "['programName']"
-								},
-								"sink": {
-									"name": "programName"
-								}
-							},
-							{
-								"source": {
-									"path": "['programId']"
-								},
-								"sink": {
-									"name": "programId"
-								}
-							},
-							{
-								"source": {
-									"path": "['workspaceName']"
-								},
-								"sink": {
-									"name": "workspaceName"
+									"name": "description"
 								}
 							},
 							{
@@ -833,14 +800,55 @@
 							},
 							{
 								"source": {
-									"path": "['active']"
+									"path": "['status']"
 								},
 								"sink": {
-									"name": "active"
+									"name": "status"
+								}
+							},
+							{
+								"source": {
+									"path": "['type']"
+								},
+								"sink": {
+									"name": "type"
+								}
+							},
+							{
+								"source": {
+									"path": "['isActive']"
+								},
+								"sink": {
+									"name": "isActive"
+								}
+							},
+							{
+								"source": {
+									"path": "['workspace']"
+								},
+								"sink": {
+									"name": "workspace"
+								}
+							},
+							{
+								"source": {
+									"path": "['smartListId']"
+								},
+								"sink": {
+									"name": "smartListId"
+								}
+							},
+							{
+								"source": {
+									"path": "['parentProgramId']"
+								},
+								"sink": {
+									"name": "parentProgramId"
 								}
 							}
 						],
-						"collectionReference": "$['result']"
+						"collectionReference": "$['result']",
+						"mapComplexValuesToString": true
 					}
 				},
 				"inputs": [
@@ -849,11 +857,11 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"RelativePath": {
-								"value": "/rest/asset/v1/smartCampaigns.json?access_token=@{activity('GetAccessTokenForProgramTypesNames').output.access_token}&earliestUpdatedAt=@{pipeline().parameters.StartDateFilter}&latestUpdatedAt=@{pipeline().parameters.EndDateFilter}&maxReturn=200",
+								"value": "/rest/asset/v1/smartCampaigns.json?access_token=619e80c7-f702-47be-9a3a-2dbc70c76638:lon&earliestUpdatedAt=2020-07-31T00:00:00Z&latestUpdatedAt=2020-10-31T00:00:00Z&maxReturn=200",
 								"type": "Expression"
 							},
 							"MarketoBaseUrl": {
-								"value": "@variables('BaseUrl')",
+								"value": "https://665-CPW-432.mktorest.com",
 								"type": "Expression"
 							}
 						}
@@ -864,7 +872,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "MarketoCampaigns",
+							"TableName": "MarketoSmartCampaigns",
 							"SchemaName": "Stg"
 						}
 					}
@@ -877,7 +885,7 @@
 					{
 						"activity": "GetCampaigns",
 						"dependencyConditions": [
-							"Failed"
+							"Succeeded"
 						]
 					}
 				],
@@ -916,7 +924,7 @@
 					{
 						"activity": "GetCampaigns",
 						"dependencyConditions": [
-							"Succeeded"
+							"Failed"
 						]
 					}
 				],
