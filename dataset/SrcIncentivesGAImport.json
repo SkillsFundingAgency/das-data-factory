@@ -1,0 +1,18 @@
+{
+	"name": "SrcIncentivesGAImport",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "googlestorage_connectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "GoogleCloudStorageLocation"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
