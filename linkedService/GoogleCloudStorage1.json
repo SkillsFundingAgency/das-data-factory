@@ -1,24 +1,35 @@
 {
 	"name": "GoogleCloudStorage1",
 	"properties": {
-		"annotations": [],
 		"type": "GoogleCloudStorage",
+		"annotations": [],
 		"typeProperties": {
 			"serviceUrl": "https://storage.googleapis.com",
-			"accessKeyId": "abc",
+			"accessKeyId": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "GS_AccessKeyId"
+			},
 			"secretAccessKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "gstest"
+				"secretName": "GS_SecretAccessKey"
 			}
 		},
 		"connectVia": {
 			"referenceName": "AzureIntegrationRunTime",
 			"type": "IntegrationRuntimeReference"
 		}
+	},
+	"connectVia": {
+		"referenceName": "AzureIntegrationRunTime",
+		"type": "IntegrationRuntimeReference"
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
