@@ -11,7 +11,7 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "GS_accessKeyId"
+				"secretName": "googlestorage-accesskeyid"
 			},
 			"secretAccessKey": {
 				"type": "AzureKeyVaultSecret",
@@ -19,7 +19,7 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "GS_secretAccessKey"
+				"secretName": "googlestorage-secretaccesskey"
 			}
 		},
 		"connectVia": {
@@ -27,6 +27,5 @@
 			"type": "IntegrationRuntimeReference"
 		},
 		"description": "Connection to Google Storage containing GA Data"
-	},
-	"type": "Microsoft.DataFactory/factories/linkedservices"
+	}
 }
