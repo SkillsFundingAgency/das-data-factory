@@ -1,0 +1,7 @@
+{
+	"name": "ImportIncentivesGAData",
+	"properties": {
+		"description": "Import Incentives GA Data ",
+		"annotations": []
+	}
+}
