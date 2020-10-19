@@ -1,18 +1,25 @@
 {
 	"name": "googlestorage_connectionstring",
 	"properties": {
-		"annotations": [],
 		"type": "GoogleCloudStorage",
+		"annotations": [],
 		"typeProperties": {
 			"serviceUrl": "https://storage.googleapis.com",
-			"accessKeyId": "abc ",
+			"accessKeyId": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "GS_accessKeyId"
+			},
 			"secretAccessKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "GS_AccessKey"
+				"secretName": "GS_secretAccessKey"
 			}
 		},
 		"connectVia": {
