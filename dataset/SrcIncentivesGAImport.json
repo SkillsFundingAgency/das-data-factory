@@ -5,11 +5,25 @@
 			"referenceName": "googlestorage_connectionstring",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"ContainerName": {
+				"type": "string"
+			},
+			"Directory": {
+				"type": "string"
+			},
+			"FileName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
 			"location": {
-				"type": "GoogleCloudStorageLocation"
+				"type": "GoogleCloudStorageLocation",
+				"bucketName": "das-at-databucket",
+				"folderPath": "gadata",
+				"fileName": "output-00000-of-00001.parquet"
 			},
 			"compressionCodec": "snappy"
 		},
