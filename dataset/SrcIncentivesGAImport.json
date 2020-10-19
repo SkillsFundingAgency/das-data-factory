@@ -18,9 +18,15 @@
 		"typeProperties": {
 			"location": {
 				"type": "GoogleCloudStorageLocation",
-				"bucketName": "das-at-databucket",
+				"bucketName": {
+					"value": "@dataset().ContainerName",
+					"type": "Expression"
+				},
 				"folderPath": "gadata",
-				"fileName": "output-00000-of-00001.parquet"
+				"fileName": {
+					"value": "@dataset().FileName",
+					"type": "Expression"
+				}
 			},
 			"compressionCodec": "snappy"
 		},
