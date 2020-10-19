@@ -1,0 +1,31 @@
+{
+	"name": "googlestorage_connectionstring",
+	"properties": {
+		"type": "GoogleCloudStorage",
+		"annotations": [],
+		"typeProperties": {
+			"serviceUrl": "https://storage.googleapis.com",
+			"accessKeyId": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "googlestorage-accesskeyid"
+			},
+			"secretAccessKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "googlestorage-secretaccesskey"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
+		},
+		"description": "Connection to Google Storage containing GA Data"
+	}
+}
