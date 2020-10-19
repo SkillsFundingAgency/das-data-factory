@@ -25,7 +25,8 @@
 		"connectVia": {
 			"referenceName": "AzureIntegrationRunTime",
 			"type": "IntegrationRuntimeReference"
-		}
+		},
+		"description": "Connection to Google Storage containing GA Data"
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
