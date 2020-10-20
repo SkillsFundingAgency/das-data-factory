@@ -1,5 +1,5 @@
 {
-	"name": "googlestorage_connectionstring",
+	"name": "googlecloud_connection",
 	"properties": {
 		"type": "GoogleCloudStorage",
 		"annotations": [],
@@ -11,7 +11,7 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "googlestorage-accesskeyid"
+				"secretName": "googlecloud-accesskeyid"
 			},
 			"secretAccessKey": {
 				"type": "AzureKeyVaultSecret",
@@ -19,7 +19,7 @@
 					"referenceName": "AzureKeyVault1",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "googlestorage-secretaccesskey"
+				"secretName": "googlecloud-secretaccesskey"
 			}
 		},
 		"connectVia": {
