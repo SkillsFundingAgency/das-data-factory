@@ -301,6 +301,14 @@
 									"name": "hits_page_pagePathLevel4",
 									"type": "String"
 								}
+							},
+							{
+								"source": {
+									"name": "FileName"
+								},
+								"sink": {
+									"name": "FileName"
+								}
 							}
 						],
 						"typeConversion": true,
