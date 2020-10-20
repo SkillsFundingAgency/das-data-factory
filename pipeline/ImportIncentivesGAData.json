@@ -61,7 +61,7 @@
 				}
 			},
 			{
-				"name": "Copy  GA Data",
+				"name": "CopyGAData",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -124,92 +124,6 @@
 				]
 			},
 			{
-				"name": "LogCommitSuccessfulExecutionToStaging",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "Copy  GA Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:30:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportCommitmentToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
-							"type": "Expression"
-						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					}
-				}
-			},
-			{
-				"name": "LogCommitError",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Copy  GA Data",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:30:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
-					"storedProcedureParameters": {
-						"ErrorMessage": {
-							"value": {
-								"value": "@{activity('CopyCommitData').Error.message}",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"RunId": {
-							"value": {
-								"value": "@{variables('RunId')}",
-								"type": "Expression"
-							},
-							"type": "Int32"
-						},
-						"TaskType": {
-							"value": "ImportCommitmentToDatamart",
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamgmt_staging_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
 				"name": "GetProjectContainer",
 				"type": "Lookup",
 				"dependsOn": [
@@ -267,10 +181,108 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "LogSuccessfulActivityCopyGAData",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyGAData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportMarketoActivityTypeIdsToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogErrorActivityGADataCopyError",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CopyGAData",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[InsertLogErrorDetails]",
+						"storedProcedureParameters": {
+							"ErrorMessage": {
+								"type": "String",
+								"value": {
+									"value": "@{activity('CopyGAData').Error.message}",
+									"type": "Expression"
+								}
+							},
+							"RunId": {
+								"type": "Int32",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							},
+							"TaskType": {
+								"type": "String",
+								"value": "ImportMarketoActivityTypeIdsToDMStaging"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
 			}
 		],
 		"variables": {
 			"ProjectContainer": {
+				"type": "String"
+			},
+			"RunId": {
 				"type": "String"
 			}
 		},
