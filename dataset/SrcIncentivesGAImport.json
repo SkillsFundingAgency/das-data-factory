@@ -2,7 +2,7 @@
 	"name": "SrcIncentivesGAImport",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "googlestorage_connectionstring",
+			"referenceName": "googlecloud_connection",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
