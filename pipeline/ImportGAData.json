@@ -256,8 +256,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "ID3",
-									"type": "String",
+									"name": "MarketoGUID",
 									"physicalType": "nvarchar"
 								}
 							},
