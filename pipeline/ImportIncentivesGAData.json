@@ -61,48 +61,11 @@
 				}
 			},
 			{
-				"name": "GetComtTableList",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "GetRunId",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,PLTableName as PLTableName \nFROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='Commitments' and IsEnabled=1 and FullCopyToPL=1",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "DestDataMart",
-						"type": "DatasetReference",
-						"parameters": {
-							"TableName": "Users",
-							"SchemaName": "Stg"
-						}
-					},
-					"firstRowOnly": false
-				}
-			},
-			{
 				"name": "Copy  GA Data",
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "GetComtTableList",
+						"activity": "SetProjectContainer",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -243,8 +206,65 @@
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "GetProjectContainer",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-at-databucket'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-databucket'\n                      ELSE 'Unknown'\n           END VaultUrl\n                ",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "SetProjectContainer",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetProjectContainer",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": []
 			}
 		],
+		"variables": {
+			"ProjectContainer": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
