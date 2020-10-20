@@ -10,7 +10,8 @@
 				"type": "string"
 			},
 			"FileName": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "output-00000-of-00001.parquet"
 			}
 		},
 		"annotations": [],
