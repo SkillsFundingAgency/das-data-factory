@@ -98,6 +98,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
+						"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'GA_SessionData' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[GA_SessionData]",
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
