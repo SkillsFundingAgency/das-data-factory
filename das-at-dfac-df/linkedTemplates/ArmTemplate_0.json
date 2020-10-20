@@ -47,6 +47,17 @@
 			"type": "string",
 			"defaultValue": "findapprenticeship"
 		},
+		"googlecloud_connection_properties_typeProperties_accessKeyId": {
+			"type": "object",
+			"defaultValue": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "googlecloud-accesskeyid"
+			}
+		},
 		"marketo_httpservice_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{linkedService().MarketoBaseUrl}"
@@ -323,6 +334,36 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/googlecloud_connection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "GoogleCloudStorage",
+				"annotations": [],
+				"typeProperties": {
+					"serviceUrl": "https://storage.googleapis.com",
+					"accessKeyId": "[parameters('googlecloud_connection_properties_typeProperties_accessKeyId')]",
+					"secretAccessKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "googlecloud-secretaccesskey"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				},
+				"description": "Connection to Google Storage containing GA Data"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
 			]
 		},
 		{
@@ -660,44 +701,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/avmsplus_dbconnectionstring')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcComts')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Commitment database connection string",
-				"linkedServiceName": {
-					"referenceName": "comt_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Apprenticeship"
-					},
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "dbo"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/comt_dbconnectionstring')]"
 			]
 		}
 	]

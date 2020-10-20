@@ -47,6 +47,17 @@
 			"type": "string",
 			"defaultValue": "findapprenticeship"
 		},
+		"googlecloud_connection_properties_typeProperties_accessKeyId": {
+			"type": "object",
+			"defaultValue": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "googlecloud-accesskeyid"
+			}
+		},
 		"marketo_httpservice_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{linkedService().MarketoBaseUrl}"
@@ -148,6 +159,9 @@
 					"faa_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('faa_cdbconnectionstring_properties_typeProperties_database')]"
 					},
+					"googlecloud_connection_properties_typeProperties_accessKeyId": {
+						"value": "[parameters('googlecloud_connection_properties_typeProperties_accessKeyId')]"
+					},
 					"marketo_httpservice_properties_typeProperties_url": {
 						"value": "[parameters('marketo_httpservice_properties_typeProperties_url')]"
 					},
@@ -223,6 +237,26 @@
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_1')]"
+			]
+		},
+		{
+			"name": "das-at-dfac-df_ArmTemplate_3",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_3.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_2')]"
 			]
 		}
 	]

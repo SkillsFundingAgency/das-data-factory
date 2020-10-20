@@ -33,6 +33,101 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowCommitment')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Data flow commitment",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SrcComts",
+								"type": "DatasetReference"
+							},
+							"name": "CommitSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference"
+							},
+							"name": "CommitSink"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> CommitSource\nCommitSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> CommitSink"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowFinance')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dataflow Finance",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SrcFinance",
+								"type": "DatasetReference"
+							},
+							"name": "Financesource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference"
+							},
+							"name": "FinanceSink"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> Financesource\nFinancesource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FinanceSink"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowIncentives')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SrcEmpIncentive",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DataFlowReservation')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -2234,7 +2329,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlowCommitment')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportFinanceToDM')]",
@@ -2945,7 +3042,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlowFinance')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportIncentivesToDataMart')]",
@@ -3642,7 +3741,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlowIncentives')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportReservationToDM')]",
@@ -5873,6 +5974,42 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Trigger-ImportGAData')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ImportGAData",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2020-10-20T15:10:00.000Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								7
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Master-ImportAccUsersComtFinResvToDataMart')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -6325,51 +6462,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/Master-ImportCampaignDataToDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger-ImportAccUsersComFinResvToDM')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Master-ImportAccUsersComtFinResvToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 1,
-						"startTime": "2020-09-09T23:25:00.000Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								2
-							],
-							"weekDays": [
-								"Monday",
-								"Tuesday",
-								"Wednesday",
-								"Thursday",
-								"Friday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Master-ImportAccUsersComtFinResvToDataMart')]"
 			]
 		}
 	]

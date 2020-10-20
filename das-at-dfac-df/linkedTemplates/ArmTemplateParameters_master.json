@@ -35,6 +35,16 @@
 		"faa_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "findapprenticeship"
 		},
+		"googlecloud_connection_properties_typeProperties_accessKeyId": {
+			"value": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "googlecloud-accesskeyid"
+			}
+		},
 		"marketo_httpservice_properties_typeProperties_url": {
 			"value": "@{linkedService().MarketoBaseUrl}"
 		},
