@@ -321,7 +321,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcIncentivesGAImport",
+						"referenceName": "SrcGAImport",
 						"type": "DatasetReference",
 						"parameters": {
 							"ContainerName": {

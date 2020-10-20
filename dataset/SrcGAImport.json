@@ -1,5 +1,5 @@
 {
-	"name": "SrcIncentivesGAImport",
+	"name": "SrcGAImport",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "googlecloud_connection",
