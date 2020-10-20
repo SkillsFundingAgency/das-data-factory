@@ -333,7 +333,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "GetRunId",
+						"activity": "SetRunId",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -520,19 +520,37 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@activity('GetRunId').output.firstRow.RunId",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
 			"ProjectContainer": {
-				"type": "String",
-				"defaultValue": "das-at-databucket"
+				"type": "String"
 			},
 			"RunId": {
 				"type": "String"
 			},
 			"FileName": {
-				"type": "String",
-				"defaultValue": "output-00000-of-00001.parquet"
+				"type": "String"
 			}
 		},
 		"annotations": []
