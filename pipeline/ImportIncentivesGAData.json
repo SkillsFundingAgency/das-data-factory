@@ -92,7 +92,9 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"tableOption": "autoCreate"
+						"preCopyScript": "delete from Stg.gasessiondata",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -115,7 +117,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "Users",
+							"TableName": "gasessiondata",
 							"SchemaName": "Stg"
 						}
 					}
@@ -230,7 +232,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-at-databucket'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-databucket'\n                      ELSE 'Unknown'\n           END VaultUrl\n                ",
+							"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-at-databucket'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-databucket'\n                      ELSE 'Unknown'\n           END ProjectContainer\n                ",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -257,7 +259,14 @@
 						]
 					}
 				],
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ProjectContainer",
+					"value": {
+						"value": "@activity('GetProjectContainer').output.firstRow.ProjectContainer",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
