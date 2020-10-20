@@ -1,5 +1,5 @@
 {
-	"name": "SrcGAImport",
+	"name": "SrcGAData",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "googlecloud_connection",

@@ -357,7 +357,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcGAImport",
+						"referenceName": "SrcGAData",
 						"type": "DatasetReference",
 						"parameters": {
 							"ContainerName": {
