@@ -109,7 +109,14 @@
 				"inputs": [
 					{
 						"referenceName": "SrcIncentivesGAImport",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ContainerName": {
+								"value": "@variables('ProjectContainer')",
+								"type": "Expression"
+							},
+							"FileName": "@variables('FileName')"
+						}
 					}
 				],
 				"outputs": [
@@ -280,10 +287,15 @@
 		],
 		"variables": {
 			"ProjectContainer": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "das-at-databucket"
 			},
 			"RunId": {
 				"type": "String"
+			},
+			"FileName": {
+				"type": "String",
+				"defaultValue": "output-00000-of-00001.parquet"
 			}
 		},
 		"annotations": []
