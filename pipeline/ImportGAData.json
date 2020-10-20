@@ -1,7 +1,7 @@
 {
-	"name": "ImportIncentivesGAData",
+	"name": "ImportGAData",
 	"properties": {
-		"description": "Import Incentives GA Data ",
+		"description": "Import GA Data ",
 		"activities": [
 			{
 				"name": "GenerateRunId",
