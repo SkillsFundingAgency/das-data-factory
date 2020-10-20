@@ -7177,7 +7177,7 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "SrcGAImport",
+								"referenceName": "SrcGAData",
 								"type": "DatasetReference",
 								"parameters": {
 									"ContainerName": {
@@ -7429,7 +7429,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
-				"[concat(variables('factoryId'), '/datasets/SrcGAImport')]"
+				"[concat(variables('factoryId'), '/datasets/SrcGAData')]"
 			]
 		},
 		{
@@ -13201,7 +13201,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SrcGAImport')]",
+			"name": "[concat(parameters('factoryName'), '/SrcGAData')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {

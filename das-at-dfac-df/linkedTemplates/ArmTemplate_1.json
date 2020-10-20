@@ -138,7 +138,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SrcGAImport')]",
+			"name": "[concat(parameters('factoryName'), '/SrcGAData')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -4529,7 +4529,7 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "SrcGAImport",
+								"referenceName": "SrcGAData",
 								"type": "DatasetReference",
 								"parameters": {
 									"ContainerName": {
@@ -4779,7 +4779,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcGAImport')]"
+				"[concat(variables('factoryId'), '/datasets/SrcGAData')]"
 			]
 		},
 		{
