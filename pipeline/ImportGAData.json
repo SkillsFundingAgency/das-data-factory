@@ -105,7 +105,6 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -119,67 +118,67 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
+									"name": "FullVisitorId",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "visitNumber",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "VisitNumber",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "visitId",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "VisitId",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "visitStartDateTime",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "VisitStartDateTime",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "visitDate",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "VisitDate",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
 									"name": "fullVisitorId",
 									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"name": "visitNumber",
-									"type": "String",
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "visitNumber",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"name": "visitId",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "visitId",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"name": "visitStartDateTime",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "visitStartDateTime",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"name": "visitDate",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "visitDate",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"name": "visitorId",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "visitorId",
+									"name": "VisitorId",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -191,7 +190,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "userId",
+									"name": "UserId",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -203,7 +202,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "clientId",
+									"name": "ClientId",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -215,7 +214,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hits_page_pagePath",
+									"name": "Hits_Page_PagePath",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -227,7 +226,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hits_time",
+									"name": "Hits_Time",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -239,7 +238,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "employerID",
+									"name": "EmployerID",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -264,6 +263,7 @@
 								},
 								"sink": {
 									"name": "MarketoGUID",
+									"type": "String",
 									"physicalType": "nvarchar"
 								}
 							},
@@ -286,7 +286,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hits_page_pagePathLevel1",
+									"name": "Hits_Page_PagePathLevel1",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -298,7 +298,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hits_page_pagePathLevel2",
+									"name": "Hits_Page_PagePathLevel2",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -310,7 +310,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hits_page_pagePathLevel3",
+									"name": "Hits_Page_PagePathLevel3",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -322,7 +322,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hits_page_pagePathLevel4",
+									"name": "Hits_Page_PagePathLevel4",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -342,7 +342,9 @@
 									"name": "ImportDate"
 								},
 								"sink": {
-									"name": "ImportDate"
+									"name": "StgImportDate",
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							}
 						],
