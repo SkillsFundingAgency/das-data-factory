@@ -114,39 +114,44 @@
 								},
 								"sink": {
 									"name": "fullVisitorId",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "visitNumber",
-									"type": "Int64",
-									"physicalType": "INT64"
+									"type": "String",
+									"physicalType": "UTF8"
 								},
 								"sink": {
 									"name": "visitNumber",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "visitId",
-									"type": "Int64",
-									"physicalType": "INT64"
+									"type": "String",
+									"physicalType": "UTF8"
 								},
 								"sink": {
 									"name": "visitId",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "visitStartDateTime",
-									"type": "String"
+									"type": "String",
+									"physicalType": "UTF8"
 								},
 								"sink": {
 									"name": "visitStartDateTime",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -157,18 +162,20 @@
 								},
 								"sink": {
 									"name": "visitDate",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "visitorId",
-									"type": "Int64",
-									"physicalType": "INT64"
+									"type": "String",
+									"physicalType": "UTF8"
 								},
 								"sink": {
 									"name": "visitorId",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -179,7 +186,8 @@
 								},
 								"sink": {
 									"name": "userId",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -190,7 +198,8 @@
 								},
 								"sink": {
 									"name": "clientId",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -201,18 +210,20 @@
 								},
 								"sink": {
 									"name": "hits_page_pagePath",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
 								"source": {
 									"name": "hits_time",
-									"type": "Int64",
-									"physicalType": "INT64"
+									"type": "String",
+									"physicalType": "UTF8"
 								},
 								"sink": {
 									"name": "hits_time",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -223,7 +234,8 @@
 								},
 								"sink": {
 									"name": "employerID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -234,7 +246,8 @@
 								},
 								"sink": {
 									"name": "ID2",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -245,7 +258,8 @@
 								},
 								"sink": {
 									"name": "ID3",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -256,7 +270,8 @@
 								},
 								"sink": {
 									"name": "EFSAToken",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -267,7 +282,8 @@
 								},
 								"sink": {
 									"name": "hits_page_pagePathLevel1",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -278,7 +294,8 @@
 								},
 								"sink": {
 									"name": "hits_page_pagePathLevel2",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -289,7 +306,8 @@
 								},
 								"sink": {
 									"name": "hits_page_pagePathLevel3",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -300,7 +318,8 @@
 								},
 								"sink": {
 									"name": "hits_page_pagePathLevel4",
-									"type": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -308,7 +327,9 @@
 									"name": "FileName"
 								},
 								"sink": {
-									"name": "FileName"
+									"name": "FileName",
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							}
 						],
