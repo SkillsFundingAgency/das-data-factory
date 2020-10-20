@@ -2,7 +2,6 @@
 	"name": "googlecloud_connection",
 	"properties": {
 		"type": "GoogleCloudStorage",
-		"name": "googlecloud_connection",
 		"annotations": [],
 		"typeProperties": {
 			"serviceUrl": "https://storage.googleapis.com",
