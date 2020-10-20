@@ -1,0 +1,35 @@
+{
+	"name": "SrcGAImport",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "googlecloud_connection",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ContainerName": {
+				"type": "string"
+			},
+			"FileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "GoogleCloudStorageLocation",
+				"bucketName": {
+					"value": "@dataset().ContainerName",
+					"type": "Expression"
+				},
+				"folderPath": "gadata",
+				"fileName": {
+					"value": "@dataset().FileName",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
