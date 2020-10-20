@@ -86,6 +86,13 @@
 							{
 								"name": "FileName",
 								"value": "$$FILEPATH"
+							},
+							{
+								"name": "ImportDate",
+								"value": {
+									"value": "@utcnow()",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {
@@ -328,6 +335,14 @@
 									"name": "FileName",
 									"type": "String",
 									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ImportDate"
+								},
+								"sink": {
+									"name": "ImportDate"
 								}
 							}
 						],
