@@ -112,6 +112,13 @@
 						"type": "TabularTranslator",
 						"mappings": [
 							{
+								"sink": {
+									"name": "GASD_Id",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
 								"source": {
 									"name": "fullVisitorId",
 									"type": "String",
@@ -274,7 +281,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "EFSAToken",
+									"name": "ESFAToken",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -343,6 +350,18 @@
 								},
 								"sink": {
 									"name": "StgImportDate",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ID3",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "ID3",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
