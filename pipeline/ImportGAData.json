@@ -112,13 +112,6 @@
 						"type": "TabularTranslator",
 						"mappings": [
 							{
-								"sink": {
-									"name": "GASD_Id",
-									"type": "Int64",
-									"physicalType": "bigint"
-								}
-							},
-							{
 								"source": {
 									"name": "fullVisitorId",
 									"type": "String",
