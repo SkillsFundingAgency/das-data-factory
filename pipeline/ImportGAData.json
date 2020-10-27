@@ -93,6 +93,10 @@
 									"value": "@utcnow()",
 									"type": "Expression"
 								}
+							},
+							{
+								"name": "Derived_ESFAToken",
+								"value": "$$COLUMN:EFSAToken"
 							}
 						],
 						"storeSettings": {
@@ -257,9 +261,7 @@
 							},
 							{
 								"source": {
-									"name": "ID3",
-									"type": "String",
-									"physicalType": "UTF8"
+									"name": "Derived_ESFAToken"
 								},
 								"sink": {
 									"name": "MarketoGUID",
