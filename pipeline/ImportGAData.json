@@ -93,6 +93,10 @@
 									"value": "@utcnow()",
 									"type": "Expression"
 								}
+							},
+							{
+								"name": "Derived_ESFAToken",
+								"value": "$$COLUMN:EFSAToken"
 							}
 						],
 						"storeSettings": {
@@ -257,9 +261,7 @@
 							},
 							{
 								"source": {
-									"name": "ID3",
-									"type": "String",
-									"physicalType": "UTF8"
+									"name": "Derived_ESFAToken"
 								},
 								"sink": {
 									"name": "MarketoGUID",
@@ -274,7 +276,7 @@
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "EFSAToken",
+									"name": "ESFAToken",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
@@ -343,6 +345,18 @@
 								},
 								"sink": {
 									"name": "StgImportDate",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ID3",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "ID3",
 									"type": "String",
 									"physicalType": "nvarchar"
 								}
