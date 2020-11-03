@@ -5951,7 +5951,7 @@
 					"recurrence": {
 						"frequency": "Week",
 						"interval": 1,
-						"startTime": "2020-08-27T15:44:00.000Z",
+						"startTime": "2020-08-27T15:44:00Z",
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [
@@ -5994,14 +5994,14 @@
 					"recurrence": {
 						"frequency": "Day",
 						"interval": 1,
-						"startTime": "2020-10-20T15:10:00.000Z",
+						"startTime": "2020-10-20T15:10:00Z",
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [
 								0
 							],
 							"hours": [
-								7
+								22
 							]
 						}
 					}
@@ -6353,7 +6353,7 @@
 					"recurrence": {
 						"frequency": "Week",
 						"interval": 1,
-						"startTime": "2020-04-14T10:08:00.000Z",
+						"startTime": "2020-04-14T10:08:00Z",
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [
@@ -6402,7 +6402,7 @@
 					"recurrence": {
 						"frequency": "Week",
 						"interval": 1,
-						"startTime": "2020-08-25T15:24:00.000Z",
+						"startTime": "2020-08-25T15:24:00Z",
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [
@@ -6447,7 +6447,7 @@
 					"recurrence": {
 						"frequency": "Day",
 						"interval": 1,
-						"startTime": "2020-10-07T21:51:00.000Z",
+						"startTime": "2020-10-07T21:51:00Z",
 						"timeZone": "UTC",
 						"schedule": {
 							"minutes": [

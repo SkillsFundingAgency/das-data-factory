@@ -1,0 +1,679 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "das-at-dfac-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ImportGAData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Import GA Data ",
+				"activities": [
+					{
+						"name": "GenerateRunId",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[GenerateRunId]"
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "GetRunId",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "GenerateRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Users"
+								}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "CopyGAData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "LogStartOfImportToStaging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.03:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"additionalColumns": [
+									{
+										"name": "FileName",
+										"value": "$$FILEPATH"
+									},
+									{
+										"name": "ImportDate",
+										"value": {
+											"value": "@utcnow()",
+											"type": "Expression"
+										}
+									},
+									{
+										"name": "Derived_ESFAToken",
+										"value": "$$COLUMN:EFSAToken"
+									}
+								],
+								"storeSettings": {
+									"type": "GoogleCloudStorageReadSettings",
+									"maxConcurrentConnections": 2,
+									"recursive": true,
+									"wildcardFolderPath": "gadata",
+									"wildcardFileName": "*.parquet"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "fullVisitorId",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "FullVisitorId",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "visitNumber",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "VisitNumber",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "visitId",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "VisitId",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "visitStartDateTime",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "VisitStartDateTime",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "visitDate",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "VisitDate",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "visitorId",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "VisitorId",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "userId",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "UserId",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "clientId",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "ClientId",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "hits_page_pagePath",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "Hits_Page_PagePath",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "hits_time",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "Hits_Time",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "employerID",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "EmployerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ID2",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "ID2",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Derived_ESFAToken"
+										},
+										"sink": {
+											"name": "MarketoGUID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EFSAToken",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "ESFAToken",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "hits_page_pagePathLevel1",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "Hits_Page_PagePathLevel1",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "hits_page_pagePathLevel2",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "Hits_Page_PagePathLevel2",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "hits_page_pagePathLevel3",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "Hits_Page_PagePathLevel3",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "hits_page_pagePathLevel4",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "Hits_Page_PagePathLevel4",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "FileName"
+										},
+										"sink": {
+											"name": "FileName",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ImportDate"
+										},
+										"sink": {
+											"name": "StgImportDate",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ID3",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "ID3",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": false,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcGAData",
+								"type": "DatasetReference",
+								"parameters": {
+									"ContainerName": {
+										"value": "@variables('ProjectContainer')",
+										"type": "Expression"
+									},
+									"FileName": "@variables('FileName')"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "GA_SessionData",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "GetProjectContainer",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT CASE WHEN '@{pipeline().DataFactory}'='das-at-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-test-dfac-df'\n                      THEN 'das-at-databucket'\n                      WHEN '@{pipeline().DataFactory}'='das-pp-dfac-df'\n                      THEN 'das-at-databucket'\n                     WHEN '@{pipeline().DataFactory}'='das-prd-dfac-df'\n                      THEN 'das-prd-databucket'\n                      ELSE 'Unknown'\n           END ProjectContainer\n                ",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "SetProjectContainer",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetProjectContainer",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "ProjectContainer",
+							"value": {
+								"value": "@activity('GetProjectContainer').output.firstRow.ProjectContainer",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "LogSuccessfulActivityCopyGAData",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "CopyGAData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportGADataToDMStaging'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogErrorActivityGADataCopyError",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "CopyGAData",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[InsertLogErrorDetails]",
+								"storedProcedureParameters": {
+									"ErrorMessage": {
+										"type": "String",
+										"value": {
+											"value": "@{activity('CopyGAData').Error.message}",
+											"type": "Expression"
+										}
+									},
+									"RunId": {
+										"type": "Int32",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									},
+									"TaskType": {
+										"type": "String",
+										"value": "ImportGADataToDMStaging"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogStartOfImportToStaging",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "SetProjectContainer",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportGADataToDMStaging'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "SetRunId",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RunId",
+							"value": {
+								"value": "@activity('GetRunId').output.firstRow.RunId",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"variables": {
+					"ProjectContainer": {
+						"type": "String"
+					},
+					"RunId": {
+						"type": "String"
+					},
+					"FileName": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Trigger-ImportGAData')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ImportGAData",
+							"type": "PipelineReference"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2020-10-20T15:10:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								22
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/ImportGAData')]"
+			]
+		}
+	]
+}
