@@ -107,7 +107,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "CampaignGenerateKey",
+						"activity": "TransactionLineGenerateKey",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -139,6 +139,129 @@
 							"SchemaName": "Stg"
 						}
 					}
+				}
+			},
+			{
+				"name": "EmployerPayeSchemGenerateKey",
+				"description": "Generate Key",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "CampaignGenerateKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SaltKeyLogging]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": {
+								"value": "@{activity('GetRunId').output.firstRow.RunId}",
+								"type": "Expression"
+							},
+							"type": "Int64"
+						},
+						"SourceType": {
+							"value": "EmployerPayeSchemes",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "LevyDeclarationsGenerateKey",
+				"description": "Generate Key",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "EmployerPayeSchemGenerateKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SaltKeyLogging]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": {
+								"value": "@{activity('GetRunId').output.firstRow.RunId}",
+								"type": "Expression"
+							},
+							"type": "Int64"
+						},
+						"SourceType": {
+							"value": "LevyDeclarations",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "TransactionLineGenerateKey",
+				"description": "Generate Key",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LevyDeclarationsGenerateKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SaltKeyLogging]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": {
+								"value": "@{activity('GetRunId').output.firstRow.RunId}",
+								"type": "Expression"
+							},
+							"type": "Int64"
+						},
+						"SourceType": {
+							"value": "TransactionLine",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
