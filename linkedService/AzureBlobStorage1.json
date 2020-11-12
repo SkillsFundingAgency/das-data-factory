@@ -1,0 +1,14 @@
+{
+	"name": "AzureBlobStorage1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "htps"
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
