@@ -25,7 +25,7 @@
 				}
 			},
 			{
-				"name": "GenerateKey",
+				"name": "CampaignGenerateKey",
 				"description": "Generate Key",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
@@ -107,7 +107,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "GenerateKey",
+						"activity": "CampaignGenerateKey",
 						"dependencyConditions": [
 							"Succeeded"
 						]
