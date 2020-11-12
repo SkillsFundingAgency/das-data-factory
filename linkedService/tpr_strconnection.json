@@ -1,0 +1,12 @@
+{
+	"name": "tpr_strconnection",
+	"properties": {
+		"description": "Connection to dasattprstr with Storage Blob Data Contributor role",
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://dasattprstr.blob.core.windows.net",
+			"accountKind": "Storage"
+		}
+	}
+}
