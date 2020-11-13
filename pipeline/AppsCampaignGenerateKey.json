@@ -107,7 +107,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "LevyDeclarationsGenerateKey",
+						"activity": "PayeReferenceGenerateKey",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -183,8 +183,8 @@
 				}
 			},
 			{
-				"name": "LevyDeclarationsGenerateKey",
-				"description": "Generate Key",
+				"name": "PayeReferenceGenerateKey",
+				"description": "Paye Reference Generate Key",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
