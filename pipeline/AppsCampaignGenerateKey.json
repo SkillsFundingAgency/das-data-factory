@@ -107,7 +107,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "TransactionLineGenerateKey",
+						"activity": "LevyDeclarationsGenerateKey",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -142,8 +142,8 @@
 				}
 			},
 			{
-				"name": "EmployerPayeSchemGenerateKey",
-				"description": "Generate Key",
+				"name": "EmployerReferenceGenerateKey",
+				"description": "Employer Reference Generate Key",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -172,7 +172,7 @@
 							"type": "Int64"
 						},
 						"SourceType": {
-							"value": "EmployerPayeSchemes",
+							"value": "EmployerReference",
 							"type": "String"
 						}
 					}
@@ -188,7 +188,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "EmployerPayeSchemGenerateKey",
+						"activity": "EmployerReferenceGenerateKey",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -213,48 +213,7 @@
 							"type": "Int64"
 						},
 						"SourceType": {
-							"value": "LevyDeclarations",
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamgmt_staging_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "TransactionLineGenerateKey",
-				"description": "Generate Key",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "LevyDeclarationsGenerateKey",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.00:30:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[SaltKeyLogging]",
-					"storedProcedureParameters": {
-						"RunId": {
-							"value": {
-								"value": "@{activity('GetRunId').output.firstRow.RunId}",
-								"type": "Expression"
-							},
-							"type": "Int64"
-						},
-						"SourceType": {
-							"value": "TransactionLine",
+							"value": "PayeReference",
 							"type": "String"
 						}
 					}
