@@ -502,7 +502,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -1217,7 +1218,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -2003,7 +2005,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -2677,7 +2680,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -3358,7 +3362,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -4128,7 +4133,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -4767,7 +4773,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{

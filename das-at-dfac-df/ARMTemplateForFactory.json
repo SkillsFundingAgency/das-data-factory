@@ -136,7 +136,7 @@
 						}
 					},
 					{
-						"name": "GenerateKey",
+						"name": "CampaignGenerateKey",
 						"description": "Generate Key",
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
@@ -218,7 +218,7 @@
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "GenerateKey",
+								"activity": "EmployerReferenceGenerateKey",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -250,6 +250,47 @@
 									"SchemaName": "Stg"
 								}
 							}
+						}
+					},
+					{
+						"name": "EmployerReferenceGenerateKey",
+						"description": "Employer Reference Generate Key",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "CampaignGenerateKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[SaltKeyLogging]",
+							"storedProcedureParameters": {
+								"RunId": {
+									"value": {
+										"value": "@{activity('GetRunId').output.firstRow.RunId}",
+										"type": "Expression"
+									},
+									"type": "Int64"
+								},
+								"SourceType": {
+									"value": "EmployerReference",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -578,7 +619,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -1299,7 +1341,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -5377,7 +5420,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -6443,7 +6487,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -7758,7 +7803,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -10736,7 +10782,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -11379,7 +11426,8 @@
 										"integrationRuntime": {
 											"referenceName": "AzureIntegrationRunTime",
 											"type": "IntegrationRuntimeReference"
-										}
+										},
+										"traceLevel": "Fine"
 									}
 								},
 								{
