@@ -202,6 +202,248 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "CopyFileToDb",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "LogStartOfImport",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.03:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"additionalColumns": [
+										{
+											"name": "FileName",
+											"value": {
+												"value": "@{item().name}",
+												"type": "Expression"
+											}
+										}
+									],
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"wildcardFileName": {
+											"value": "@{item().name}",
+											"type": "Expression"
+										}
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "?Record Type",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "RecordType1",
+												"physicalType": "int"
+											}
+										},
+										{
+											"source": {
+												"name": "",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "BinaryId",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "District Number_Replace",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "TypeCode",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Reference_Replace",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "IdamUserId",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "AO District",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "UserType",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "AO Tax Type",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "UserName",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "AO Check Char",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "UserEmail",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "AO Reference",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "UserCreatedTimeStamp",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Start Date",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "LastSignedInTimeStamp",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "End Date",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "EmployerAccountId",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "End Date Code",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "Ukprn",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Restart Date",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "RunId",
+												"type": "Int64",
+												"physicalType": "bigint"
+											}
+										},
+										{
+											"source": {
+												"name": "Review Yr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "AsDm_CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime2"
+											}
+										},
+										{
+											"source": {
+												"name": "Company Reg No",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "AsDm_UpdatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime2"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SrcTpr",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "TprStaging",
+										"SchemaName": "Stg"
+									}
+								}
+							]
 						}
 					]
 				}
