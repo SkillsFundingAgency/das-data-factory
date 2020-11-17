@@ -24,7 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
-						"modifiedDatetimeStart": "2020-11-16T00:00:00.000Z",
+						"modifiedDatetimeStart": "2020-11-11T00:00:00.000Z",
 						"modifiedDatetimeEnd": "2020-11-24T00:00:00.000Z"
 					},
 					"formatSettings": {
