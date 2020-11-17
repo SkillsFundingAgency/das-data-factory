@@ -3,11 +3,11 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "CopyData",
-				"type": "Copy",
+				"name": "GetLatestFileNamesInTPR",
+				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "0.00:30:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -15,27 +15,49 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"wildcardFileName": "*txt"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
+					"dataset": {
 						"referenceName": "SrcTpr",
 						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"modifiedDatetimeStart": "2020-11-11T00:00:00.000Z",
+						"modifiedDatetimeEnd": "2020-11-24T00:00:00.000Z"
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
 					}
-				]
+				}
+			},
+			{
+				"name": "SetFileNameToLoad",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetLatestFileNamesInTPR",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FileName",
+					"value": {
+						"value": "@activity('GetLatestFileNamesInTPR').output.childItems",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"FileName": {
+				"type": "Array"
+			}
+		},
 		"annotations": []
 	}
 }
