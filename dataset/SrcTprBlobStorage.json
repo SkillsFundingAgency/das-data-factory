@@ -1,5 +1,5 @@
 {
-	"name": "SrcTpr",
+	"name": "SrcTprBlobStorage",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "tpr_strconnection",
