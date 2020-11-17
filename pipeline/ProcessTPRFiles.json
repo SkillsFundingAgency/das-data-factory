@@ -155,7 +155,14 @@
 									]
 								}
 							],
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "RunId",
+								"value": {
+									"value": "@activity('GetRunId').output.firstRow.RunId",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
