@@ -24,7 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
-						"modifiedDatetimeStart": "2020-11-11T00:00:00.000Z",
+						"modifiedDatetimeStart": "2020-11-16T00:00:00.000Z",
 						"modifiedDatetimeEnd": "2020-11-24T00:00:00.000Z"
 					},
 					"formatSettings": {
@@ -33,8 +33,8 @@
 				}
 			},
 			{
-				"name": "SetFileNameToLoad",
-				"type": "SetVariable",
+				"name": "ForEach1",
+				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "GetLatestFileNamesInTPR",
@@ -45,11 +45,69 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "FileName",
-					"value": {
+					"items": {
 						"value": "@activity('GetLatestFileNamesInTPR').output.childItems",
 						"type": "Expression"
-					}
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "GetRunId",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[GenerateRunId]"
+							},
+							"linkedServiceName": {
+								"referenceName": "datamgmt_staging_dbconnectionstring",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "GetSrcFileDetailsToDb",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "GetRunId",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "INSERT INTO Mgmt.SourceFileList\n(FileName)\nVALUES ('@{item().name}')",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						}
+					]
 				}
 			}
 		],
