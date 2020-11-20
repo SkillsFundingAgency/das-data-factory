@@ -125,7 +125,11 @@
 											},
 											"dataset": {
 												"referenceName": "DestTPR",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "log_execution_results",
+													"SchemaName": "mgmt"
+												}
 											}
 										}
 									},
