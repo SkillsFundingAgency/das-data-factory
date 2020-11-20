@@ -117,19 +117,15 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "select '@{item().name}'",
+													"value": "IF NOT EXISTS (SELECT 1 FROM Mgmt.SourceFileList where FileName='@{item().name}'\nbegin\nINSERT INTO Mgmt.SourceFileList\n(FileName)\nselect '@{item().name}'\nend\n\nSELECT '1'\n",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00",
 												"partitionOption": "None"
 											},
 											"dataset": {
-												"referenceName": "DestDataMart",
-												"type": "DatasetReference",
-												"parameters": {
-													"TableName": "Users",
-													"SchemaName": "Stg"
-												}
+												"referenceName": "DestTPR",
+												"type": "DatasetReference"
 											}
 										}
 									},
@@ -160,11 +156,11 @@
 												"partitionOption": "None"
 											},
 											"dataset": {
-												"referenceName": "DestDataMart",
+												"referenceName": "DestTPR",
 												"type": "DatasetReference",
 												"parameters": {
-													"TableName": "Stg",
-													"SchemaName": "Users"
+													"TableName": "LOG_EXECUTION_RESULTS",
+													"SchemaName": "MGMT"
 												}
 											},
 											"firstRowOnly": true
@@ -186,7 +182,7 @@
 											"storedProcedureName": "[dbo].[GenerateRunId]"
 										},
 										"linkedServiceName": {
-											"referenceName": "datamgmt_staging_dbconnectionstring",
+											"referenceName": "tpr_dbconnectionstring",
 											"type": "LinkedServiceReference"
 										}
 									},
@@ -240,11 +236,11 @@
 												"partitionOption": "None"
 											},
 											"dataset": {
-												"referenceName": "DestDataMart",
+												"referenceName": "DestTPR",
 												"type": "DatasetReference",
 												"parameters": {
-													"TableName": "Users",
-													"SchemaName": "Stg"
+													"TableName": "Log_Execution_Results",
+													"SchemaName": "Mgmt"
 												}
 											}
 										}
@@ -276,6 +272,13 @@
 														"name": "FileName",
 														"value": {
 															"value": "@{item().name}",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "RunId",
+														"value": {
+															"value": "@variables('RunId')",
 															"type": "Expression"
 														}
 													}
