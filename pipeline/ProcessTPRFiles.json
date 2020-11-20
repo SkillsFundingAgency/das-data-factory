@@ -24,6 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
 						"modifiedDatetimeStart": "2020-11-11T00:00:00.000Z",
 						"modifiedDatetimeEnd": "2020-11-24T00:00:00.000Z"
 					},
@@ -73,7 +74,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderQuery": "select '@{item().name}'",
+									"sqlReaderQuery": {
+										"value": "select '@{item().name}'",
+										"type": "Expression"
+									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -127,7 +131,14 @@
 						{
 							"name": "GenerateRunId",
 							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "If Condition1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.00:30:00",
 								"retry": 0,
@@ -520,6 +531,12 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": []
 						}
 					]
 				}
