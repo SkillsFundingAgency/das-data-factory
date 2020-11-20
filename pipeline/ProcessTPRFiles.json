@@ -161,7 +161,7 @@
 										"typeProperties": {
 											"source": {
 												"type": "AzureSqlSource",
-												"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+												"sqlReaderQuery": "SELECT CAST(MAX(Run_Id) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
 												"queryTimeout": "02:00:00",
 												"partitionOption": "None"
 											},
