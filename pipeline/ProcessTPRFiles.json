@@ -486,17 +486,13 @@
 										],
 										"outputs": [
 											{
-												"referenceName": "DestDataMart",
-												"type": "DatasetReference",
-												"parameters": {
-													"TableName": "TprStaging",
-													"SchemaName": "Stg"
-												}
+												"referenceName": "DestTPR",
+												"type": "DatasetReference"
 											}
 										]
 									},
 									{
-										"name": "Lookup1",
+										"name": "UpdateLogAndRecreateIndex",
 										"type": "Lookup",
 										"dependsOn": [
 											{
@@ -507,20 +503,36 @@
 											}
 										],
 										"policy": {
-											"timeout": "7.00:00:00",
+											"timeout": "0.03:00:00",
 											"retry": 0,
 											"retryIntervalInSeconds": 30,
 											"secureOutput": false,
 											"secureInput": false
 										},
-										"userProperties": []
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": "/* Update Counts in RecordCounts */\n   INSERT INTO Mgmt.Log_Record_Counts\n   (LogId,RunId,SourceTableName,TargetTableName,SourceRecordCount,TargetRecordCount)\n   SELECT '''+CAST(@LogID AS VARCHAR(15))+'''\n         ,'''+CAST(@Run_Id AS VARCHAR(15))+'''\n\t\t ,'''+@FileName+'''\n\t     ,''StagingData''\n\t\t ,(SELECT COUNT(*) FROM OPENROWSET (\n\t\t                                     BULK '''+@FileName+'''\n\t\t                                    ,DATA_SOURCE='''+@DataSource+'''\n                                            ,FIRSTROW=2\n\t\t\t\t\t                        ,FORMATFILE='''+@FormatFile+'''\n\t\t\t\t                            ,FORMATFILE_DATA_SOURCE='''+@DataSource+'''\n\t\t                                   ) AS tpr\n           )\n\t\t ,(SELECT COUNT(*) FROM Tpr.StagingData WHERE SourceFileName='''+@FileName+''')\n  /* Update Flag in SourceFileList as Loaded */\n  UPDATE SFL\n     SET SFL.LoadedToStaging=1\n\t    ,SFL.StagingLoadDate=getdate()\n\t--\t,SFL.RunId='+CAST(@Run_Id AS VARCHAR(15))+'\n    FROM Mgmt.SourceFileList SFL\n   WHERE SFL.SourceFileID='''+cast(@counter as varchar(15))+'''\n\t\t\t \t\t\t \n'\n\n   EXEC (@ExecuteSQL1+@ExecuteSQL2)\n\n\n     SET @Counter=@Counter+1\n     END\n\n/* Recreate the Index */\n\n  CREATE NONCLUSTERED INDEX NCI_Staging_TPR\n      ON Tpr.StagingData(TPRUniqueID)\n\n\n\n/* Update Log Execution Results as Success if the query ran succesfully*/\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending- Go To Step3 RunValidationChecks'\n WHERE LogId=@LogID\n   AND RunID=@Run_Id\n",
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"dataset": {
+												"referenceName": "DestTPR",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "Log_Execution_Results",
+													"SchemaName": "Mgmt"
+												}
+											}
+										}
 									},
 									{
 										"name": "Stored procedure1",
 										"type": "SqlServerStoredProcedure",
 										"dependsOn": [
 											{
-												"activity": "Lookup1",
+												"activity": "UpdateLogAndRecreateIndex",
 												"dependencyConditions": [
 													"Succeeded"
 												]
