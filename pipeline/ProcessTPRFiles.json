@@ -53,441 +53,9 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "GetSrcFileDetailsToDb",
-							"type": "Lookup",
-							"dependsOn": [
-								{
-									"activity": "SetRunId",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.00:30:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "select '@{item().name}'",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "DestDataMart",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Users",
-										"SchemaName": "Stg"
-									}
-								}
-							}
-						},
-						{
-							"name": "GetRunId",
-							"type": "Lookup",
-							"dependsOn": [
-								{
-									"activity": "GenerateRunId",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.00:30:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": true
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "DestDataMart",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Stg",
-										"SchemaName": "Users"
-									}
-								},
-								"firstRowOnly": true
-							}
-						},
-						{
-							"name": "GenerateRunId",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "If Condition1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.00:30:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": true
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[GenerateRunId]"
-							},
-							"linkedServiceName": {
-								"referenceName": "datamgmt_staging_dbconnectionstring",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
-							"name": "SetRunId",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "GetRunId",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "RunId",
-								"value": {
-									"value": "@activity('GetRunId').output.firstRow.RunId",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "LogStartOfImport",
-							"type": "Lookup",
-							"dependsOn": [
-								{
-									"activity": "GetSrcFileDetailsToDb",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.00:10:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": true
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-2'\n\t   ,'ImportDataFromFile'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "DestDataMart",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Users",
-										"SchemaName": "Stg"
-									}
-								}
-							}
-						},
-						{
-							"name": "CopyFileToDb",
-							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "LogStartOfImport",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.03:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "DelimitedTextSource",
-									"additionalColumns": [
-										{
-											"name": "FileName",
-											"value": {
-												"value": "@{item().name}",
-												"type": "Expression"
-											}
-										}
-									],
-									"storeSettings": {
-										"type": "AzureBlobStorageReadSettings",
-										"recursive": true,
-										"wildcardFileName": {
-											"value": "@{item().name}",
-											"type": "Expression"
-										}
-									},
-									"formatSettings": {
-										"type": "DelimitedTextReadSettings"
-									}
-								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"preCopyScript": "/* Truncate Staging Table */\n\n  TRUNCATE TABLE Tpr.StagingData\n\n  /* Drop Existing Index before the load */\n\n   DROP INDEX IF EXISTS NCI_Staging_TPR ON Tpr.StagingData",
-									"disableMetricsCollection": false
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"mappings": [
-										{
-											"source": {
-												"name": "?Record Type",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "RecordType1",
-												"physicalType": "int"
-											}
-										},
-										{
-											"source": {
-												"name": "",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "BinaryId",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "District Number_Replace",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "TypeCode",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "Reference_Replace",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "IdamUserId",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "AO District",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "UserType",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "AO Tax Type",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "UserName",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "AO Check Char",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "UserEmail",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "AO Reference",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "UserCreatedTimeStamp",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "Start Date",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "LastSignedInTimeStamp",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "End Date",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "EmployerAccountId",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "End Date Code",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "Ukprn",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "Restart Date",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "RunId",
-												"type": "Int64",
-												"physicalType": "bigint"
-											}
-										},
-										{
-											"source": {
-												"name": "Review Yr",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "AsDm_CreatedDate",
-												"type": "DateTime",
-												"physicalType": "datetime2"
-											}
-										},
-										{
-											"source": {
-												"name": "Company Reg No",
-												"type": "String",
-												"physicalType": "String"
-											},
-											"sink": {
-												"name": "AsDm_UpdatedDate",
-												"type": "DateTime",
-												"physicalType": "datetime2"
-											}
-										}
-									],
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "SrcTprBlobStorage",
-									"type": "DatasetReference"
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DestDataMart",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "TprStaging",
-										"SchemaName": "Stg"
-									}
-								}
-							]
-						},
-						{
-							"name": "Lookup1",
-							"type": "Lookup",
-							"dependsOn": [
-								{
-									"activity": "CopyFileToDb",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": []
-						},
-						{
 							"name": "Stored procedure1",
 							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Lookup1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -536,7 +104,391 @@
 							"name": "If Condition1",
 							"type": "IfCondition",
 							"dependsOn": [],
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@and(startswith(item().name,'apprenticeship'),endswith(item().name,'.txt'))",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "GetSrcFileDetailsToDb",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.00:30:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": {
+													"value": "select '@{item().name}'",
+													"type": "Expression"
+												},
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"dataset": {
+												"referenceName": "DestDataMart",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "Users",
+													"SchemaName": "Stg"
+												}
+											}
+										}
+									},
+									{
+										"name": "GetRunId",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.00:30:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": true,
+											"secureInput": true
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"dataset": {
+												"referenceName": "DestDataMart",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "Stg",
+													"SchemaName": "Users"
+												}
+											},
+											"firstRowOnly": true
+										}
+									},
+									{
+										"name": "GenerateRunId",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.00:30:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": true,
+											"secureInput": true
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[GenerateRunId]"
+										},
+										"linkedServiceName": {
+											"referenceName": "datamgmt_staging_dbconnectionstring",
+											"type": "LinkedServiceReference"
+										}
+									},
+									{
+										"name": "SetRunId",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "RunId",
+											"value": {
+												"value": "@activity('GetRunId').output.firstRow.RunId",
+												"type": "Expression"
+											}
+										}
+									},
+									{
+										"name": "LogStartOfImport",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.00:10:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": true,
+											"secureInput": true
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": {
+													"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-2'\n\t   ,'ImportDataFromFile'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+													"type": "Expression"
+												},
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"dataset": {
+												"referenceName": "DestDataMart",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "Users",
+													"SchemaName": "Stg"
+												}
+											}
+										}
+									},
+									{
+										"name": "CopyFileToDb",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.03:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"additionalColumns": [
+													{
+														"name": "FileName",
+														"value": {
+															"value": "@{item().name}",
+															"type": "Expression"
+														}
+													}
+												],
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": true,
+													"wildcardFileName": {
+														"value": "@{item().name}",
+														"type": "Expression"
+													}
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"preCopyScript": "/* Truncate Staging Table */\n\n  TRUNCATE TABLE Tpr.StagingData\n\n  /* Drop Existing Index before the load */\n\n   DROP INDEX IF EXISTS NCI_Staging_TPR ON Tpr.StagingData",
+												"disableMetricsCollection": false
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"name": "?Record Type",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "RecordType1",
+															"physicalType": "int"
+														}
+													},
+													{
+														"source": {
+															"name": "",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "BinaryId",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "District Number_Replace",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "TypeCode",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "Reference_Replace",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "IdamUserId",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "AO District",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "UserType",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "AO Tax Type",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "UserName",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "AO Check Char",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "UserEmail",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "AO Reference",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "UserCreatedTimeStamp",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "Start Date",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "LastSignedInTimeStamp",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "End Date",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "EmployerAccountId",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "End Date Code",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "Ukprn",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "Restart Date",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "RunId",
+															"type": "Int64",
+															"physicalType": "bigint"
+														}
+													},
+													{
+														"source": {
+															"name": "Review Yr",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "AsDm_CreatedDate",
+															"type": "DateTime",
+															"physicalType": "datetime2"
+														}
+													},
+													{
+														"source": {
+															"name": "Company Reg No",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "AsDm_UpdatedDate",
+															"type": "DateTime",
+															"physicalType": "datetime2"
+														}
+													}
+												],
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "SrcTprBlobStorage",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DestDataMart",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "TprStaging",
+													"SchemaName": "Stg"
+												}
+											}
+										]
+									},
+									{
+										"name": "Lookup1",
+										"type": "Lookup",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": []
+									}
+								]
+							}
 						}
 					]
 				}
