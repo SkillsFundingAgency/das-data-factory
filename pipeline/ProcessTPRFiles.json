@@ -123,7 +123,7 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "INSERT INTO Mgmt.SourceFileList\n(FileName)\nselect '@{item().name}'\nend\n\n/* Get Source File ID */\n\nDeclare @SourceFileId int\n\nSELECT @SourceFileID=Max(SourceFileId) From Mgmt.SourceFileList WHERE FileName='@{item().name}' \n\n\n\n/* Update SourceFileList with the  RunId that's processing the File */\n UPDATE SFL\n    SET SFL.RunId=@variables('RunId')\n   FROM Mgmt.SourceFileList SFL\n  WHERE SFL.SourceFileID=@SourceFileId\n\nSELECT @SourceFileId\n",
+													"value": "INSERT INTO Mgmt.SourceFileList\n(FileName)\nselect '@{item().name}'\nend\n\n/* Get Source File ID */\n\nDeclare @SourceFileId int\n\nSELECT @SourceFileID=Max(SourceFileId) From Mgmt.SourceFileList WHERE FileName='@{item().name}' \n\n\n\n/* Update SourceFileList with the  RunId that's processing the File */\n UPDATE SFL\n    SET SFL.RunId=@{variables('RunId')}\n   FROM Mgmt.SourceFileList SFL\n  WHERE SFL.SourceFileID=@SourceFileId\n\nSELECT @SourceFileId\n",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00",
