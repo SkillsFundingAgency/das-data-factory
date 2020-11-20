@@ -77,18 +77,18 @@
 										"userProperties": [],
 										"typeProperties": {
 											"source": {
-												"type": "DelimitedTextSource",
-												"storeSettings": {
-													"type": "AzureBlobStorageReadSettings",
-													"recursive": true
-												},
-												"formatSettings": {
-													"type": "DelimitedTextReadSettings"
-												}
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": "SELECT '1'",
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
 											},
 											"dataset": {
-												"referenceName": "SrcTprBlobStorage",
-												"type": "DatasetReference"
+												"referenceName": "DestTPR",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "log_execution_results",
+													"SchemaName": "mgmt"
+												}
 											}
 										}
 									}
