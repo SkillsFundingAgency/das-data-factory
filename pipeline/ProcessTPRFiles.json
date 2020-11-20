@@ -25,8 +25,14 @@
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
 						"recursive": true,
-						"modifiedDatetimeStart": "2020-11-11T00:00:00.000Z",
-						"modifiedDatetimeEnd": "2020-11-24T00:00:00.000Z"
+						"modifiedDatetimeStart": {
+							"value": "@adddays(utcnow(),-1)",
+							"type": "Expression"
+						},
+						"modifiedDatetimeEnd": {
+							"value": "@utcnow()",
+							"type": "Expression"
+						}
 					},
 					"formatSettings": {
 						"type": "DelimitedTextReadSettings"
