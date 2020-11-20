@@ -477,6 +477,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Trade Class",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "TradeClass",
 															"type": "String",
@@ -484,6 +489,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "AO Ind",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AOInd",
 															"type": "String",
@@ -491,6 +501,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Xfer Type",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "XferType",
 															"type": "String",
@@ -498,6 +513,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Unique Ref District",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "UniqueRefDistrict",
 															"type": "String",
@@ -505,6 +525,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Unique Reference",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "UniqueReference",
 															"type": "String",
@@ -512,6 +537,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Record Type",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "RecordType2",
 															"type": "String",
@@ -519,6 +549,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Name 1",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "Name1",
 															"type": "String",
@@ -526,6 +561,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Name 2",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "Name2",
 															"type": "String",
@@ -533,6 +573,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Telephone Nmbr",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "TelephoneNumber",
 															"type": "String",
@@ -540,6 +585,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Email Address",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "EmailAddress",
 															"type": "String",
@@ -547,6 +597,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Type",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressType",
 															"type": "String",
@@ -566,6 +621,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Line 1",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressLine1",
 															"type": "String",
@@ -573,6 +633,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Line 2",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressLine2",
 															"type": "String",
@@ -580,6 +645,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Line 3",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressLine3",
 															"type": "String",
@@ -587,6 +657,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Line 4",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressLine4",
 															"type": "String",
@@ -594,6 +669,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Line 5",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressLine5",
 															"type": "String",
@@ -601,6 +681,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Post Code",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "PostCode",
 															"type": "String",
@@ -608,6 +693,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Foreign Country",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "ForeignCountry",
 															"type": "String",
@@ -615,6 +705,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Address Verified Indicator",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "AddressVerifiedIndicator",
 															"type": "String",
@@ -622,6 +717,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Record Type_1",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "RecordType3",
 															"type": "String",
@@ -629,6 +729,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Signal Unique ID",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SignalUniqueID",
 															"type": "String",
@@ -636,6 +741,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Code_4",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SignalCode",
 															"type": "String",
@@ -643,6 +753,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Signal Chgd",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SignalChanged",
 															"type": "String",
@@ -650,6 +765,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Start Year",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SignalStartYear",
 															"type": "String",
@@ -657,6 +777,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "End Year",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SignalEndYear",
 															"type": "String",
@@ -664,6 +789,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Value",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SignalValue",
 															"type": "String",
@@ -671,6 +801,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Record Type_5",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "RecordType7",
 															"type": "String",
@@ -678,6 +813,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "EmployerSchemeHistory Unique ID",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "EmployerSchemeHistoryUniqueID",
 															"type": "String",
@@ -685,6 +825,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Start Year_8",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "EmployerSchemeHistStartYear",
 															"type": "String",
@@ -692,6 +837,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "End Year_9",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "EmployerSchemeHistEndYear",
 															"type": "String",
@@ -699,6 +849,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Scheme Type",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "SchemeType",
 															"type": "String",
@@ -706,6 +861,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Record Type_10",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "RecordType12",
 															"type": "String",
@@ -713,6 +873,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Employer Count ID",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "EmployerCountID",
 															"type": "String",
@@ -720,6 +885,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Code_13",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "EEC_Code",
 															"type": "String",
@@ -727,6 +897,11 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Date Taken",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "DateTaken",
 															"type": "String",
@@ -734,17 +909,15 @@
 														}
 													},
 													{
+														"source": {
+															"name": "Number Counted",
+															"type": "String",
+															"physicalType": "String"
+														},
 														"sink": {
 															"name": "NumberCounted",
 															"type": "String",
 															"physicalType": "varchar"
-														}
-													},
-													{
-														"sink": {
-															"name": "SourceSK",
-															"type": "Int32",
-															"physicalType": "int"
 														}
 													},
 													{
@@ -767,33 +940,6 @@
 															"name": "RunID",
 															"type": "Int32",
 															"physicalType": "int"
-														}
-													},
-													{
-														"source": {
-															"name": ""
-														},
-														"sink": {
-															"name": "IsValid",
-															"type": "Boolean",
-															"physicalType": "bit"
-														}
-													},
-													{
-														"source": {
-															"name": ""
-														},
-														"sink": {
-															"name": "InvalidReason",
-															"type": "String",
-															"physicalType": "varchar"
-														}
-													},
-													{
-														"sink": {
-															"name": "RecordCreatedDate",
-															"type": "DateTime",
-															"physicalType": "datetime2"
 														}
 													}
 												],
