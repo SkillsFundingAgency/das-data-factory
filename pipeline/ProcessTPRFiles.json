@@ -114,7 +114,14 @@
 									{
 										"name": "GetSrcFileDetailsToDb",
 										"type": "Lookup",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "SetRunId",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"policy": {
 											"timeout": "0.00:30:00",
 											"retry": 0,
@@ -146,7 +153,14 @@
 									{
 										"name": "GetRunId",
 										"type": "Lookup",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "GenerateRunId",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"policy": {
 											"timeout": "0.00:30:00",
 											"retry": 0,
@@ -196,7 +210,14 @@
 									{
 										"name": "SetRunId",
 										"type": "SetVariable",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "GetRunId",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"userProperties": [],
 										"typeProperties": {
 											"variableName": "RunId",
@@ -209,7 +230,14 @@
 									{
 										"name": "LogStartOfImport",
 										"type": "Lookup",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "GetSrcFileDetailsToDb",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"policy": {
 											"timeout": "0.00:10:00",
 											"retry": 0,
@@ -241,7 +269,14 @@
 									{
 										"name": "CopyFileToDb",
 										"type": "Copy",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "LogStartOfImport",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"policy": {
 											"timeout": "0.03:00:00",
 											"retry": 0,
@@ -477,7 +512,14 @@
 									{
 										"name": "Lookup1",
 										"type": "Lookup",
-										"dependsOn": [],
+										"dependsOn": [
+											{
+												"activity": "CopyFileToDb",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
 										"policy": {
 											"timeout": "7.00:00:00",
 											"retry": 0,
