@@ -117,7 +117,7 @@
 											"source": {
 												"type": "AzureSqlSource",
 												"sqlReaderQuery": {
-													"value": "IF NOT EXISTS (SELECT 1 FROM Mgmt.SourceFileList where FileName='@{item().name}'\nbegin\nINSERT INTO Mgmt.SourceFileList\n(FileName)\nselect '@{item().name}'\nend\n\nSELECT '1'\n",
+													"value": "INSERT INTO Mgmt.SourceFileList\n(FileName)\nselect '@{item().name}'\nend\n\n/* Get Source File ID */\n\nDeclare @SourceFileId int\n\nSELECT @SourceFileID=Max(SourceFileId) From Mgmt.SourceFileList WHERE FileName='@{item().name}' \n\n\n\n/* Update SourceFileList with the  RunId that's processing the File */\n UPDATE SFL\n    SET SFL.RunId=@variables('RunId')\n   FROM Mgmt.SourceFileList SFL\n  WHERE SFL.SourceFileID=@SourceFileId\n\nSELECT @SourceFileId\n",
 													"type": "Expression"
 												},
 												"queryTimeout": "02:00:00",
@@ -312,16 +312,18 @@
 														},
 														"sink": {
 															"name": "RecordType1",
-															"physicalType": "int"
+															"type": "String",
+															"physicalType": "varchar"
 														}
 													},
 													{
 														"source": {
-															"name": "",
+															"name": "Unique ID_Replace",
+															"type": "String",
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "BinaryId",
+															"name": "TPRUniqueID",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -333,7 +335,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "TypeCode",
+															"name": "DistrictNumber",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -345,7 +347,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "IdamUserId",
+															"name": "Reference",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -357,7 +359,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "UserType",
+															"name": "AODistrict",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -369,7 +371,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "UserName",
+															"name": "AOTaxType",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -381,7 +383,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "UserEmail",
+															"name": "AOCheckChar",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -393,7 +395,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "UserCreatedTimeStamp",
+															"name": "AOReference",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -405,7 +407,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "LastSignedInTimeStamp",
+															"name": "StartDate",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -417,7 +419,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "EmployerAccountId",
+															"name": "EndDate",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -429,7 +431,7 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "Ukprn",
+															"name": "EndDateCode",
 															"type": "String",
 															"physicalType": "varchar"
 														}
@@ -441,9 +443,9 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "RunId",
-															"type": "Int64",
-															"physicalType": "bigint"
+															"name": "RestartDate",
+															"type": "String",
+															"physicalType": "varchar"
 														}
 													},
 													{
@@ -453,9 +455,9 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "AsDm_CreatedDate",
-															"type": "DateTime",
-															"physicalType": "datetime2"
+															"name": "ReviewYr",
+															"type": "String",
+															"physicalType": "varchar"
 														}
 													},
 													{
@@ -465,7 +467,327 @@
 															"physicalType": "String"
 														},
 														"sink": {
-															"name": "AsDm_UpdatedDate",
+															"name": "CompanyRegNo",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "TradeClass",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AOInd",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "XferType",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "UniqueRefDistrict",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "UniqueReference",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "RecordType2",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "Name1",
+															"type": "String",
+															"physicalType": "nvarchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "Name2",
+															"type": "String",
+															"physicalType": "nvarchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "TelephoneNumber",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "EmailAddress",
+															"type": "String",
+															"physicalType": "nvarchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressType",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "ADI",
+															"type": "String",
+															"physicalType": "String"
+														},
+														"sink": {
+															"name": "ADI",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressLine1",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressLine2",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressLine3",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressLine4",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressLine5",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "PostCode",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "ForeignCountry",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "AddressVerifiedIndicator",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "RecordType3",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SignalUniqueID",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SignalCode",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SignalChanged",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SignalStartYear",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SignalEndYear",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SignalValue",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "RecordType7",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "EmployerSchemeHistoryUniqueID",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "EmployerSchemeHistStartYear",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "EmployerSchemeHistEndYear",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SchemeType",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "RecordType12",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "EmployerCountID",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "EEC_Code",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "DateTaken",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "NumberCounted",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "SourceSK",
+															"type": "Int32",
+															"physicalType": "int"
+														}
+													},
+													{
+														"source": {
+															"name": "FileName",
+															"type": "String"
+														},
+														"sink": {
+															"name": "SourceFileName",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "RunId",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RunID",
+															"type": "Int32",
+															"physicalType": "int"
+														}
+													},
+													{
+														"source": {
+															"name": ""
+														},
+														"sink": {
+															"name": "IsValid",
+															"type": "Boolean",
+															"physicalType": "bit"
+														}
+													},
+													{
+														"source": {
+															"name": ""
+														},
+														"sink": {
+															"name": "InvalidReason",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"sink": {
+															"name": "RecordCreatedDate",
 															"type": "DateTime",
 															"physicalType": "datetime2"
 														}
@@ -487,7 +809,11 @@
 										"outputs": [
 											{
 												"referenceName": "DestTPR",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "StagingData",
+													"SchemaName": "Tpr"
+												}
 											}
 										]
 									},
@@ -513,7 +839,10 @@
 										"typeProperties": {
 											"source": {
 												"type": "AzureSqlSource",
-												"sqlReaderQuery": "/* Update Counts in RecordCounts */\n   INSERT INTO Mgmt.Log_Record_Counts\n   (LogId,RunId,SourceTableName,TargetTableName,SourceRecordCount,TargetRecordCount)\n   SELECT '''+CAST(@LogID AS VARCHAR(15))+'''\n         ,'''+CAST(@Run_Id AS VARCHAR(15))+'''\n\t\t ,'''+@FileName+'''\n\t     ,''StagingData''\n\t\t ,(SELECT COUNT(*) FROM OPENROWSET (\n\t\t                                     BULK '''+@FileName+'''\n\t\t                                    ,DATA_SOURCE='''+@DataSource+'''\n                                            ,FIRSTROW=2\n\t\t\t\t\t                        ,FORMATFILE='''+@FormatFile+'''\n\t\t\t\t                            ,FORMATFILE_DATA_SOURCE='''+@DataSource+'''\n\t\t                                   ) AS tpr\n           )\n\t\t ,(SELECT COUNT(*) FROM Tpr.StagingData WHERE SourceFileName='''+@FileName+''')\n  /* Update Flag in SourceFileList as Loaded */\n  UPDATE SFL\n     SET SFL.LoadedToStaging=1\n\t    ,SFL.StagingLoadDate=getdate()\n\t--\t,SFL.RunId='+CAST(@Run_Id AS VARCHAR(15))+'\n    FROM Mgmt.SourceFileList SFL\n   WHERE SFL.SourceFileID='''+cast(@counter as varchar(15))+'''\n\t\t\t \t\t\t \n'\n\n   EXEC (@ExecuteSQL1+@ExecuteSQL2)\n\n\n     SET @Counter=@Counter+1\n     END\n\n/* Recreate the Index */\n\n  CREATE NONCLUSTERED INDEX NCI_Staging_TPR\n      ON Tpr.StagingData(TPRUniqueID)\n\n\n\n/* Update Log Execution Results as Success if the query ran succesfully*/\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending- Go To Step3 RunValidationChecks'\n WHERE LogId=@LogID\n   AND RunID=@Run_Id\n",
+												"sqlReaderQuery": {
+													"value": "/* Get LogId */\n\nDeclare @LogID Int\nDeclare @SourceFileId Int\n\nSELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results \n   WHERE StoredProcedureName='ImportDataFromFile'\n     AND RunId= @{variables('RunId')}\n\n\n/* Update Counts in RecordCounts */\n\n   INSERT INTO Mgmt.Log_Record_Counts\n   (LogId,RunId,SourceTableName,TargetTableName,SourceRecordCount,TargetRecordCount)\n   SELECT  @LogID\n         , @{variables('RunId')}\n\t\t ,'@{item().name}'\n\t     ,'StagingData'\n\t\t ,(SELECT COUNT(*) FROM OPENROWSET (\n\t\t                                     BULK '''+@FileName+'''\n\t\t                                    ,DATA_SOURCE='''+@DataSource+'''\n                                            ,FIRSTROW=2\n\t\t\t\t\t                        ,FORMATFILE='''+@FormatFile+'''\n\t\t\t\t                            ,FORMATFILE_DATA_SOURCE='''+@DataSource+'''\n\t\t                                   ) AS tpr\n           )\n\t\t ,(SELECT COUNT(*) FROM Tpr.StagingData WHERE SourceFileName='@{item().name}')\n\n  /* Update Flag in SourceFileList as Loaded */\n\n  UPDATE SFL\n     SET SFL.LoadedToStaging=1\n\t    ,SFL.StagingLoadDate=getdate()\n\t--\t,SFL.RunId='@{variables('RunId')}'\n    FROM Mgmt.SourceFileList SFL\n   WHERE SFL.SourceFileId=@{activity('GetSrcFileDetailsToDb').output.firstRow.SourceFileId}\n\t\t\t \t\t\t \n\n/* Recreate the Index */\n\n  CREATE NONCLUSTERED INDEX NCI_Staging_TPR\n      ON Tpr.StagingData(TPRUniqueID)\n\n\n\n/* Update Log Execution Results as Success if the query ran succesfully*/\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending- Go To Step3 RunValidationChecks'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\n",
+													"type": "Expression"
+												},
 												"queryTimeout": "02:00:00",
 												"partitionOption": "None"
 											},
@@ -528,31 +857,11 @@
 										}
 									},
 									{
-										"name": "Stored procedure1",
-										"type": "SqlServerStoredProcedure",
-										"dependsOn": [
-											{
-												"activity": "UpdateLogAndRecreateIndex",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"policy": {
-											"timeout": "7.00:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": []
-									},
-									{
-										"name": "Delete1",
+										"name": "DeleteProcessedFile",
 										"type": "Delete",
 										"dependsOn": [
 											{
-												"activity": "Stored procedure1",
+												"activity": "ExecuteETLProcs",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -578,6 +887,42 @@
 												"wildcardFileName": {
 													"value": "@{item().name}",
 													"type": "Expression"
+												}
+											}
+										}
+									},
+									{
+										"name": "ExecuteETLProcs",
+										"type": "Lookup",
+										"dependsOn": [
+											{
+												"activity": "UpdateLogAndRecreateIndex",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": "/* Run Validation Checks if Import File is Successful */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='ImportDataFromFile' and Execution_Status=1 and RunId=@RunId)\nBEGIN \nEXEC dbo.RunValidationChecks @RunId\nEND\nELSE RAISERROR( 'Import Data From File Failed -Check Log Table For Errors',1,1)\n\n\n\n/* Import Valid Records to Target Clone Tables */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='RunValidationChecks' and Execution_Status=1 and RunId=@RunId) \nBEGIN\nEXEC dbo.LoadTargetCloneTables @RunId\nEND\nELSE RAISERROR( 'Validation Checks Failed-Check Log Table For Errors',1,1)\n\n\n/* Swap Clone Tables With Live */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='LoadTargetCloneTables' and Execution_Status=1 and RunId=@RunId) \nBEGIN\nEXEC dbo.LoadTargetTables @RunId\nEND\nELSE RAISERROR( 'Loading Clone Tables Failed-Check Log Table For Errors',1,1)\n\n\n\n--/* Update History Table with Processed File */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='LoadTargetTables' and Execution_Status=1 and RunId=@RunId)\nBEGIN\nEXEC dbo.UpdateHistoryTable @RunId,@RetentionDate\nEND\nELSE RAISERROR( 'Loading Target Tables Failed-Check Log Table For Errors',1,1)\n\n\n\n\n--/* Raise Error if Updating History Table Failed */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='UpdateHistoryTable' and Execution_Status<>1 and RunId=@RunId)\nBEGIN\nRAISERROR( 'Updating History Table Failed-Check Log Table For Errors',1,1)\nEND\n\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='UpdateHistoryTable' and Execution_Status=1 and RunId=@RunId)\nBEGIN\nUPDATE Mgmt.Log_RunId SET EndDateTime=getdate() Where Run_Id=@RunId\nEND\n\nSELECT '1'",
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"dataset": {
+												"referenceName": "DestTPR",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "Log_Execution_Results",
+													"SchemaName": "Mgmt"
 												}
 											}
 										}
