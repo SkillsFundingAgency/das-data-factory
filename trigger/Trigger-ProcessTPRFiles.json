@@ -1,0 +1,42 @@
+{
+	"name": "Trigger-ProcessTPRFiles",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "ProcessTPRFiles",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Week",
+				"interval": 1,
+				"startTime": "2020-11-23T11:35:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						0,
+						15,
+						30,
+						45
+					],
+					"hours": [
+						10,
+						11,
+						12,
+						13,
+						14
+					],
+					"weekDays": [
+						"Thursday"
+					]
+				}
+			}
+		}
+	}
+}
