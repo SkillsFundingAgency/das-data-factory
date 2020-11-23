@@ -1013,46 +1013,11 @@
 										}
 									},
 									{
-										"name": "DeleteProcessedFile",
-										"type": "Delete",
-										"dependsOn": [
-											{
-												"activity": "CheckIfFileProcessed",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"policy": {
-											"timeout": "0.00:30:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": true,
-											"secureInput": true
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"dataset": {
-												"referenceName": "SrcTprBlobStorage",
-												"type": "DatasetReference"
-											},
-											"enableLogging": false,
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": false,
-												"wildcardFileName": {
-													"value": "@{item().name}",
-													"type": "Expression"
-												}
-											}
-										}
-									},
-									{
 										"name": "ExecuteETLProcs",
 										"type": "Lookup",
 										"dependsOn": [
 											{
-												"activity": "UpdateLogAndRecreateIndex",
+												"activity": "DeleteProcessedFile",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -1087,11 +1052,11 @@
 										}
 									},
 									{
-										"name": "CheckIfFileProcessed",
-										"type": "Lookup",
+										"name": "DeleteProcessedFile",
+										"type": "Delete",
 										"dependsOn": [
 											{
-												"activity": "ExecuteETLProcs",
+												"activity": "UpdateLogAndRecreateIndex",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -1106,21 +1071,17 @@
 										},
 										"userProperties": [],
 										"typeProperties": {
-											"source": {
-												"type": "AzureSqlSource",
-												"sqlReaderQuery": {
-													"value": "IF EXISTS (SELECT *\nFROM Mgmt.SourceFileList\nwhere fileprocessed=1\nand filename='@{item().name}'\n)\nSELECT 'Successful'",
-													"type": "Expression"
-												},
-												"queryTimeout": "02:00:00",
-												"partitionOption": "None"
-											},
 											"dataset": {
-												"referenceName": "DestTPR",
-												"type": "DatasetReference",
-												"parameters": {
-													"TableName": "StagingData",
-													"SchemaName": "TPR"
+												"referenceName": "SrcTprBlobStorage",
+												"type": "DatasetReference"
+											},
+											"enableLogging": false,
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": false,
+												"wildcardFileName": {
+													"value": "@{item().name}",
+													"type": "Expression"
 												}
 											}
 										}
