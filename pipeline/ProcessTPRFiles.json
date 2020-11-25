@@ -59,7 +59,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If Condition1",
+							"name": "CheckItsExpectedFile",
 							"type": "IfCondition",
 							"dependsOn": [],
 							"userProperties": [],
