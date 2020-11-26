@@ -302,7 +302,8 @@
 													}
 												},
 												"formatSettings": {
-													"type": "DelimitedTextReadSettings"
+													"type": "DelimitedTextReadSettings",
+													"skipLineCount": 1
 												}
 											},
 											"sink": {
@@ -316,9 +317,8 @@
 												"mappings": [
 													{
 														"source": {
-															"name": "?Record Type",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 1
 														},
 														"sink": {
 															"name": "RecordType1",
@@ -328,9 +328,8 @@
 													},
 													{
 														"source": {
-															"name": "Unique ID_Replace",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 2
 														},
 														"sink": {
 															"name": "TPRUniqueID",
@@ -340,9 +339,8 @@
 													},
 													{
 														"source": {
-															"name": "District Number_Replace",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 3
 														},
 														"sink": {
 															"name": "DistrictNumber",
@@ -352,9 +350,8 @@
 													},
 													{
 														"source": {
-															"name": "Reference_Replace",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 4
 														},
 														"sink": {
 															"name": "Reference",
@@ -364,9 +361,8 @@
 													},
 													{
 														"source": {
-															"name": "AO District",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 5
 														},
 														"sink": {
 															"name": "AODistrict",
@@ -376,9 +372,8 @@
 													},
 													{
 														"source": {
-															"name": "AO Tax Type",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 6
 														},
 														"sink": {
 															"name": "AOTaxType",
@@ -388,9 +383,8 @@
 													},
 													{
 														"source": {
-															"name": "AO Check Char",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 7
 														},
 														"sink": {
 															"name": "AOCheckChar",
@@ -400,9 +394,8 @@
 													},
 													{
 														"source": {
-															"name": "AO Reference",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 8
 														},
 														"sink": {
 															"name": "AOReference",
@@ -412,9 +405,8 @@
 													},
 													{
 														"source": {
-															"name": "Start Date",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 9
 														},
 														"sink": {
 															"name": "StartDate",
@@ -424,9 +416,8 @@
 													},
 													{
 														"source": {
-															"name": "End Date",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 10
 														},
 														"sink": {
 															"name": "EndDate",
@@ -436,9 +427,8 @@
 													},
 													{
 														"source": {
-															"name": "End Date Code",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 11
 														},
 														"sink": {
 															"name": "EndDateCode",
@@ -448,9 +438,8 @@
 													},
 													{
 														"source": {
-															"name": "Restart Date",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 12
 														},
 														"sink": {
 															"name": "RestartDate",
@@ -460,9 +449,8 @@
 													},
 													{
 														"source": {
-															"name": "Review Yr",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 13
 														},
 														"sink": {
 															"name": "ReviewYr",
@@ -472,9 +460,8 @@
 													},
 													{
 														"source": {
-															"name": "Company Reg No",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 14
 														},
 														"sink": {
 															"name": "CompanyRegNo",
@@ -484,9 +471,8 @@
 													},
 													{
 														"source": {
-															"name": "Trade Class",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 15
 														},
 														"sink": {
 															"name": "TradeClass",
@@ -496,9 +482,8 @@
 													},
 													{
 														"source": {
-															"name": "AO Ind",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 16
 														},
 														"sink": {
 															"name": "AOInd",
@@ -508,9 +493,8 @@
 													},
 													{
 														"source": {
-															"name": "Xfer Type",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 17
 														},
 														"sink": {
 															"name": "XferType",
@@ -520,9 +504,8 @@
 													},
 													{
 														"source": {
-															"name": "Unique Ref District",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 18
 														},
 														"sink": {
 															"name": "UniqueRefDistrict",
@@ -532,9 +515,8 @@
 													},
 													{
 														"source": {
-															"name": "Unique Reference",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 19
 														},
 														"sink": {
 															"name": "UniqueReference",
@@ -544,9 +526,8 @@
 													},
 													{
 														"source": {
-															"name": "Record Type",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 20
 														},
 														"sink": {
 															"name": "RecordType2",
@@ -556,9 +537,8 @@
 													},
 													{
 														"source": {
-															"name": "Name 1",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 21
 														},
 														"sink": {
 															"name": "Name1",
@@ -568,9 +548,8 @@
 													},
 													{
 														"source": {
-															"name": "Name 2",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 22
 														},
 														"sink": {
 															"name": "Name2",
@@ -580,9 +559,8 @@
 													},
 													{
 														"source": {
-															"name": "Telephone Nmbr",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 23
 														},
 														"sink": {
 															"name": "TelephoneNumber",
@@ -592,9 +570,8 @@
 													},
 													{
 														"source": {
-															"name": "Email Address",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 24
 														},
 														"sink": {
 															"name": "EmailAddress",
@@ -604,9 +581,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Type",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 25
 														},
 														"sink": {
 															"name": "AddressType",
@@ -616,9 +592,8 @@
 													},
 													{
 														"source": {
-															"name": "ADI",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 26
 														},
 														"sink": {
 															"name": "ADI",
@@ -628,9 +603,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Line 1",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 27
 														},
 														"sink": {
 															"name": "AddressLine1",
@@ -640,9 +614,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Line 2",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 28
 														},
 														"sink": {
 															"name": "AddressLine2",
@@ -652,9 +625,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Line 3",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 29
 														},
 														"sink": {
 															"name": "AddressLine3",
@@ -664,9 +636,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Line 4",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 30
 														},
 														"sink": {
 															"name": "AddressLine4",
@@ -676,9 +647,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Line 5",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 31
 														},
 														"sink": {
 															"name": "AddressLine5",
@@ -688,9 +658,8 @@
 													},
 													{
 														"source": {
-															"name": "Post Code",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 32
 														},
 														"sink": {
 															"name": "PostCode",
@@ -700,9 +669,8 @@
 													},
 													{
 														"source": {
-															"name": "Foreign Country",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 33
 														},
 														"sink": {
 															"name": "ForeignCountry",
@@ -712,9 +680,8 @@
 													},
 													{
 														"source": {
-															"name": "Address Verified Indicator",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 34
 														},
 														"sink": {
 															"name": "AddressVerifiedIndicator",
@@ -724,9 +691,8 @@
 													},
 													{
 														"source": {
-															"name": "Record Type_1",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 35
 														},
 														"sink": {
 															"name": "RecordType3",
@@ -736,9 +702,8 @@
 													},
 													{
 														"source": {
-															"name": "Signal Unique ID",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 36
 														},
 														"sink": {
 															"name": "SignalUniqueID",
@@ -748,9 +713,8 @@
 													},
 													{
 														"source": {
-															"name": "Code_4",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 37
 														},
 														"sink": {
 															"name": "SignalCode",
@@ -760,9 +724,8 @@
 													},
 													{
 														"source": {
-															"name": "Signal Chgd",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 38
 														},
 														"sink": {
 															"name": "SignalChanged",
@@ -772,9 +735,8 @@
 													},
 													{
 														"source": {
-															"name": "Start Year",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 39
 														},
 														"sink": {
 															"name": "SignalStartYear",
@@ -784,9 +746,8 @@
 													},
 													{
 														"source": {
-															"name": "End Year",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 40
 														},
 														"sink": {
 															"name": "SignalEndYear",
@@ -796,9 +757,8 @@
 													},
 													{
 														"source": {
-															"name": "Value",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 41
 														},
 														"sink": {
 															"name": "SignalValue",
@@ -808,9 +768,8 @@
 													},
 													{
 														"source": {
-															"name": "Record Type_5",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 42
 														},
 														"sink": {
 															"name": "RecordType7",
@@ -820,9 +779,8 @@
 													},
 													{
 														"source": {
-															"name": "EmployerSchemeHistory Unique ID",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 43
 														},
 														"sink": {
 															"name": "EmployerSchemeHistoryUniqueID",
@@ -832,9 +790,8 @@
 													},
 													{
 														"source": {
-															"name": "Start Year_8",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 44
 														},
 														"sink": {
 															"name": "EmployerSchemeHistStartYear",
@@ -844,9 +801,8 @@
 													},
 													{
 														"source": {
-															"name": "End Year_9",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 45
 														},
 														"sink": {
 															"name": "EmployerSchemeHistEndYear",
@@ -856,9 +812,8 @@
 													},
 													{
 														"source": {
-															"name": "Scheme Type",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 46
 														},
 														"sink": {
 															"name": "SchemeType",
@@ -868,9 +823,8 @@
 													},
 													{
 														"source": {
-															"name": "Record Type_10",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 47
 														},
 														"sink": {
 															"name": "RecordType12",
@@ -880,9 +834,8 @@
 													},
 													{
 														"source": {
-															"name": "Employer Count ID",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 48
 														},
 														"sink": {
 															"name": "EmployerCountID",
@@ -892,9 +845,8 @@
 													},
 													{
 														"source": {
-															"name": "Code_13",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 49
 														},
 														"sink": {
 															"name": "EEC_Code",
@@ -904,9 +856,8 @@
 													},
 													{
 														"source": {
-															"name": "Date Taken",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 50
 														},
 														"sink": {
 															"name": "DateTaken",
@@ -916,9 +867,8 @@
 													},
 													{
 														"source": {
-															"name": "Number Counted",
 															"type": "String",
-															"physicalType": "String"
+															"ordinal": 51
 														},
 														"sink": {
 															"name": "NumberCounted",
