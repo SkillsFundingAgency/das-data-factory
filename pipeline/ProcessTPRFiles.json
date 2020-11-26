@@ -270,8 +270,8 @@
 											"timeout": "0.03:00:00",
 											"retry": 0,
 											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
+											"secureOutput": true,
+											"secureInput": true
 										},
 										"userProperties": [],
 										"typeProperties": {
