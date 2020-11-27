@@ -1,0 +1,22 @@
+{
+	"name": "tpr_strconnection",
+	"properties": {
+		"type": "AzureBlobStorage",
+		"annotations": [],
+		"typeProperties": {
+			"serviceEndpoint": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tpr-strconnection"
+			},
+			"accountKind": "Storage"
+		},
+		"connectVia": {
+			"referenceName": "AzureIntegrationRunTime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
