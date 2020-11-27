@@ -61,11 +61,18 @@
 						{
 							"name": "CheckItsExpectedFile",
 							"type": "IfCondition",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "CheckFileStatus",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@and(startswith(item().name,'apprenticeship'),endswith(item().name,'.txt'))",
+									"value": "@and(and(startswith(item().name,'apprenticeship'),endswith(item().name,'.txt')),equals(activity('CheckFileStatus').output.firstRow.FileStatus,'Start Process'))",
 									"type": "Expression"
 								},
 								"ifFalseActivities": [
@@ -1076,6 +1083,38 @@
 										}
 									}
 								]
+							}
+						},
+						{
+							"name": "CheckFileStatus",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "IF EXISTS (SELECT FileName FROM Mgmt.SourceFileList where FileName='@{item().name}' and datediff(MINUTE,fileuploadeddatetime,getdate()) <=15)\nbegin\nSELECT 'Already In Process' as FileStatus\nend\nELSE \nBEGIN\nSELECT 'Start Process' as FileStatus\nEND",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestTPR",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "log_execution_results",
+										"SchemaName": "mgmt"
+									}
+								}
 							}
 						}
 					]
