@@ -78,6 +78,21 @@
 			"type": "string",
 			"defaultValue": "rsrv-dbconnectionstring"
 		},
+		"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "tpr-dbconnectionstring"
+		},
+		"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
+			"type": "object",
+			"defaultValue": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tpr-strconnection"
+			}
+		},
 		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "users-dbconnectionstring"
@@ -177,6 +192,12 @@
 					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
+					"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]"
+					},
 					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
@@ -220,18 +241,6 @@
 					},
 					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
 						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
-					},
-					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
 					}
 				}
 			},
@@ -252,6 +261,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
 					}
 				}
 			},

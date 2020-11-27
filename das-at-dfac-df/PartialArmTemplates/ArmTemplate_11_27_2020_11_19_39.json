@@ -1,0 +1,1315 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "das-at-dfac-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ProcessTPRFiles')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetLatestFileNamesInTPR",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "SrcTprBlobStorage",
+								"type": "DatasetReference"
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"modifiedDatetimeStart": {
+									"value": "@adddays(utcnow(),-1)",
+									"type": "Expression"
+								},
+								"modifiedDatetimeEnd": {
+									"value": "@utcnow()",
+									"type": "Expression"
+								}
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEachFile",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetLatestFileNamesInTPR",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetLatestFileNamesInTPR').output.childItems",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "CheckItsExpectedFile",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "CheckFileStatus",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@and(and(startswith(item().name,'apprenticeship'),endswith(item().name,'.txt')),equals(activity('CheckFileStatus').output.firstRow.FileStatus,'Start Process'))",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "IgnoreRun",
+												"type": "Lookup",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.00:30:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": "SELECT '1'",
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "log_execution_results",
+															"SchemaName": "mgmt"
+														}
+													}
+												}
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "GetSrcFileDetailsToDb",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "SetRunId",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.00:30:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "INSERT INTO Mgmt.SourceFileList\n(FileName)\nselect '@{item().name}'\n\n/* Get Source File ID */\n\nDeclare @SourceFileId int\n\nSELECT @SourceFileID=Max(SourceFileId) From Mgmt.SourceFileList WHERE FileName='@{item().name}' \n\n\n\n/* Update SourceFileList with the  RunId that's processing the File */\n UPDATE SFL\n    SET SFL.RunId=@{variables('RunId')}\n   FROM Mgmt.SourceFileList SFL\n  WHERE SFL.SourceFileID=@SourceFileId\n\nSELECT @SourceFileId as SourceFileId\n",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "log_execution_results",
+															"SchemaName": "mgmt"
+														}
+													}
+												}
+											},
+											{
+												"name": "GetRunId",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "GenerateRunId",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.00:30:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": "SELECT CAST(MAX(Run_Id) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "LOG_EXECUTION_RESULTS",
+															"SchemaName": "MGMT"
+														}
+													},
+													"firstRowOnly": true
+												}
+											},
+											{
+												"name": "GenerateRunId",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.00:30:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[[dbo].[GenerateRunId]"
+												},
+												"linkedServiceName": {
+													"referenceName": "tpr_dbconnectionstring",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "SetRunId",
+												"type": "SetVariable",
+												"dependsOn": [
+													{
+														"activity": "GetRunId",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "RunId",
+													"value": {
+														"value": "@activity('GetRunId').output.firstRow.RunId",
+														"type": "Expression"
+													}
+												}
+											},
+											{
+												"name": "LogStartOfImport",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "GetSrcFileDetailsToDb",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.00:10:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-2'\n\t   ,'ADF-ImportDataFromFile'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "Log_Execution_Results",
+															"SchemaName": "Mgmt"
+														}
+													}
+												}
+											},
+											{
+												"name": "CopyFileToDb",
+												"type": "Copy",
+												"dependsOn": [
+													{
+														"activity": "LogStartOfImport",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.03:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "DelimitedTextSource",
+														"additionalColumns": [
+															{
+																"name": "FileName",
+																"value": {
+																	"value": "@{item().name}",
+																	"type": "Expression"
+																}
+															},
+															{
+																"name": "RunId",
+																"value": {
+																	"value": "@variables('RunId')",
+																	"type": "Expression"
+																}
+															}
+														],
+														"storeSettings": {
+															"type": "AzureBlobStorageReadSettings",
+															"recursive": true,
+															"wildcardFileName": {
+																"value": "@{item().name}",
+																"type": "Expression"
+															}
+														},
+														"formatSettings": {
+															"type": "DelimitedTextReadSettings",
+															"skipLineCount": 1
+														}
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"preCopyScript": "/* Truncate Staging Table */\n\n  TRUNCATE TABLE Tpr.StagingData\n\n  /* Drop Existing Index before the load */\n\n   DROP INDEX IF EXISTS NCI_Staging_TPR ON Tpr.StagingData",
+														"disableMetricsCollection": false
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"mappings": [
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 1
+																},
+																"sink": {
+																	"name": "RecordType1",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 2
+																},
+																"sink": {
+																	"name": "TPRUniqueID",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 3
+																},
+																"sink": {
+																	"name": "DistrictNumber",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 4
+																},
+																"sink": {
+																	"name": "Reference",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 5
+																},
+																"sink": {
+																	"name": "AODistrict",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 6
+																},
+																"sink": {
+																	"name": "AOTaxType",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 7
+																},
+																"sink": {
+																	"name": "AOCheckChar",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 8
+																},
+																"sink": {
+																	"name": "AOReference",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 9
+																},
+																"sink": {
+																	"name": "StartDate",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 10
+																},
+																"sink": {
+																	"name": "EndDate",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 11
+																},
+																"sink": {
+																	"name": "EndDateCode",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 12
+																},
+																"sink": {
+																	"name": "RestartDate",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 13
+																},
+																"sink": {
+																	"name": "ReviewYr",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 14
+																},
+																"sink": {
+																	"name": "CompanyRegNo",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 15
+																},
+																"sink": {
+																	"name": "TradeClass",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 16
+																},
+																"sink": {
+																	"name": "AOInd",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 17
+																},
+																"sink": {
+																	"name": "XferType",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 18
+																},
+																"sink": {
+																	"name": "UniqueRefDistrict",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 19
+																},
+																"sink": {
+																	"name": "UniqueReference",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 20
+																},
+																"sink": {
+																	"name": "RecordType2",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 21
+																},
+																"sink": {
+																	"name": "Name1",
+																	"type": "String",
+																	"physicalType": "nvarchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 22
+																},
+																"sink": {
+																	"name": "Name2",
+																	"type": "String",
+																	"physicalType": "nvarchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 23
+																},
+																"sink": {
+																	"name": "TelephoneNumber",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 24
+																},
+																"sink": {
+																	"name": "EmailAddress",
+																	"type": "String",
+																	"physicalType": "nvarchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 25
+																},
+																"sink": {
+																	"name": "AddressType",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 26
+																},
+																"sink": {
+																	"name": "ADI",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 27
+																},
+																"sink": {
+																	"name": "AddressLine1",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 28
+																},
+																"sink": {
+																	"name": "AddressLine2",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 29
+																},
+																"sink": {
+																	"name": "AddressLine3",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 30
+																},
+																"sink": {
+																	"name": "AddressLine4",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 31
+																},
+																"sink": {
+																	"name": "AddressLine5",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 32
+																},
+																"sink": {
+																	"name": "PostCode",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 33
+																},
+																"sink": {
+																	"name": "ForeignCountry",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 34
+																},
+																"sink": {
+																	"name": "AddressVerifiedIndicator",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 35
+																},
+																"sink": {
+																	"name": "RecordType3",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 36
+																},
+																"sink": {
+																	"name": "SignalUniqueID",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 37
+																},
+																"sink": {
+																	"name": "SignalCode",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 38
+																},
+																"sink": {
+																	"name": "SignalChanged",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 39
+																},
+																"sink": {
+																	"name": "SignalStartYear",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 40
+																},
+																"sink": {
+																	"name": "SignalEndYear",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 41
+																},
+																"sink": {
+																	"name": "SignalValue",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 42
+																},
+																"sink": {
+																	"name": "RecordType7",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 43
+																},
+																"sink": {
+																	"name": "EmployerSchemeHistoryUniqueID",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 44
+																},
+																"sink": {
+																	"name": "EmployerSchemeHistStartYear",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 45
+																},
+																"sink": {
+																	"name": "EmployerSchemeHistEndYear",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 46
+																},
+																"sink": {
+																	"name": "SchemeType",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 47
+																},
+																"sink": {
+																	"name": "RecordType12",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 48
+																},
+																"sink": {
+																	"name": "EmployerCountID",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 49
+																},
+																"sink": {
+																	"name": "EEC_Code",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 50
+																},
+																"sink": {
+																	"name": "DateTaken",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"type": "String",
+																	"ordinal": 51
+																},
+																"sink": {
+																	"name": "NumberCounted",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"name": "FileName",
+																	"type": "String"
+																},
+																"sink": {
+																	"name": "SourceFileName",
+																	"type": "String",
+																	"physicalType": "varchar"
+																}
+															},
+															{
+																"source": {
+																	"name": "RunId",
+																	"type": "String"
+																},
+																"sink": {
+																	"name": "RunID",
+																	"type": "Int32",
+																	"physicalType": "int"
+																}
+															}
+														],
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "SrcTprBlobStorage",
+														"type": "DatasetReference"
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "StagingData",
+															"SchemaName": "Tpr"
+														}
+													}
+												]
+											},
+											{
+												"name": "UpdateLogAndRecreateIndex",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "CopyFileToDb",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.03:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "/* Get LogId */\n\nDeclare @LogID Int\nDeclare @SourceFileId Int\n\nSELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results \n   WHERE StoredProcedureName='ADF-ImportDataFromFile'\n     AND RunId= @{variables('RunId')}\n\n\n/* Update Counts in RecordCounts */\n\n   INSERT INTO Mgmt.Log_Record_Counts\n   (LogId,RunId,SourceTableName,TargetTableName,SourceRecordCount,TargetRecordCount)\n   SELECT  @LogID\n         , @{variables('RunId')}\n\t\t ,'@{item().name}'\n\t     ,'StagingData'\n\t\t ,(SELECT COUNT(*) FROM Tpr.StagingData WHERE SourceFileName='@{item().name}')\n\t\t ,(SELECT COUNT(*) FROM Tpr.StagingData WHERE SourceFileName='@{item().name}')\n\n  /* Update Flag in SourceFileList as Loaded */\n\n  UPDATE SFL\n     SET SFL.LoadedToStaging=1\n\t    ,SFL.StagingLoadDate=getdate()\n\t--\t,SFL.RunId='@{variables('RunId')}'\n    FROM Mgmt.SourceFileList SFL\n   WHERE SFL.SourceFileId=@{activity('GetSrcFileDetailsToDb').output.firstRow.SourceFileId}\n\t\t\t \t\t\t \n\n/* Recreate the Index */\n\nCREATE NONCLUSTERED INDEX NCI_Staging_TPR\n      ON Tpr.StagingData(TPRUniqueID)\n\n\n\n/* Update Log Execution Results as Success if the query ran succesfully*/\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending- Go To Step3 RunValidationChecks'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT '1'\n",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "Log_Execution_Results",
+															"SchemaName": "Mgmt"
+														}
+													}
+												}
+											},
+											{
+												"name": "ExecuteETLProcs",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "DeleteProcessedFile",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.07:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "DECLARE @RunId int\nDECLARE @RetentionDate datetime\n\nSET @RunId = @{variables('RunId')}\n\nSELECT @RetentionDate=DATEADD(MONTH, -1, GETDATE()) \n\n/* Run Validation Checks if Import File is Successful */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='ADF-ImportDataFromFile' and Execution_Status=1 and RunId=@RunId)\nBEGIN \nEXEC dbo.RunValidationChecks @{variables('RunId')}\nEND\nELSE RAISERROR( 'Import Data From File Failed in ADF -Check Log Table For Errors',1,1)\n\n\n\n/* Import Valid Records to Target Clone Tables */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='RunValidationChecks' and Execution_Status=1 and RunId=@RunId) \nBEGIN\nEXEC dbo.LoadTargetCloneTables @{variables('RunId')}\nEND\nELSE RAISERROR( 'Validation Checks Failed-Check Log Table For Errors',1,1)\n\n\n/* Swap Clone Tables With Live */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='LoadTargetCloneTables' and Execution_Status=1 and RunId=@RunId) \nBEGIN\nEXEC dbo.LoadTargetTables @{variables('RunId')}\nEND\nELSE RAISERROR( 'Loading Clone Tables Failed-Check Log Table For Errors',1,1)\n\n\n\n--/* Update History Table with Processed File */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='LoadTargetTables' and Execution_Status=1 and RunId=@RunId)\nBEGIN\nEXEC dbo.UpdateHistoryTable @{variables('RunId')},@RetentionDate\nEND\nELSE RAISERROR( 'Loading Target Tables Failed-Check Log Table For Errors',1,1)\n\n\n\n\n--/* Raise Error if Updating History Table Failed */\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='UpdateHistoryTable' and Execution_Status<>1 and RunId=@{variables('RunId')})\nBEGIN\nRAISERROR( 'Updating History Table Failed-Check Log Table For Errors',1,1)\nEND\n\n\nIF EXISTS (SELECT * FROM Mgmt.Log_Execution_Results where StoredProcedureName='UpdateHistoryTable' and Execution_Status=1 and RunId=@{variables('RunId')})\nBEGIN\nUPDATE Mgmt.Log_RunId SET EndDateTime=getdate() Where Run_Id=@{variables('RunId')}\nEND\n\nSELECT '1'\n",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "Log_Execution_Results",
+															"SchemaName": "Mgmt"
+														}
+													}
+												}
+											},
+											{
+												"name": "DeleteProcessedFile",
+												"type": "Delete",
+												"dependsOn": [
+													{
+														"activity": "UpdateLogAndRecreateIndex",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.00:30:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataset": {
+														"referenceName": "SrcTprBlobStorage",
+														"type": "DatasetReference"
+													},
+													"enableLogging": false,
+													"storeSettings": {
+														"type": "AzureBlobStorageReadSettings",
+														"recursive": false,
+														"wildcardFileName": {
+															"value": "@{item().name}",
+															"type": "Expression"
+														}
+													}
+												}
+											},
+											{
+												"name": "LogError",
+												"type": "Lookup",
+												"dependsOn": [
+													{
+														"activity": "CopyFileToDb",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.00:30:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": true,
+													"secureInput": true
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": " DECLARE @LogID int\n DECLARE @ErrorMessage varchar(max)\n DECLARE @RunId Bigint\n DECLARE @ErrorId int\n\n\n\n SET @Runid=@{variables('RunId')}\n\n\n SELECT @LogID = MAX(LogID)\n   FROM Mgmt.Log_Execution_Results\n  WHERE StoredProcedureName='ADF-ImportDataFromFile'\n\n  INSERT INTO Mgmt.Log_Error_Details\n\t  (\n\t   ErrorProcedure\n\t  ,ErrorMessage\n\t  ,ErrorDateTime\n\t  ,Run_Id\n\t  )\n  SELECT \n        \n\t    'ADF-ImportDataFromFile',\n            @{concat('''',replace(activity('CopyFileToDb').Error.message,'''',''''''),'''')},\n\t    GETDATE(),\n\t\t@RunId as RunId; \n\n  SELECT @ErrorId=MAX(ErrorId) FROM Mgmt.Log_Error_Details\n\n/* Update Log Execution Results as Fail if there is an Error*/\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=0\n      ,EndDateTime=getdate()\n\t  ,ErrorId=@ErrorId\n WHERE LogId=@LogID\n   AND RunID=@RunId\n\nSELECT 'NA'",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"dataset": {
+														"referenceName": "DestTPR",
+														"type": "DatasetReference",
+														"parameters": {
+															"TableName": "Log_Execution_Results",
+															"SchemaName": "mgmt"
+														}
+													}
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "CheckFileStatus",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "IF EXISTS (SELECT FileName FROM Mgmt.SourceFileList where FileName='@{item().name}' and datediff(MINUTE,fileuploadeddatetime,getdate()) <=15)\nbegin\nSELECT 'Already In Process' as FileStatus\nend\nELSE \nBEGIN\nSELECT 'Start Process' as FileStatus\nEND",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestTPR",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "log_execution_results",
+												"SchemaName": "mgmt"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"variables": {
+					"FileName": {
+						"type": "Array"
+					},
+					"RunId": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SrcTprBlobStorage')]",
+				"[concat(variables('factoryId'), '/datasets/DestTPR')]",
+				"[concat(variables('factoryId'), '/linkedServices/tpr_dbconnectionstring')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestTPR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "tpr_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TableName": {
+						"type": "string"
+					},
+					"SchemaName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SchemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/tpr_dbconnectionstring')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SrcTprBlobStorage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "tpr_strconnection",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "tpr"
+					},
+					"columnDelimiter": "\t",
+					"escapeChar": "\\",
+					"firstRowAsHeader": false,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/tpr_strconnection')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tpr_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "tpr-dbconnectionstring"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tpr_strconnection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "AzureBlobStorage",
+				"annotations": [],
+				"typeProperties": {
+					"serviceEndpoint": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "tpr-strconnection"
+					},
+					"accountKind": "Storage"
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Trigger-ProcessTPRFiles')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ProcessTPRFiles",
+							"type": "PipelineReference"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 1,
+						"startTime": "2020-11-23T11:35:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0,
+								15,
+								30,
+								45
+							],
+							"hours": [
+								10,
+								11,
+								12,
+								13,
+								14
+							],
+							"weekDays": [
+								"Thursday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/ProcessTPRFiles')]"
+			]
+		}
+	]
+}

@@ -78,6 +78,21 @@
 			"type": "string",
 			"defaultValue": "rsrv-dbconnectionstring"
 		},
+		"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "tpr-dbconnectionstring"
+		},
+		"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
+			"type": "object",
+			"defaultValue": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tpr-strconnection"
+			}
+		},
 		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "users-dbconnectionstring"
@@ -474,6 +489,54 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/tpr_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tpr_strconnection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "AzureBlobStorage",
+				"annotations": [],
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "Storage"
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/users_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -599,22 +662,20 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SrcAccounts')]",
+			"name": "[concat(parameters('factoryName'), '/DestTPR')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "eas_acc_dbconnectionstring",
+					"referenceName": "tpr_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
 					"TableName": {
-						"type": "string",
-						"defaultValue": "EmployerAgreement"
+						"type": "string"
 					},
 					"SchemaName": {
-						"type": "string",
-						"defaultValue": "Employer_Account"
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -632,75 +693,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/eas_acc_dbconnectionstring')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcAppRedundancy')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "appred_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "dbo"
-					},
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Employer"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/appred_dbconnectionstring')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcAvmsPlus')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "avmsplus_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Vacancy"
-					},
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "dbo"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "SrcTable"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/avmsplus_dbconnectionstring')]"
+				"[concat(variables('factoryId'), '/linkedServices/tpr_dbconnectionstring')]"
 			]
 		}
 	]

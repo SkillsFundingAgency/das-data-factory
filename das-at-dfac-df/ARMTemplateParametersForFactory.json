@@ -60,6 +60,19 @@
 		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "rsrv-dbconnectionstring"
 		},
+		"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "tpr-dbconnectionstring"
+		},
+		"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
+			"value": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tpr-strconnection"
+			}
+		},
 		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "users-dbconnectionstring"
 		},
