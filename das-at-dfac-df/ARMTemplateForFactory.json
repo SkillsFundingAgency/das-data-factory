@@ -13265,6 +13265,7 @@
 														"disableMetricsCollection": false
 													},
 													"enableStaging": false,
+													"enableSkipIncompatibleRow": true,
 													"translator": {
 														"type": "TabularTranslator",
 														"mappings": [
@@ -15452,7 +15453,9 @@
 								11,
 								12,
 								13,
-								14
+								14,
+								15,
+								16
 							],
 							"weekDays": [
 								"Thursday"
