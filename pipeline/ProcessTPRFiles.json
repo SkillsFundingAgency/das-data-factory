@@ -277,7 +277,7 @@
 											"timeout": "0.03:00:00",
 											"retry": 0,
 											"retryIntervalInSeconds": 30,
-											"secureOutput": true,
+											"secureOutput": false,
 											"secureInput": true
 										},
 										"userProperties": [],
@@ -320,6 +320,20 @@
 											},
 											"enableStaging": false,
 											"enableSkipIncompatibleRow": true,
+											"logSettings": {
+												"enableCopyActivityLog": true,
+												"copyActivityLogSettings": {
+													"logLevel": "Warning",
+													"enableReliableLogging": false
+												},
+												"logLocationSettings": {
+													"linkedServiceName": {
+														"referenceName": "tpr_strconnection",
+														"type": "LinkedServiceReference"
+													},
+													"path": "tpr"
+												}
+											},
 											"translator": {
 												"type": "TabularTranslator",
 												"mappings": [
@@ -1082,6 +1096,122 @@
 												}
 											}
 										}
+									},
+									{
+										"name": "Copy data1",
+										"type": "Copy",
+										"dependsOn": [
+											{
+												"activity": "CopyFileToDb",
+												"dependencyConditions": [
+													"Completed"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"additionalColumns": [
+													{
+														"name": "RunId",
+														"value": {
+															"value": "@variables('RunId')",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "TestName",
+														"value": "IncompatibleRowsInFile"
+													}
+												],
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": true,
+													"wildcardFolderPath": "copyactivity-logs/CopyFileToDb/a08b88e9-db49-4489-a1f8-85497d108aa7/",
+													"wildcardFileName": "*txt"
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings",
+													"skipLineCount": 1
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink"
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"name": "RunId",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RunId",
+															"type": "Int64",
+															"physicalType": "bigint"
+														}
+													},
+													{
+														"source": {
+															"type": "String",
+															"physicalType": "String",
+															"ordinal": 2
+														},
+														"sink": {
+															"name": "TestName",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"type": "String",
+															"physicalType": "String",
+															"ordinal": 55
+														},
+														"sink": {
+															"name": "ErrorMessage",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													}
+												],
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "SrcTprBlobStorage",
+												"type": "DatasetReference",
+												"parameters": {
+													"Delimiter": ","
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DestTPR",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": "stagingdatarejected",
+													"SchemaName": "tpr"
+												}
+											}
+										]
 									}
 								]
 							}

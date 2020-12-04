@@ -5,6 +5,12 @@
 			"referenceName": "tpr_strconnection",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"Delimiter": {
+				"type": "string",
+				"defaultValue": "/t"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
@@ -12,7 +18,10 @@
 				"type": "AzureBlobStorageLocation",
 				"container": "tpr"
 			},
-			"columnDelimiter": "\t",
+			"columnDelimiter": {
+				"value": "@dataset().Delimiter",
+				"type": "Expression"
+			},
 			"escapeChar": "\\",
 			"firstRowAsHeader": false,
 			"quoteChar": "\""
