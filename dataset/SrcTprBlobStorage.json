@@ -6,9 +6,12 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"Delimiter": {
+			"ColumnDelimiter": {
+				"type": "string"
+			},
+			"EscapeCharacter": {
 				"type": "string",
-				"defaultValue": "/t"
+				"defaultValue": "\\"
 			}
 		},
 		"annotations": [],
@@ -19,10 +22,13 @@
 				"container": "tpr"
 			},
 			"columnDelimiter": {
-				"value": "@dataset().Delimiter",
+				"value": "@dataset().ColumnDelimiter",
 				"type": "Expression"
 			},
-			"escapeChar": "\\",
+			"escapeChar": {
+				"value": "@dataset().EscapeCharacter",
+				"type": "Expression"
+			},
 			"firstRowAsHeader": false,
 			"quoteChar": "\""
 		},
