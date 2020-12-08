@@ -931,7 +931,11 @@
 										"inputs": [
 											{
 												"referenceName": "SrcTprBlobStorage",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"ColumnDelimiter": "\t",
+													"EscapeCharacter": "\\"
+												}
 											}
 										],
 										"outputs": [
@@ -1098,7 +1102,7 @@
 										}
 									},
 									{
-										"name": "Copy data1",
+										"name": "CopySkippedRowsToLogTable",
 										"type": "Copy",
 										"dependsOn": [
 											{
@@ -1109,7 +1113,7 @@
 											}
 										],
 										"policy": {
-											"timeout": "7.00:00:00",
+											"timeout": "0.03:00:00",
 											"retry": 0,
 											"retryIntervalInSeconds": 30,
 											"secureOutput": false,
@@ -1126,16 +1130,15 @@
 															"value": "@variables('RunId')",
 															"type": "Expression"
 														}
-													},
-													{
-														"name": "TestName",
-														"value": "IncompatibleRowsInFile"
 													}
 												],
 												"storeSettings": {
 													"type": "AzureBlobStorageReadSettings",
 													"recursive": true,
-													"wildcardFolderPath": "copyactivity-logs/CopyFileToDb/a08b88e9-db49-4489-a1f8-85497d108aa7/",
+													"wildcardFolderPath": {
+														"value": "@concat('copyactivity-logs/CopyFileToDb/',activity('CopyFileToDb').output.logFilePath,'/')",
+														"type": "Expression"
+													},
 													"wildcardFileName": "*txt"
 												},
 												"formatSettings": {
@@ -1144,48 +1147,12 @@
 												}
 											},
 											"sink": {
-												"type": "AzureSqlSink"
+												"type": "AzureSqlSink",
+												"tableOption": "autoCreate"
 											},
 											"enableStaging": false,
 											"translator": {
 												"type": "TabularTranslator",
-												"mappings": [
-													{
-														"source": {
-															"name": "RunId",
-															"type": "String"
-														},
-														"sink": {
-															"name": "RunId",
-															"type": "Int64",
-															"physicalType": "bigint"
-														}
-													},
-													{
-														"source": {
-															"type": "String",
-															"physicalType": "String",
-															"ordinal": 2
-														},
-														"sink": {
-															"name": "TestName",
-															"type": "String",
-															"physicalType": "varchar"
-														}
-													},
-													{
-														"source": {
-															"type": "String",
-															"physicalType": "String",
-															"ordinal": 55
-														},
-														"sink": {
-															"name": "ErrorMessage",
-															"type": "String",
-															"physicalType": "varchar"
-														}
-													}
-												],
 												"typeConversion": true,
 												"typeConversionSettings": {
 													"allowDataTruncation": true,
@@ -1198,7 +1165,8 @@
 												"referenceName": "SrcTprBlobStorage",
 												"type": "DatasetReference",
 												"parameters": {
-													"Delimiter": ","
+													"ColumnDelimiter": ",",
+													"EscapeCharacter": "\""
 												}
 											}
 										],
@@ -1207,7 +1175,7 @@
 												"referenceName": "DestTPR",
 												"type": "DatasetReference",
 												"parameters": {
-													"TableName": "stagingdatarejected",
+													"TableName": "SrcFileRejectedRecords",
 													"SchemaName": "tpr"
 												}
 											}
