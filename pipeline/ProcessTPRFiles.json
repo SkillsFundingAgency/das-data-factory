@@ -337,7 +337,7 @@
 														"referenceName": "tpr_strconnection",
 														"type": "LinkedServiceReference"
 													},
-													"path": "tpr"
+													"path": ""
 												}
 											},
 											"translator": {
@@ -1254,11 +1254,8 @@
 												"parameters": {
 													"ColumnDelimiter": ",",
 													"EscapeCharacter": "\"",
-													"SubFolder": {
-														"value": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')",
-														"type": "Expression"
-													},
-													"RootFolder": "tpr"
+													"SubFolder": " ",
+													"RootFolder": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')"
 												}
 											}
 										],
@@ -1299,11 +1296,11 @@
 												"parameters": {
 													"ColumnDelimiter": "\t",
 													"EscapeCharacter": "\\",
-													"SubFolder": {
+													"SubFolder": " ",
+													"RootFolder": {
 														"value": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')",
 														"type": "Expression"
-													},
-													"RootFolder": "tpr"
+													}
 												}
 											},
 											"enableLogging": false,
