@@ -1049,7 +1049,11 @@
 										"typeProperties": {
 											"dataset": {
 												"referenceName": "SrcTprBlobStorage",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"ColumnDelimiter": "\t",
+													"EscapeCharacter": "\\"
+												}
 											},
 											"enableLogging": false,
 											"storeSettings": {
@@ -1130,16 +1134,23 @@
 															"value": "@variables('RunId')",
 															"type": "Expression"
 														}
+													},
+													{
+														"name": "FileName",
+														"value": {
+															"value": "@{item().name}",
+															"type": "Expression"
+														}
 													}
 												],
 												"storeSettings": {
 													"type": "AzureBlobStorageReadSettings",
 													"recursive": true,
 													"wildcardFolderPath": {
-														"value": "@concat('copyactivity-logs/CopyFileToDb/',activity('CopyFileToDb').output.logFilePath,'/')",
+														"value": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')",
 														"type": "Expression"
 													},
-													"wildcardFileName": "*txt"
+													"wildcardFileName": "*.txt"
 												},
 												"formatSettings": {
 													"type": "DelimitedTextReadSettings",
@@ -1147,12 +1158,82 @@
 												}
 											},
 											"sink": {
-												"type": "AzureSqlSink",
-												"tableOption": "autoCreate"
+												"type": "AzureSqlSink"
 											},
 											"enableStaging": false,
+											"enableSkipIncompatibleRow": false,
 											"translator": {
 												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"type": "String",
+															"physicalType": "String",
+															"ordinal": 1
+														},
+														"sink": {
+															"name": "ErrorDateTime",
+															"type": "DateTime",
+															"physicalType": "datetime2"
+														}
+													},
+													{
+														"source": {
+															"type": "String",
+															"physicalType": "String",
+															"ordinal": 3
+														},
+														"sink": {
+															"name": "ErrorName",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"type": "String",
+															"ordinal": 4
+														},
+														"sink": {
+															"name": "ErrorRecord",
+															"type": "String",
+															"physicalType": "nvarchar"
+														}
+													},
+													{
+														"source": {
+															"type": "String",
+															"ordinal": 5
+														},
+														"sink": {
+															"name": "ErrorMessage",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													},
+													{
+														"source": {
+															"name": "RunId",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RunId",
+															"type": "Int64",
+															"physicalType": "bigint"
+														}
+													},
+													{
+														"source": {
+															"name": "FileName",
+															"type": "String"
+														},
+														"sink": {
+															"name": "SrcFileName",
+															"type": "String",
+															"physicalType": "varchar"
+														}
+													}
+												],
 												"typeConversion": true,
 												"typeConversionSettings": {
 													"allowDataTruncation": true,
@@ -1180,6 +1261,45 @@
 												}
 											}
 										]
+									},
+									{
+										"name": "DeleteLogFile",
+										"type": "Delete",
+										"dependsOn": [
+											{
+												"activity": "CopySkippedRowsToLogTable",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.01:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataset": {
+												"referenceName": "SrcTprBlobStorage",
+												"type": "DatasetReference",
+												"parameters": {
+													"ColumnDelimiter": "\t",
+													"EscapeCharacter": "\\"
+												}
+											},
+											"enableLogging": false,
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true,
+												"wildcardFileName": {
+													"value": "@{activity('CopyFileToDb').output.logFilePath}",
+													"type": "Expression"
+												}
+											}
+										}
 									}
 								]
 							}
