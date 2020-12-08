@@ -17,7 +17,13 @@
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "SrcTprBlobStorage",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ColumnDelimiter": "\t",
+							"EscapeCharacter": "\\",
+							"SubFolder": " ",
+							"RootFolder": "tpr"
+						}
 					},
 					"fieldList": [
 						"childItems"
@@ -934,7 +940,9 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"ColumnDelimiter": "\t",
-													"EscapeCharacter": "\\"
+													"EscapeCharacter": "\\",
+													"SubFolder": " ",
+													"RootFolder": "tpr"
 												}
 											}
 										],
@@ -1052,7 +1060,9 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"ColumnDelimiter": "\t",
-													"EscapeCharacter": "\\"
+													"EscapeCharacter": "\\",
+													"SubFolder": " ",
+													"RootFolder": "tpr"
 												}
 											},
 											"enableLogging": false,
@@ -1146,10 +1156,6 @@
 												"storeSettings": {
 													"type": "AzureBlobStorageReadSettings",
 													"recursive": true,
-													"wildcardFolderPath": {
-														"value": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')",
-														"type": "Expression"
-													},
 													"wildcardFileName": "*.txt"
 												},
 												"formatSettings": {
@@ -1247,7 +1253,12 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"ColumnDelimiter": ",",
-													"EscapeCharacter": "\""
+													"EscapeCharacter": "\"",
+													"SubFolder": {
+														"value": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')",
+														"type": "Expression"
+													},
+													"RootFolder": "tpr"
 												}
 											}
 										],
@@ -1287,7 +1298,12 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"ColumnDelimiter": "\t",
-													"EscapeCharacter": "\\"
+													"EscapeCharacter": "\\",
+													"SubFolder": {
+														"value": "@replace(activity('CopyFileToDb').output.logFilePath,'tpr/','')",
+														"type": "Expression"
+													},
+													"RootFolder": "tpr"
 												}
 											},
 											"enableLogging": false,
@@ -1295,7 +1311,7 @@
 												"type": "AzureBlobStorageReadSettings",
 												"recursive": true,
 												"wildcardFileName": {
-													"value": "@{activity('CopyFileToDb').output.logFilePath}",
+													"value": "*.txt",
 													"type": "Expression"
 												}
 											}
