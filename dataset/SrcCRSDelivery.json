@@ -1,0 +1,33 @@
+{
+	"name": "SrcCRSDelivery",
+	"properties": {
+		"description": "Src CRS Delivery",
+		"linkedServiceName": {
+			"referenceName": "crsdel_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "EmployerAgreement"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "Employer_Account"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().SchemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TableName",
+				"type": "Expression"
+			}
+		}
+	}
+}
