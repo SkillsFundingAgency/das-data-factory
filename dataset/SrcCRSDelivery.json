@@ -9,11 +9,11 @@
 		"parameters": {
 			"TableName": {
 				"type": "string",
-				"defaultValue": "EmployerAgreement"
+				"defaultValue": "ProviderRegistration"
 			},
 			"SchemaName": {
 				"type": "string",
-				"defaultValue": "Employer_Account"
+				"defaultValue": "dbo"
 			}
 		},
 		"annotations": [],
