@@ -18,7 +18,73 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "UkPrn",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StatusDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "StatusId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ProviderTypeId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "OrganisationTypeId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FeedbackTotal",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Address1",
+				"type": "varchar"
+			},
+			{
+				"name": "Address2",
+				"type": "varchar"
+			},
+			{
+				"name": "Address3",
+				"type": "varchar"
+			},
+			{
+				"name": "Address4",
+				"type": "varchar"
+			},
+			{
+				"name": "Town",
+				"type": "varchar"
+			},
+			{
+				"name": "Postcode",
+				"type": "varchar"
+			},
+			{
+				"name": "Lat",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "Long",
+				"type": "float",
+				"precision": 15
+			}
+		],
 		"typeProperties": {
 			"schema": {
 				"value": "@dataset().SchemaName",
