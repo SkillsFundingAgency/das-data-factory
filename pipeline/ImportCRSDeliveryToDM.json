@@ -296,7 +296,7 @@
 									},
 									"datasetParameters": {
 										"source1": {
-											"TableName": "Users",
+											"TableName": "ProviderRegistration",
 											"SchemaName": "dbo"
 										},
 										"sink1": {
