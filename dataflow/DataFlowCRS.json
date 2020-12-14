@@ -7,7 +7,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcCRSDelivery",
+						"referenceName": "SrcCRS",
 						"type": "DatasetReference"
 					},
 					"name": "source1"
