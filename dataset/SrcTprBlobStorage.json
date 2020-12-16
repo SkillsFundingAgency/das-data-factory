@@ -5,15 +5,44 @@
 			"referenceName": "tpr_strconnection",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"ColumnDelimiter": {
+				"type": "string",
+				"defaultValue": "\t"
+			},
+			"EscapeCharacter": {
+				"type": "string",
+				"defaultValue": "\\"
+			},
+			"SubFolder": {
+				"type": "string"
+			},
+			"RootFolder": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"container": "tpr"
+				"folderPath": {
+					"value": "@dataset().SubFolder",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().RootFolder",
+					"type": "Expression"
+				}
 			},
-			"columnDelimiter": "\t",
-			"escapeChar": "\\",
+			"columnDelimiter": {
+				"value": "@dataset().ColumnDelimiter",
+				"type": "Expression"
+			},
+			"escapeChar": {
+				"value": "@dataset().EscapeCharacter",
+				"type": "Expression"
+			},
 			"firstRowAsHeader": false,
 			"quoteChar": "\""
 		},
