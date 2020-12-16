@@ -92,10 +92,10 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcCRSDelivery",
+									"referenceName": "SrcCRS",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "ProviderRegistration",
+										"TableName": "ApprenticeshipFunding",
 										"SchemaName": "dbo"
 									}
 								}
