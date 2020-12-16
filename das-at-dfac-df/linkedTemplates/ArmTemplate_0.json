@@ -23,6 +23,14 @@
 			"type": "string",
 			"defaultValue": "comt-dbconnectionstring"
 		},
+		"crs_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "crs-dbconnectionstring"
+		},
+		"crsdel_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "crsdel-dbconnectionstring"
+		},
 		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "datamgmt-staging-dbconnectionstring"
@@ -203,6 +211,60 @@
 							"type": "LinkedServiceReference"
 						},
 						"secretName": "[parameters('comt_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/crs_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('crs_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/crsdel_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('crsdel_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				},
 				"connectVia": {
@@ -561,139 +623,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DestDataMart')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "datamgmt_staging_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Users"
-					},
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "Stg"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "SourseSK",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "BinaryId",
-						"type": "varchar"
-					},
-					{
-						"name": "TypeCode",
-						"type": "varchar"
-					},
-					{
-						"name": "IdamUserId",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "UserName",
-						"type": "varchar"
-					},
-					{
-						"name": "UserEmail",
-						"type": "varchar"
-					},
-					{
-						"name": "UserCreatedTimeStamp",
-						"type": "varchar"
-					},
-					{
-						"name": "LastSignedInTimeStamp",
-						"type": "varchar"
-					},
-					{
-						"name": "EmployerAccountId",
-						"type": "varchar"
-					},
-					{
-						"name": "Ukprn",
-						"type": "varchar"
-					},
-					{
-						"name": "RunId",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "AsDm_CreatedDate",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "AsDm_UpdatedDate",
-						"type": "datetime2",
-						"scale": 7
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DestTPR')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "tpr_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string"
-					},
-					"SchemaName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/tpr_dbconnectionstring')]"
 			]
 		}
 	]

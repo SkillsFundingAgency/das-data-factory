@@ -17,6 +17,12 @@
 		"comt_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "comt-dbconnectionstring"
 		},
+		"crs_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "crs-dbconnectionstring"
+		},
+		"crsdel_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "crsdel-dbconnectionstring"
+		},
 		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "datamgmt-staging-dbconnectionstring"
 		},

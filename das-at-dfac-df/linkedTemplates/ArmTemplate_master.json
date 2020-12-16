@@ -23,6 +23,14 @@
 			"type": "string",
 			"defaultValue": "comt-dbconnectionstring"
 		},
+		"crs_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "crs-dbconnectionstring"
+		},
+		"crsdel_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "crsdel-dbconnectionstring"
+		},
 		"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "datamgmt-staging-dbconnectionstring"
@@ -156,6 +164,12 @@
 					"comt_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('comt_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
+					"crs_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('crs_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"crsdel_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('crsdel_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('datamgmt_staging_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
@@ -238,9 +252,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
-						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
 					}
 				}
 			},
@@ -261,6 +272,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
+						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
 					},
 					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
