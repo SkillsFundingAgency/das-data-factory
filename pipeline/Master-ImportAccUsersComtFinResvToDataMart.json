@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportRedundancyToDM",
+						"activity": "ExecuteImportCRSToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -296,7 +296,66 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"RunId": "@{activity('GetRunId').output.firstRow.RunId}",
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportCRSDeliveryToDM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportRedundancyToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportCRSDeliveryToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportCRSToDM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportCRSDeliveryToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportCRSDeliveryToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
 						"MaxConcurrentConnections": "4",
 						"DIU": "4"
 					}
