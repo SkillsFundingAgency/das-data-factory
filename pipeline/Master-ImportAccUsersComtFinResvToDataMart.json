@@ -347,7 +347,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportCRSDeliveryToDM",
+						"referenceName": "ImportCRSToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
