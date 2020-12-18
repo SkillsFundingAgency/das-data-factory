@@ -1,7 +1,7 @@
 {
-	"name": "SrcCRSDelivery",
+	"name": "SrcFAT2CRSDelivery",
 	"properties": {
-		"description": "Src CRS Delivery",
+		"description": "Src FAT2 CRS Delivery",
 		"linkedServiceName": {
 			"referenceName": "crsdel_dbconnectionstring",
 			"type": "LinkedServiceReference"
