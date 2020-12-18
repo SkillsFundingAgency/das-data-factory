@@ -1,7 +1,7 @@
 {
-	"name": "DataFlowCRS",
+	"name": "DataFlowFAT2CRS",
 	"properties": {
-		"description": "DataFlow CRS",
+		"description": "DataFlow FAT2 CRS",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
