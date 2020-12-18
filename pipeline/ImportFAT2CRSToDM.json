@@ -1,7 +1,7 @@
 {
-	"name": "ImportCRSToDM",
+	"name": "ImportFAT2CRSToDM",
 	"properties": {
-		"description": "Import CRS to Datamart",
+		"description": "Import FAT2 CRS to Datamart",
 		"activities": [
 			{
 				"name": "GetTableList",
@@ -92,7 +92,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcCRS",
+									"referenceName": "SrcFAT2CRS",
 									"type": "DatasetReference",
 									"parameters": {
 										"TableName": "ApprenticeshipFunding",
@@ -282,7 +282,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "DataFlowCRS",
+									"referenceName": "DataFlowFAT2CRS",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
