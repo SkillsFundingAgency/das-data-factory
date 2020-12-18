@@ -1,13 +1,13 @@
 {
-	"name": "DataFlowCRSDelivery",
+	"name": "DataFlowFAT2CRSDelivery",
 	"properties": {
-		"description": "DataFlow CRS Delivery",
+		"description": "DataFlow FAT2 CRS Delivery",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SrcCRSDelivery",
+						"referenceName": "SrcFAT2CRSDelivery",
 						"type": "DatasetReference"
 					},
 					"name": "source1"
