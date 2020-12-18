@@ -1,7 +1,7 @@
 {
-	"name": "ImportCRSDeliveryToDM",
+	"name": "ImportFAT2CRSDeliveryToDM",
 	"properties": {
-		"description": "Import CRS Delivery to Datamart",
+		"description": "Import FAT2 CRS Delivery to Datamart",
 		"activities": [
 			{
 				"name": "GetTableList",
@@ -92,7 +92,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "SrcCRSDelivery",
+									"referenceName": "SrcFAT2CRSDelivery",
 									"type": "DatasetReference",
 									"parameters": {
 										"TableName": "ProviderRegistration",
@@ -282,7 +282,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "DataFlowCRSDelivery",
+									"referenceName": "DataFlowFAT2CRSDelivery",
 									"type": "DataFlowReference",
 									"parameters": {
 										"SourceQuery": {
