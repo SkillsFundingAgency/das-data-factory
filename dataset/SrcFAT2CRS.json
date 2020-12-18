@@ -1,7 +1,7 @@
 {
-	"name": "SrcCRS",
+	"name": "SrcFAT2CRS",
 	"properties": {
-		"description": "Src CRS ",
+		"description": "Src FAT2 CRS ",
 		"linkedServiceName": {
 			"referenceName": "crs_dbconnectionstring",
 			"type": "LinkedServiceReference"
