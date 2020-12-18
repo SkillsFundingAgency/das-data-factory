@@ -300,7 +300,7 @@
 											"SchemaName": "dbo"
 										},
 										"sink1": {
-											"TableName": "CRSDel_@{item().TABLE_NAME}",
+											"TableName": "FAT2_@{item().TABLE_NAME}",
 											"SchemaName": "Stg"
 										}
 									}
@@ -390,7 +390,7 @@
 									},
 									"StgTableName": {
 										"value": {
-											"value": "Stg.CRSDel_@{item().TABLE_NAME}",
+											"value": "Stg.FAT2_@{item().TABLE_NAME}",
 											"type": "Expression"
 										},
 										"type": "String"
