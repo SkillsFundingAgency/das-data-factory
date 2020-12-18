@@ -319,7 +319,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportCRSDeliveryToDM",
+						"referenceName": "ImportFAT2CRSDeliveryToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
@@ -347,7 +347,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ImportCRSToDM",
+						"referenceName": "ImportFAT2CRSToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
