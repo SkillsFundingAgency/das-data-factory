@@ -63,6 +63,9 @@
 		"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 			"value": "recruit"
 		},
+		"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "roatp-dbconnectionstring"
+		},
 		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "rsrv-dbconnectionstring"
 		},

@@ -82,6 +82,10 @@
 			"type": "string",
 			"defaultValue": "recruit"
 		},
+		"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "roatp-dbconnectionstring"
+		},
 		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rsrv-dbconnectionstring"
@@ -203,6 +207,9 @@
 					"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
 					},
+					"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
@@ -211,9 +218,6 @@
 					},
 					"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]"
-					},
-					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -232,6 +236,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
