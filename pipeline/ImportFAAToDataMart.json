@@ -38,7 +38,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM Stg.FAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
+							"value": "--DELETE FROM Stg.FAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"maxConcurrentConnections": {
@@ -59,111 +59,91 @@
 							{
 								"source": {
 									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "$['EntityId']['$binary']"
+								},
+								"sink": {
+									"name": "EntityBinaryId"
 								}
 							},
 							{
 								"source": {
 									"path": "$['EntityId']['$type']"
+								},
+								"sink": {
+									"name": "EntityTypeCode"
 								}
 							},
 							{
 								"source": {
 									"path": "$['DateCreated']['$date']"
+								},
+								"sink": {
+									"name": "DateCreatedTimeStamp"
 								}
 							},
 							{
 								"source": {
 									"path": "$['DateUpdated']['$date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['Username']"
+								},
+								"sink": {
+									"name": "DateUpdatedTimeStamp"
 								}
 							},
 							{
 								"source": {
 									"path": "$['Status']"
+								},
+								"sink": {
+									"name": "Status"
 								}
 							},
 							{
 								"source": {
 									"path": "$['Roles']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['ActivationCode']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['ActivateCodeExpiry']"
+								},
+								"sink": {
+									"name": "Roles"
 								}
 							},
 							{
 								"source": {
 									"path": "$['ActivationDate']['$date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['LoginIncorrectAttempts']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['PasswordResetCode']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['PasswordResetCodeExpiry']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['PasswordResetIncorrectAttempts']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['AccountUnlockCode']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['AccountUnlockCodeExpiry']"
+								},
+								"sink": {
+									"name": "ActivationDateTimeStamp"
 								}
 							},
 							{
 								"source": {
 									"path": "$['LastLogin']['$date']"
+								},
+								"sink": {
+									"name": "LastLoginDateTimeStamp"
 								}
 							},
 							{
 								"source": {
 									"path": "$['LastActivity']['$date']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['PendingUsername']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['PendingUsernameCode']"
+								},
+								"sink": {
+									"name": "LastActivityDateTimeStamp"
 								}
 							},
 							{
@@ -2231,7 +2211,7 @@
 			},
 			"RunId": {
 				"type": "string",
-				"defaultValue": "\"1\""
+				"defaultValue": "150"
 			}
 		},
 		"variables": {
