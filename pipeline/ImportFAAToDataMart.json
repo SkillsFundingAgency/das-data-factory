@@ -165,7 +165,7 @@
 						"referenceName": "SrcFAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "traineeships"
+							"CollectionName": "users"
 						}
 					}
 				],
