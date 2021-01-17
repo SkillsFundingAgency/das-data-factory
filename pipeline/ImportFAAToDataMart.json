@@ -38,7 +38,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "--DELETE FROM Stg.FAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
+							"value": "DELETE FROM Stg.FAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"maxConcurrentConnections": {
@@ -208,42 +208,6 @@
 				}
 			},
 			{
-				"name": "ImportRAAUsersStgToLive",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "LogSuccessfulExecution",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.01:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[ImportRAAUsersStgToLive]",
-					"storedProcedureParameters": {
-						"RunId": {
-							"value": {
-								"value": "@variables('RunId')",
-								"type": "Expression"
-							},
-							"type": "Int32"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "datamgmt_staging_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
 				"name": "LogRAAUserImportErrorDetails",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
@@ -267,7 +231,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@{activity('ImportRAAUsers').Error.message}",
+								"value": "@{activity('ImportFAAUsers').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -280,7 +244,7 @@
 							"type": "Int32"
 						},
 						"TaskType": {
-							"value": "ImportRAAUsersToDM",
+							"value": "ImportFAAUsersToDM",
 							"type": "String"
 						}
 					}
@@ -313,7 +277,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -851,7 +815,7 @@
 						"referenceName": "SrcRAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "vacancies"
+							"CollectionName": "traineeships"
 						}
 					}
 				],
@@ -860,7 +824,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "RAA_Vacancies",
+							"TableName": "FAA_Traineeships",
 							"SchemaName": "Stg"
 						}
 					}
