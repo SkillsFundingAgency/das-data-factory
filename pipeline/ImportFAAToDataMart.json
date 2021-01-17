@@ -79,7 +79,8 @@
 									"path": "$['EntityId']['$binary']"
 								},
 								"sink": {
-									"name": "EntityBinaryId"
+									"name": "EntityId",
+									"type": "String"
 								}
 							},
 							{
@@ -87,7 +88,8 @@
 									"path": "$['EntityId']['$type']"
 								},
 								"sink": {
-									"name": "EntityTypeCode"
+									"name": "EntityTypeCode",
+									"type": "String"
 								}
 							},
 							{
@@ -95,7 +97,8 @@
 									"path": "$['DateCreated']['$date']"
 								},
 								"sink": {
-									"name": "DateCreatedTimeStamp"
+									"name": "DateCreatedTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -103,7 +106,13 @@
 									"path": "$['DateUpdated']['$date']"
 								},
 								"sink": {
-									"name": "DateUpdatedTimeStamp"
+									"name": "DateUpdatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Username']"
 								}
 							},
 							{
@@ -111,7 +120,8 @@
 									"path": "$['Status']"
 								},
 								"sink": {
-									"name": "Status"
+									"name": "Status",
+									"type": "String"
 								}
 							},
 							{
@@ -119,7 +129,8 @@
 									"path": "$['Roles']"
 								},
 								"sink": {
-									"name": "Roles"
+									"name": "Roles",
+									"type": "String"
 								}
 							},
 							{
@@ -127,7 +138,8 @@
 									"path": "$['ActivationDate']['$date']"
 								},
 								"sink": {
-									"name": "ActivationDateTimeStamp"
+									"name": "ActivationTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -135,7 +147,8 @@
 									"path": "$['LastLogin']['$date']"
 								},
 								"sink": {
-									"name": "LastLoginDateTimeStamp"
+									"name": "LastLogInTimeStamp",
+									"type": "String"
 								}
 							},
 							{
@@ -143,7 +156,8 @@
 									"path": "$['LastActivity']['$date']"
 								},
 								"sink": {
-									"name": "LastActivityDateTimeStamp"
+									"name": "LastActivityTimeStamp",
+									"type": "String"
 								}
 							},
 							{
