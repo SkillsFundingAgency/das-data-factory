@@ -75,7 +75,7 @@
 							},
 							{
 								"source": {
-									"path": "$['idamUserId']"
+									"path": "$['idamsUserId']"
 								},
 								"sink": {
 									"name": "IdamUserId",
@@ -88,6 +88,24 @@
 								},
 								"sink": {
 									"name": "UserType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['name']"
+								},
+								"sink": {
+									"name": "UserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['email']"
+								},
+								"sink": {
+									"name": "UserEmail",
 									"type": "String"
 								}
 							},
@@ -106,6 +124,15 @@
 								},
 								"sink": {
 									"name": "LastSignedInTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountIds']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
 									"type": "String"
 								}
 							},
