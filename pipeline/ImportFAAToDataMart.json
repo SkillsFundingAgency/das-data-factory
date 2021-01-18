@@ -712,13 +712,22 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
-						"filter": "{\"_id\":\"CandidateSkills\"}"
+						"filter": ""
 					},
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM Stg.RAA_ReferenceDataCandidateSkills\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAReferenceDataToDM'\n\t   ,getdate()\n\t   ,0",
+							"value": "DELETE FROM Stg.FAA_ContactMessages\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAContactMessagesToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"maxConcurrentConnections": {
@@ -738,29 +747,83 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['_id']"
+									"path": "$['_id']['$binary']"
 								},
 								"sink": {
-									"name": "CandidateSkillsId",
+									"name": "BinaryId",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "$['lastUpdatedDate']"
+									"path": "$['_id']['$type']"
 								},
 								"sink": {
-									"name": "CandidateSkillsLastUpdatedDateTimeStamp",
+									"name": "TypeCode",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "$['skills']"
+									"path": "$['EntityId']['$binary']"
 								},
 								"sink": {
-									"name": "Skills",
+									"name": "EntityId",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$type']"
+								},
+								"sink": {
+									"name": "EntityTypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateCreated']['$date']"
+								},
+								"sink": {
+									"name": "DateCreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateUpdated']['$date']"
+								},
+								"sink": {
+									"name": "DateUpdatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['UserId']"
+								},
+								"sink": {
+									"name": "UserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Enquiry']"
+								},
+								"sink": {
+									"name": "Enquiry",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
 								}
 							}
 						],
@@ -773,7 +836,7 @@
 						"referenceName": "SrcFAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "Candidate"
+							"CollectionName": "contactmessages"
 						}
 					}
 				],
@@ -782,7 +845,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "RAA_ReferenceDataCandidateSkills",
+							"TableName": "FAA_ContactMessages",
 							"SchemaName": "Stg"
 						}
 					}
