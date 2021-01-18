@@ -1320,42 +1320,6 @@
 									"name": "CandidateId",
 									"type": "String"
 								}
-							},
-							{
-								"source": {
-									"path": "$['Location']"
-								},
-								"sink": {
-									"name": "Location",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['WithinDistance']"
-								},
-								"sink": {
-									"name": "WithinDistance",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['ApprenticeshipLevel']"
-								},
-								"sink": {
-									"name": "ApprenticeshipLevel",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['Keywords']"
-								},
-								"sink": {
-									"name": "Keywords",
-									"type": "String"
-								}
 							}
 						],
 						"collectionReference": "",
