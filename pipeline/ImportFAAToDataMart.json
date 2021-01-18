@@ -112,11 +112,6 @@
 							},
 							{
 								"source": {
-									"path": "$['Username']"
-								}
-							},
-							{
-								"source": {
 									"path": "$['Status']"
 								},
 								"sink": {
