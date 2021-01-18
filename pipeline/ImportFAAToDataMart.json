@@ -1658,10 +1658,10 @@
 								"source": {
 									"path": "$['Vacancy']['IsRecruitVacancy']"
 								},
-                "sink": {
-                  "name": "IsRecruitVacancy",
-                  "type": "String"
-                }
+								"sink": {
+									"name": "IsRecruitVacancy",
+									"type": "String"
+								}
 							}
 						],
 						"collectionReference": "",
@@ -1695,7 +1695,7 @@
 					{
 						"activity": "ImportFAAApprenticeships",
 						"dependencyConditions": [
-							"Failed"
+							"Succeeded"
 						]
 					}
 				],
@@ -1734,7 +1734,7 @@
 					{
 						"activity": "ImportFAAApprenticeships",
 						"dependencyConditions": [
-							"Succeeded"
+							"Failed"
 						]
 					}
 				],
