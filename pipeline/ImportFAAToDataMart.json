@@ -895,7 +895,11 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$"
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
 								}
 							}
 						],
