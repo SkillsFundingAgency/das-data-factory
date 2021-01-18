@@ -691,7 +691,7 @@
 				}
 			},
 			{
-				"name": "ImportFAASavedSearches",
+				"name": "ImportFAAContactMessages",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -856,7 +856,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportFAASavedSearches",
+						"activity": "ImportFAAContactMessages",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1282,11 +1282,11 @@
 				]
 			},
 			{
-				"name": "LogRDErrorMessage",
+				"name": "LogFAAContactMessageError",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportFAASavedSearches",
+						"activity": "ImportFAAContactMessages",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -1305,7 +1305,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@{activity('ImportRAAReferenceDataCandidateSkills').Error.message}",
+								"value": "@{activity('ImportFAAContactMessages').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
