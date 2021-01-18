@@ -1248,80 +1248,125 @@
 					},
 					"translator": {
 						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['RunId']"
-								},
-								"sink": {
-									"name": "RunId",
-									"type": "Int64"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_id']['$binary']"
-								},
-								"sink": {
-									"name": "BinaryId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_id']['$type']"
-								},
-								"sink": {
-									"name": "TypeCode",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['EntityId']['$binary']"
-								},
-								"sink": {
-									"name": "EntityId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['EntityId']['$type']"
-								},
-								"sink": {
-									"name": "EntityTypeCode",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['DateCreated']['$date']"
-								},
-								"sink": {
-									"name": "DateCreatedTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['DateUpdated']['$date']"
-								},
-								"sink": {
-									"name": "DateUpdatedTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['CandidateId']['$binary']"
-								},
-								"sink": {
-									"name": "CandidateId",
-									"type": "String"
-								}
-							}
-						],
+            "mappings": [
+              {
+                "source": {
+                  "path": "$['RunId']"
+                },
+                "sink": {
+                  "name": "RunId",
+                  "type": "Int64"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['_id']['$binary']"
+                },
+                "sink": {
+                  "name": "BinaryId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['_id']['$type']"
+                },
+                "sink": {
+                  "name": "TypeCode",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['EntityId']['$binary']"
+                },
+                "sink": {
+                  "name": "EntityId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['EntityId']['$type']"
+                },
+                "sink": {
+                  "name": "EntityTypeCode",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['DateCreated']['$date']"
+                },
+                "sink": {
+                  "name": "DateCreatedTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['DateUpdated']['$date']"
+                },
+                "sink": {
+                  "name": "DateUpdatedTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['DateApplied']['$date']"
+                },
+                "sink": {
+                  "name": "DateAppliedTimeStamp",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['CandidateId']['$binary']"
+                },
+                "sink": {
+                  "name": "CandidateId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['LegacyApplicationId']"
+                },
+                "sink": {
+                  "name": "LegacyApplicationId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['Vacancy']['_id']"
+                },
+                "sink": {
+                  "name": "VacancyId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['Vacancy']['VacancyReference']"
+                },
+                "sink": {
+                  "name": "VacancyReference",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['Vacancy']['ApplyViaEmployerWebsite']"
+                },
+                "sink": {
+                  "name": "ApplyViaEmployerWebsite",
+                  "type": "String"
+                }
+              }
+            ],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
