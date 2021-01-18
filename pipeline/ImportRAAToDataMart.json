@@ -274,7 +274,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -1157,7 +1158,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAVacanciesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -1195,7 +1197,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAapplicationReviewToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -2155,7 +2158,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAReferenceDataToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -2166,6 +2170,182 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "ImportRAAVacancyReviews",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAReferenceDataBankHolidays",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
+						"batchSize": 100,
+						"filter": "\n"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM Stg.RAA_VacancyReviews\n\n INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t,'ImportRAAVacancyReviewsToDM'\n\t   ,getdate()\n\t   ,0",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['vacancyReference']"
+								},
+								"sink": {
+									"name": "VacancyReference",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdDate']['$date']"
+								},
+								"sink": {
+									"name": "CreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountId']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['userId']"
+								},
+								"sink": {
+									"name": "UserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['vacancySnapshot']['submittedDate']['$date']"
+								},
+								"sink": {
+									"name": "SubmittedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manualOutcome']"
+								},
+								"sink": {
+									"name": "ManualOutcome",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manualQaFieldIndicators'][0]['fieldIdentifier']"
+								},
+								"sink": {
+									"name": "ManualQaFieldIndicator",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manualQaFieldIndicators'][0]['isChangeRequested']"
+								},
+								"sink": {
+									"name": "ManualQaFieldChangeRequested",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manualQaComment']"
+								},
+								"sink": {
+									"name": "ManualQaComment",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "vacancyReviews"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_VacancyReviews",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
