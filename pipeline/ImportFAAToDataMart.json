@@ -691,7 +691,7 @@
 				}
 			},
 			{
-				"name": "ImportFAA",
+				"name": "ImportFAASavedSearches",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -770,10 +770,10 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRAACosmos",
+						"referenceName": "SrcFAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "referenceData"
+							"CollectionName": "Candidate"
 						}
 					}
 				],
@@ -793,7 +793,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportFAA",
+						"activity": "ImportFAASavedSearches",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1223,7 +1223,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportFAA",
+						"activity": "ImportFAASavedSearches",
 						"dependencyConditions": [
 							"Failed"
 						]
