@@ -878,7 +878,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.FAA_SavedSearches\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   ,'ImportFAASavedSearchesToDM'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.FAA_SavedSearches\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   ,'ImportFAASavedSearchesToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"maxConcurrentConnections": {
 							"value": "@pipeline().parameters.MaxConcurrentConnections",
 							"type": "Expression"
@@ -1234,7 +1237,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.FAA_Traineeships\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   ,'ImportFAATraineeshipsToDM'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.FAA_Traineeships\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   \n           ,'ImportFAATraineeshipsToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"maxConcurrentConnections": {
 							"value": "@pipeline().parameters.MaxConcurrentConnections",
 							"type": "Expression"
@@ -1248,125 +1254,125 @@
 					},
 					"translator": {
 						"type": "TabularTranslator",
-            "mappings": [
-              {
-                "source": {
-                  "path": "$['RunId']"
-                },
-                "sink": {
-                  "name": "RunId",
-                  "type": "Int64"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['_id']['$binary']"
-                },
-                "sink": {
-                  "name": "BinaryId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['_id']['$type']"
-                },
-                "sink": {
-                  "name": "TypeCode",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['EntityId']['$binary']"
-                },
-                "sink": {
-                  "name": "EntityId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['EntityId']['$type']"
-                },
-                "sink": {
-                  "name": "EntityTypeCode",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['DateCreated']['$date']"
-                },
-                "sink": {
-                  "name": "DateCreatedTimeStamp",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['DateUpdated']['$date']"
-                },
-                "sink": {
-                  "name": "DateUpdatedTimeStamp",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['DateApplied']['$date']"
-                },
-                "sink": {
-                  "name": "DateAppliedTimeStamp",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['CandidateId']['$binary']"
-                },
-                "sink": {
-                  "name": "CandidateId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['LegacyApplicationId']"
-                },
-                "sink": {
-                  "name": "LegacyApplicationId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['Vacancy']['_id']"
-                },
-                "sink": {
-                  "name": "VacancyId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['Vacancy']['VacancyReference']"
-                },
-                "sink": {
-                  "name": "VacancyReference",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['Vacancy']['ApplyViaEmployerWebsite']"
-                },
-                "sink": {
-                  "name": "ApplyViaEmployerWebsite",
-                  "type": "String"
-                }
-              }
-            ],
+						"mappings": [
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$binary']"
+								},
+								"sink": {
+									"name": "EntityId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$type']"
+								},
+								"sink": {
+									"name": "EntityTypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateCreated']['$date']"
+								},
+								"sink": {
+									"name": "DateCreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateUpdated']['$date']"
+								},
+								"sink": {
+									"name": "DateUpdatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateApplied']['$date']"
+								},
+								"sink": {
+									"name": "DateAppliedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['CandidateId']['$binary']"
+								},
+								"sink": {
+									"name": "CandidateId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['LegacyApplicationId']"
+								},
+								"sink": {
+									"name": "LegacyApplicationId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['_id']"
+								},
+								"sink": {
+									"name": "VacancyId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['VacancyReference']"
+								},
+								"sink": {
+									"name": "VacancyReference",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['ApplyViaEmployerWebsite']"
+								},
+								"sink": {
+									"name": "ApplyViaEmployerWebsite",
+									"type": "String"
+								}
+							}
+						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
@@ -1390,6 +1396,92 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "LogSuccessfulExecutionOfTraineeships",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportFAATraineeships",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAATraineeshipsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Vacancies"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogFAATraineeshipsError",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportFAATraineeships",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+					"storedProcedureParameters": {
+						"ErrorMessage": {
+							"value": {
+								"value": "@{activity('ImportFAATraineeships').Error.message}",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"TaskType": {
+							"value": "ImportFAATraineeshipsToDM",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
