@@ -566,7 +566,7 @@
 				]
 			},
 			{
-				"name": "LogRAAaplicationReviewImportErrorDetails",
+				"name": "LogFAAImportErrorDetails",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -589,7 +589,7 @@
 					"storedProcedureParameters": {
 						"ErrorMessage": {
 							"value": {
-								"value": "@{activity('ImportRAAapplicationReviews').Error.message}",
+								"value": "@{activity('ImportFAACandidatePostCode').Error.message}",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -602,7 +602,7 @@
 							"type": "Int32"
 						},
 						"TaskType": {
-							"value": "ImportRAAApplicationReviewToDM",
+							"value": "ImportFAACandidatePostCodeToDM",
 							"type": "String"
 						}
 					}
@@ -652,7 +652,7 @@
 				}
 			},
 			{
-				"name": "LogSuccessfulExecutionOfApplicationReviews",
+				"name": "LogSuccessfulExecutionOfCandidatePostcode",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -674,7 +674,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAapplicationReviewToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAACandidatePostcodeToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -691,7 +691,7 @@
 				}
 			},
 			{
-				"name": "ImportRAAReferenceDataCandidateSkills",
+				"name": "ImportFAA",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -793,7 +793,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAReferenceDataCandidateSkills",
+						"activity": "ImportFAA",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1223,7 +1223,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAReferenceDataCandidateSkills",
+						"activity": "ImportFAA",
 						"dependencyConditions": [
 							"Failed"
 						]
