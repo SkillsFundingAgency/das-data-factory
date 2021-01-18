@@ -208,7 +208,7 @@
 				}
 			},
 			{
-				"name": "LogRAAUserImportErrorDetails",
+				"name": "LogFAAUserImportErrorDetails",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -294,7 +294,7 @@
 				}
 			},
 			{
-				"name": "ImportRAAVacancies",
+				"name": "ImportFAACandidateDob",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -315,18 +315,28 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100
 					},
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM Stg.RAA_Vacancies\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportRAAVacanciesToDM'\n\t   ,getdate()\n\t   ,0",
+							"value": "DELETE FROM Stg.FAA_CandidateDob\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAACandidateDobToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"maxConcurrentConnections": {
 							"value": "@pipeline().parameters.MaxConcurrentConnections",
 							"type": "Expression"
 						},
+						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
@@ -342,467 +352,51 @@
 									"path": "$['_id']['$binary']"
 								},
 								"sink": {
-									"name": "BinaryId",
+									"name": "CandidateId",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "$['_id']['$type']"
+									"path": "$['DateCreated']['$date']"
 								},
 								"sink": {
-									"name": "TypeCode",
+									"name": "DateCreatedTimeStamp"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateUpdated']['$date']"
+								},
+								"sink": {
+									"name": "DateUpdatedTimeStamp"
+								}
+							},
+							{
+								"source": {
+									"path": "$['LegacyCandidateId']"
+								},
+								"sink": {
+									"name": "LegacyCandidateId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RegistrationDetails']['DateOfBirth']['$date']"
+								},
+								"sink": {
+									"name": "DateOfBirth",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "$['vacancyReference']"
+									"path": "$['RunId']"
 								},
 								"sink": {
-									"name": "VacancyReference",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['status']"
-								},
-								"sink": {
-									"name": "VacancyStatus",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['ownerType']"
-								},
-								"sink": {
-									"name": "OwnerType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['sourceOrigin']"
-								},
-								"sink": {
-									"name": "SourceOrigin",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['sourceType']"
-								},
-								"sink": {
-									"name": "SourceType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['closedDate']['$date']"
-								},
-								"sink": {
-									"name": "ClosedDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['createdDate']['$date']"
-								},
-								"sink": {
-									"name": "CreatedDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['createdByUser']['userId']"
-								},
-								"sink": {
-									"name": "CreatedByUserID",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['submittedDate']['$date']"
-								},
-								"sink": {
-									"name": "SubmittedDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['submittedByUser']['userId']"
-								},
-								"sink": {
-									"name": "SubmittedByUserId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['approvedDate']['$date']"
-								},
-								"sink": {
-									"name": "ApprovedDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['liveDate']['$date']"
-								},
-								"sink": {
-									"name": "LiveDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lastUpdatedDate']['$date']"
-								},
-								"sink": {
-									"name": "LastUpdatedTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lastUpdatedByUser']['userId']"
-								},
-								"sink": {
-									"name": "LastUpdatedByUserId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['isDeleted']"
-								},
-								"sink": {
-									"name": "IsDeleted",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['applicationMethod']"
-								},
-								"sink": {
-									"name": "ApplicationMethod",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['applicationUrl']"
-								},
-								"sink": {
-									"name": "ApplicationUrl",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['closingDate']['$date']"
-								},
-								"sink": {
-									"name": "ClosingDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['description']"
-								},
-								"sink": {
-									"name": "VacancyDescription",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerDescription']"
-								},
-								"sink": {
-									"name": "EmployerDescription",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerName']"
-								},
-								"sink": {
-									"name": "EmployerName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerNameOption']"
-								},
-								"sink": {
-									"name": "EmployerNameOption",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['legalEntityName']"
-								},
-								"sink": {
-									"name": "LegalEntityName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['geoCodeMethod']"
-								},
-								"sink": {
-									"name": "GeoCodeMethod",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['legalEntityId']"
-								},
-								"sink": {
-									"name": "LegalEntityId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['numberOfPositions']"
-								},
-								"sink": {
-									"name": "NumberOfPositions",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['outcomeDescription']"
-								},
-								"sink": {
-									"name": "OutcomeDescription",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['programmeId']"
-								},
-								"sink": {
-									"name": "ProgrammeId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['qualifications']"
-								},
-								"sink": {
-									"name": "Qualifications",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['skills']"
-								},
-								"sink": {
-									"name": "Skills",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['startDate']['$date']"
-								},
-								"sink": {
-									"name": "StartDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['title']"
-								},
-								"sink": {
-									"name": "VacancyTitle",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingDescription']"
-								},
-								"sink": {
-									"name": "TrainingDescription",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['ukprn']"
-								},
-								"sink": {
-									"name": "TrainingProviderUkprn",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['trainingProvider']['name']"
-								},
-								"sink": {
-									"name": "TrainingProviderName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['duration']"
-								},
-								"sink": {
-									"name": "WageDuration",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['durationUnit']"
-								},
-								"sink": {
-									"name": "WageDurationUnit",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['workingWeekDescription']"
-								},
-								"sink": {
-									"name": "WorkingWeekDescription",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['weeklyHours']"
-								},
-								"sink": {
-									"name": "WeeklyHours",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['wageType']"
-								},
-								"sink": {
-									"name": "WageType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['fixedWageYearlyAmount']"
-								},
-								"sink": {
-									"name": "FixedWageYearlyAmount",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['wage']['wageAdditionalInformation']"
-								},
-								"sink": {
-									"name": "WageAdditionalInformation",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['closureReason']"
-								},
-								"sink": {
-									"name": "ClosureReason",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['applicationInstructions']"
-								},
-								"sink": {
-									"name": "ApplicationIstructions",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerWebsiteUrl']"
-								},
-								"sink": {
-									"name": "EmployerWebsiteUrl",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['accountLegalEntityPublicHashedId']"
-								},
-								"sink": {
-									"name": "AccountLegalEntityPublicHashedId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['thingsToConsider']"
-								},
-								"sink": {
-									"name": "ThingsToConsider",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedDate']['$date']"
-								},
-								"sink": {
-									"name": "DeletedDateTimeStamp",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['deletedByUser']['userId']"
-								},
-								"sink": {
-									"name": "DeletedByUserId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['employerAccountId']"
-								},
-								"sink": {
-									"name": "EmployerAccountId",
-									"type": "String"
+									"name": "RunID",
+									"type": "Int64"
 								}
 							}
 						],
@@ -812,10 +406,10 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRAACosmos",
+						"referenceName": "SrcFAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "traineeships"
+							"CollectionName": "candidates"
 						}
 					}
 				],
@@ -824,7 +418,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "FAA_Traineeships",
+							"TableName": "FAA_CandidateDob",
 							"SchemaName": "Stg"
 						}
 					}
@@ -835,7 +429,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAVacancies",
+						"activity": "ImportFAACandidateDob",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -882,7 +476,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAVacancies",
+						"activity": "ImportFAACandidateDob",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -1143,7 +737,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAVacancies",
+						"activity": "ImportFAACandidateDob",
 						"dependencyConditions": [
 							"Succeeded"
 						]
