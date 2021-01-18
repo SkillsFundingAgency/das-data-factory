@@ -852,13 +852,13 @@
 				]
 			},
 			{
-				"name": "ImportRAAReferenceDataApprenticeshipProgrammes",
+				"name": "ImportFAASavedSearches",
 				"type": "Copy",
 				"dependsOn": [
 					{
 						"activity": "ImportFAAContactMessages",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -874,11 +874,11 @@
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
 						"batchSize": 100,
-						"filter": "{\"_id\":\"ApprenticeshipProgrammes\"}\n"
+						"filter": "\n"
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.RAA_ReferenceDataApprenticeshipProgrammes\n",
+						"preCopyScript": "DELETE FROM Stg.FAA_SavedSearches",
 						"maxConcurrentConnections": {
 							"value": "@pipeline().parameters.MaxConcurrentConnections",
 							"type": "Expression"
@@ -981,10 +981,10 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SrcRAACosmos",
+						"referenceName": "SrcFAACosmos",
 						"type": "DatasetReference",
 						"parameters": {
-							"CollectionName": "referenceData"
+							"CollectionName": "savedsearches"
 						}
 					}
 				],
@@ -993,7 +993,7 @@
 						"referenceName": "DestDataMart",
 						"type": "DatasetReference",
 						"parameters": {
-							"TableName": "RAA_ReferenceDataApprenticeshipProgrammes",
+							"TableName": "FAA_SavedSearches",
 							"SchemaName": "Stg"
 						}
 					}
@@ -1004,7 +1004,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAReferenceDataApprenticeshipProgrammes",
+						"activity": "ImportFAASavedSearches",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1333,7 +1333,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ImportRAAReferenceDataApprenticeshipProgrammes",
+						"activity": "ImportFAASavedSearches",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -1699,6 +1699,45 @@
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAReferenceDataToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Vacancies"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogSuccessfulExecutionOfContactMessages",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportFAAContactMessages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAAContactMessagesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
