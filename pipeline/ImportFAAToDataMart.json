@@ -1404,7 +1404,7 @@
 					{
 						"activity": "ImportFAATraineeships",
 						"dependencyConditions": [
-							"Failed"
+							"Succeeded"
 						]
 					}
 				],
@@ -1443,7 +1443,7 @@
 					{
 						"activity": "ImportFAATraineeships",
 						"dependencyConditions": [
-							"Succeeded"
+							"Failed"
 						]
 					}
 				],
