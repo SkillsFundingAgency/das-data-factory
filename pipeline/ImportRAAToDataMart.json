@@ -2297,7 +2297,7 @@
 							},
 							{
 								"source": {
-									"path": "$['manualQaFieldIndicators'][0]['fieldIdentifier']"
+									"path": "['fieldIdentifier']"
 								},
 								"sink": {
 									"name": "ManualQaFieldIndicator",
@@ -2306,7 +2306,7 @@
 							},
 							{
 								"source": {
-									"path": "$['manualQaFieldIndicators'][0]['isChangeRequested']"
+									"path": "['isChangeRequested']"
 								},
 								"sink": {
 									"name": "ManualQaFieldChangeRequested",
@@ -2323,7 +2323,7 @@
 								}
 							}
 						],
-						"collectionReference": "",
+						"collectionReference": "$['manualQaFieldIndicators']",
 						"mapComplexValuesToString": true
 					}
 				},
