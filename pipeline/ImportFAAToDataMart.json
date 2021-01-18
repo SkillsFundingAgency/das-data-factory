@@ -897,30 +897,6 @@
 								"source": {
 									"path": "$"
 								}
-							},
-							{
-								"source": {
-									"path": "$['$[\\'_id\\'][\\'$binary\\']']"
-								},
-								"sink": {
-									"name": "BinaryId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['$[\\'_id\\'][\\'$type\\']']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['$[\\'EntityId\\'][\\'$binary\\']']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['$[\\'EntityId\\'][\\'$type\\']']"
-								}
 							}
 						],
 						"collectionReference": "",
