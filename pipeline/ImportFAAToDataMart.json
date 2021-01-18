@@ -895,70 +895,12 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "['_id']"
-								},
-								"sink": {
-									"name": "ProgrammeId",
-									"type": "String"
+									"path": "$"
 								}
 							},
 							{
 								"source": {
-									"path": "['apprenticeshipType']"
-								},
-								"sink": {
-									"name": "ApprenticeshipType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['title']"
-								},
-								"sink": {
-									"name": "Title",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['effectiveFrom']['$date']"
-								},
-								"sink": {
-									"name": "EffectiveFrom",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['duration']"
-								},
-								"sink": {
-									"name": "Duration",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['isActive']"
-								},
-								"sink": {
-									"name": "IsActive",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['educationLevelNumber']"
-								},
-								"sink": {
-									"name": "EducationLevelNumber",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_id']"
+									"path": "$['$[\\'_id\\'][\\'$binary\\']']"
 								},
 								"sink": {
 									"name": "BinaryId",
@@ -967,15 +909,21 @@
 							},
 							{
 								"source": {
-									"path": "$['lastUpdatedDate']['$date']"
-								},
-								"sink": {
-									"name": "LastUpdatedDateTimeStamp",
-									"type": "String"
+									"path": "$['$[\\'_id\\'][\\'$type\\']']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['$[\\'EntityId\\'][\\'$binary\\']']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['$[\\'EntityId\\'][\\'$type\\']']"
 								}
 							}
 						],
-						"collectionReference": "$['data']",
+						"collectionReference": "",
 						"mapComplexValuesToString": true
 					}
 				},
