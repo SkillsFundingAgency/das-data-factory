@@ -1482,6 +1482,210 @@
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "ImportFAAApprenticeships",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportFAATraineeships",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
+						"batchSize": 100,
+						"filter": "\n"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.FAA_Apprenticeships\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   \n           ,'ImportFAAApprenticeshipsToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$binary']"
+								},
+								"sink": {
+									"name": "EntityId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$type']"
+								},
+								"sink": {
+									"name": "EntityTypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateCreated']['$date']"
+								},
+								"sink": {
+									"name": "DateCreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateUpdated']['$date']"
+								},
+								"sink": {
+									"name": "DateUpdatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateApplied']['$date']"
+								},
+								"sink": {
+									"name": "DateAppliedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['CandidateId']['$binary']"
+								},
+								"sink": {
+									"name": "CandidateId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['LegacyApplicationId']"
+								},
+								"sink": {
+									"name": "LegacyApplicationId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['_id']"
+								},
+								"sink": {
+									"name": "VacancyId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['VacancyReference']"
+								},
+								"sink": {
+									"name": "VacancyReference",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['ApplyViaEmployerWebsite']"
+								},
+								"sink": {
+									"name": "ApplyViaEmployerWebsite",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Vacancy']['IsRecruitVacancy']"
+								},
+								"sink": {
+									"name": "IsRecruitVacancy"
+								}
+							}
+						],
+						"collectionReference": "",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcFAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "apprenticeships"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "FAA_Apprenticeships",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
