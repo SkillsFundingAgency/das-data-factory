@@ -879,7 +879,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "DELETE FROM Stg.FAA_SavedSearches\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   ,'ImportFAASavedSearchesToDM'\n\t   ,getdate()\n\t   ,0",
+							"value": "DELETE FROM Stg.FAA_SavedSearches\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t  \n           ,'ImportFAASavedSearchesToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"maxConcurrentConnections": {
@@ -1066,7 +1066,7 @@
 							"type": "Int32"
 						},
 						"TaskType": {
-							"value": "ImportRAAReferenceDataToDM",
+							"value": "ImportFAAContactMessagesToDM",
 							"type": "String"
 						}
 					}
@@ -1191,7 +1191,7 @@
 							"type": "Int32"
 						},
 						"TaskType": {
-							"value": "ImportRAAReferenceDataToDM",
+							"value": "ImportFAASavedSearchesToDM",
 							"type": "String"
 						}
 					}
