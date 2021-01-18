@@ -1111,6 +1111,276 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "LogSuccessfulExecutionOfSavedSearches",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportFAASavedSearches",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAASavedSearchesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Vacancies"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogFAASavedSearchesError",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportFAASavedSearches",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+					"storedProcedureParameters": {
+						"ErrorMessage": {
+							"value": {
+								"value": "@{activity('ImportFAASavedSearches').Error.message}",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"TaskType": {
+							"value": "ImportRAAReferenceDataToDM",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ImportFAATraineeships",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportFAASavedSearches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
+						"batchSize": 100,
+						"filter": "\n"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "DELETE FROM Stg.FAA_Traineeships\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   ,'ImportFAATraineeshipsToDM'\n\t   ,getdate()\n\t   ,0",
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$binary']"
+								},
+								"sink": {
+									"name": "EntityId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['EntityId']['$type']"
+								},
+								"sink": {
+									"name": "EntityTypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateCreated']['$date']"
+								},
+								"sink": {
+									"name": "DateCreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['DateUpdated']['$date']"
+								},
+								"sink": {
+									"name": "DateUpdatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['CandidateId']['$binary']"
+								},
+								"sink": {
+									"name": "CandidateId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Location']"
+								},
+								"sink": {
+									"name": "Location",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['WithinDistance']"
+								},
+								"sink": {
+									"name": "WithinDistance",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['ApprenticeshipLevel']"
+								},
+								"sink": {
+									"name": "ApprenticeshipLevel",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['Keywords']"
+								},
+								"sink": {
+									"name": "Keywords",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcFAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "traineeships"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "FAA_Traineeships",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
