@@ -1654,51 +1654,51 @@
 									"type": "String"
 								}
 							},
-              {
-                "source": {
-                  "path": "$['Vacancy']['IsRecruitVacancy']"
-                },
-                "sink": {
-                  "name": "IsRecruitVacancy",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['SuccessfulDateTime']"
-                },
-                "sink": {
-                  "name": "SuccessfulTimeStamp",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['UnsuccessfulDateTime']"
-                },
-                "sink": {
-                  "name": "UnsuccessfulTimeStamp",
-                  "type": "String"
-                }
-              }
-              {
-                "source": {
-                  "path": "$['WithdrawnOrDeclinedReason']"
-                },
-                "sink": {
-                  "name": "WithdrawnOrDeclinedReason",
-                  "type": "String"
-                }
-              }
-              {
-                "source": {
-                  "path": "$['UnsuccessfulReason']"
-                },
-                "sink": {
-                  "name": "UnsuccessfulReason",
-                  "type": "String"
-                }
-              }
+							{
+								"source": {
+									"path": "$['Vacancy']['IsRecruitVacancy']"
+								},
+								"sink": {
+									"name": "IsRecruitVacancy",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['SuccessfulDateTime']"
+								},
+								"sink": {
+									"name": "SuccessfulTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['UnsuccessfulDateTime']"
+								},
+								"sink": {
+									"name": "UnsuccessfulTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['WithdrawnOrDeclinedReason']"
+								},
+								"sink": {
+									"name": "WithdrawnOrDeclinedReason",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['UnsuccessfulReason']"
+								},
+								"sink": {
+									"name": "UnsuccessfulReason",
+									"type": "String"
+								}
+							}
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
