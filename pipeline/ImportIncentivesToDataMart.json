@@ -105,7 +105,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "DetectAndLogSourceDbChanges",
+									"activity": "SetVar_ResvKeys_2",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -307,7 +307,8 @@
 								"integrationRuntime": {
 									"referenceName": "AzureIntegrationRunTime",
 									"type": "IntegrationRuntimeReference"
-								}
+								},
+								"traceLevel": "Fine"
 							}
 						},
 						{
@@ -340,11 +341,17 @@
 										"type": "String"
 									},
 									"ConfigSchema": {
-										"value": "@{item().SCHEMA_NAME}",
+										"value": {
+											"value": "@{item().SCHEMA_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"ConfigTable": {
-										"value": "@{item().TABLE_NAME}",
+										"value": {
+											"value": "@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"K1": {
@@ -360,7 +367,10 @@
 										"type": "Int32"
 									},
 									"PLTableName": {
-										"value": "ASData_PL.EI_@{item().TABLE_NAME}",
+										"value": {
+											"value": "ASData_PL.EI_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"RunId": {
@@ -375,7 +385,10 @@
 										"type": "String"
 									},
 									"StgTableName": {
-										"value": "Stg.EI_@{item().TABLE_NAME}",
+										"value": {
+											"value": "Stg.EI_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -453,6 +466,118 @@
 										"TableName": "Users",
 										"SchemaName": "Stg"
 									}
+								}
+							}
+						},
+						{
+							"name": "Generate_IncKeys_1",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "DetectAndLogSourceDbChanges",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "Generate_IncKeys_2",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Generate_IncKeys_1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K2 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K2=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 nvarchar(max) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2\n\n",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Users",
+										"SchemaName": "Stg"
+									}
+								}
+							}
+						},
+						{
+							"name": "SetVar_ResvKeys_1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Generate_IncKeys_2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "IK1",
+								"value": {
+									"value": "@{activity('Generate_ResvKeys_1').output.firstRow.K1}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "SetVar_ResvKeys_2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "SetVar_ResvKeys_1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "RK2",
+								"value": {
+									"value": "@{activity('Generate_ResvKeys_2').output.firstRow.K2}",
+									"type": "Expression"
 								}
 							}
 						}
@@ -673,6 +798,12 @@
 				"type": "String"
 			},
 			"RunId": {
+				"type": "String"
+			},
+			"IK1": {
+				"type": "String"
+			},
+			"IK2": {
 				"type": "String"
 			}
 		},
