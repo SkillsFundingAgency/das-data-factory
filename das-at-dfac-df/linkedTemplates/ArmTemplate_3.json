@@ -2287,7 +2287,7 @@
 									"type": "Lookup",
 									"dependsOn": [
 										{
-											"activity": "DetectAndLogSourceDbChanges",
+											"activity": "SetVar_IncKeys_2",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -2305,7 +2305,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='EmpInc'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @Collist ColumnList\n\n",
+												"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='EmpInc'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('IK1')}'),'K2','0x'+'@{variables('IK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+SUBSTRING(ConfigList,len(ConfigList)/2,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='EmpInc'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList\n\n",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -2517,10 +2517,7 @@
 										"storedProcedureName": "[[dbo].[PresentationLayerFullRefresh]",
 										"storedProcedureParameters": {
 											"ColumnList": {
-												"value": {
-													"value": "@activity('GetImportSelectQuery').output.firstRow.ColumnList",
-													"type": "Expression"
-												},
+												"value": null,
 												"type": "String"
 											},
 											"ConfigSchema": {
@@ -2538,15 +2535,21 @@
 												"type": "String"
 											},
 											"K1": {
-												"value": null,
+												"value": {
+													"value": "@{variables('IK1')}",
+													"type": "Expression"
+												},
 												"type": "String"
 											},
 											"K2": {
-												"value": null,
+												"value": {
+													"value": "@{variables('IK2')}",
+													"type": "Expression"
+												},
 												"type": "String"
 											},
 											"KeyBased": {
-												"value": "0",
+												"value": "1",
 												"type": "Int32"
 											},
 											"PLTableName": {
@@ -2649,6 +2652,118 @@
 												"TableName": "Users",
 												"SchemaName": "Stg"
 											}
+										}
+									}
+								},
+								{
+									"name": "Generate_IncKeys_1",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "DetectAndLogSourceDbChanges",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "Generate_IncKeys_2",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Generate_IncKeys_1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K2 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K2=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 nvarchar(max) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2\n\n",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "SetVar_IncKeys_1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Generate_IncKeys_2",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "IK1",
+										"value": {
+											"value": "@{activity('Generate_IncKeys_1').output.firstRow.K1}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SetVar_IncKeys_2",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "SetVar_IncKeys_1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "IK2",
+										"value": {
+											"value": "@{activity('Generate_IncKeys_2').output.firstRow.K2}",
+											"type": "Expression"
 										}
 									}
 								}
@@ -2869,6 +2984,12 @@
 						"type": "String"
 					},
 					"RunId": {
+						"type": "String"
+					},
+					"IK1": {
+						"type": "String"
+					},
+					"IK2": {
 						"type": "String"
 					}
 				},
