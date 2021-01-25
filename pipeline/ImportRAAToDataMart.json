@@ -789,15 +789,24 @@
 									"type": "String"
 								}
 							},
-							{
-								"source": {
-									"path": "$['employerAccountId']"
-								},
-								"sink": {
-									"name": "EmployerAccountId",
-									"type": "String"
-								}
-							}
+              {
+                "source": {
+                  "path": "$['employerAccountId']"
+                },
+                "sink": {
+                  "name": "EmployerAccountId",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['postcode']"
+                },
+                "sink": {
+                  "name": "EmployerPostCode",
+                  "type": "String"
+                }
+              }
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
