@@ -806,6 +806,60 @@
                   "name": "EmployerPostCode",
                   "type": "String"
                 }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['addressLine1']"
+                },
+                "sink": {
+                  "name": "EmployerAddressLine1",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['addressLine2']"
+                },
+                "sink": {
+                  "name": "EmployerAddressLine2",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['addressLine3']"
+                },
+                "sink": {
+                  "name": "EmployerAddressLine3",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['addressLine4']"
+                },
+                "sink": {
+                  "name": "EmployerAddressLine4",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['latitude']"
+                },
+                "sink": {
+                  "name": "EmployerLatitude",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "path": "$['employerLocation']['longitude']"
+                },
+                "sink": {
+                  "name": "EmployerLongitude",
+                  "type": "String"
+                }
               }
 						],
 						"collectionReference": "",
