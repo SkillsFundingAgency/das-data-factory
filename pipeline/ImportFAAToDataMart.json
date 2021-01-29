@@ -566,7 +566,7 @@
 				]
 			},
 			{
-				"name": "LogFAAImportErrorDetails",
+				"name": "LogFAACandidatePostCodeImportErrorDetails",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
