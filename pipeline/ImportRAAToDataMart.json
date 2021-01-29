@@ -93,15 +93,6 @@
 							},
 							{
 								"source": {
-									"path": "$['name']"
-								},
-								"sink": {
-									"name": "UserName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['email']"
 								},
 								"sink": {
@@ -2234,7 +2225,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "DELETE FROM Stg.RAA_VacancyReviews\n\n INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t,'ImportRAAVacancyReviewsToDM'\n\t   ,getdate()\n\t   ,0",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.RAA_VacancyReviews\n\n INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t,'ImportRAAVacancyReviewsToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
 						"maxConcurrentConnections": {
 							"value": "@pipeline().parameters.MaxConcurrentConnections",
 							"type": "Expression"
