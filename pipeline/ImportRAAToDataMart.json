@@ -93,15 +93,6 @@
 							},
 							{
 								"source": {
-									"path": "$['email']"
-								},
-								"sink": {
-									"name": "UserEmail",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['createdDate']['$date']"
 								},
 								"sink": {
