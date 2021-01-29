@@ -797,6 +797,39 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "GAPresentationLayerRefresh",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LogSuccessfulActivityCopyGAData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[ImportGASessionDataToPL]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": "@{variables('RunId')}",
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
