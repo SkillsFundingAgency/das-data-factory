@@ -75,7 +75,7 @@
 							},
 							{
 								"source": {
-									"path": "$['idamUserId']"
+									"path": "$['idamsUserId']"
 								},
 								"sink": {
 									"name": "IdamUserId",
@@ -106,6 +106,15 @@
 								},
 								"sink": {
 									"name": "LastSignedInTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountIds']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
 									"type": "String"
 								}
 							},
@@ -274,7 +283,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -308,6 +318,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100
 					},
 					"sink": {
@@ -789,78 +808,23 @@
 									"type": "String"
 								}
 							},
-              {
-                "source": {
-                  "path": "$['employerAccountId']"
-                },
-                "sink": {
-                  "name": "EmployerAccountId",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['postcode']"
-                },
-                "sink": {
-                  "name": "EmployerPostCode",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['addressLine1']"
-                },
-                "sink": {
-                  "name": "EmployerAddressLine1",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['addressLine2']"
-                },
-                "sink": {
-                  "name": "EmployerAddressLine2",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['addressLine3']"
-                },
-                "sink": {
-                  "name": "EmployerAddressLine3",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['addressLine4']"
-                },
-                "sink": {
-                  "name": "EmployerAddressLine4",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['latitude']"
-                },
-                "sink": {
-                  "name": "EmployerLatitude",
-                  "type": "String"
-                }
-              },
-              {
-                "source": {
-                  "path": "$['employerLocation']['longitude']"
-                },
-                "sink": {
-                  "name": "EmployerLongitude",
-                  "type": "String"
-                }
-              }
+							{
+								"source": {
+									"path": "$['employerAccountId']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
+								}
+							}
 						],
 						"collectionReference": "",
 						"mapComplexValuesToString": true
@@ -955,6 +919,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100
 					},
 					"sink": {
@@ -1220,7 +1193,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAVacanciesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -1258,7 +1232,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAapplicationReviewToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -1292,6 +1267,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
 						"filter": "{\"_id\":\"CandidateSkills\"}"
 					},
@@ -1342,6 +1326,14 @@
 									"name": "Skills",
 									"type": "String"
 								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
+								}
 							}
 						],
 						"collectionReference": "",
@@ -1390,6 +1382,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
 						"filter": "{\"_id\":\"ApprenticeshipProgrammes\"}\n"
 					},
@@ -1490,6 +1491,14 @@
 									"name": "LastUpdatedDateTimeStamp",
 									"type": "String"
 								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
+								}
 							}
 						],
 						"collectionReference": "$['data']",
@@ -1538,6 +1547,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
 						"filter": "{\"_id\":\"QualificationTypes\"}"
 					},
@@ -1583,6 +1601,14 @@
 								"sink": {
 									"name": "QualificationTypes",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
 								}
 							}
 						],
@@ -1632,6 +1658,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
 						"filter": "{\"_id\":\"Profanities\"}"
 					},
@@ -1677,6 +1712,14 @@
 								"sink": {
 									"name": "Profanities",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
 								}
 							}
 						],
@@ -1726,6 +1769,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
 						"filter": "{\"_id\":\"BannedPhrases\"}"
 					},
@@ -1771,6 +1823,14 @@
 								"sink": {
 									"name": "BannedPhrases",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
 								}
 							}
 						],
@@ -1961,6 +2021,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
 						"batchSize": 100,
 						"filter": "{\"_id\":\"BankHolidays\"}"
 					},
@@ -2024,6 +2093,14 @@
 								"sink": {
 									"name": "NortherIrelandEvents",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId"
 								}
 							}
 						],
@@ -2218,7 +2295,8 @@
 							"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAReferenceDataToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"dataset": {
 						"referenceName": "DestDataMart",
@@ -2228,6 +2306,280 @@
 							"SchemaName": "Vacancies"
 						}
 					}
+				}
+			},
+			{
+				"name": "ImportRAAVacancyReviews",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAReferenceDataBankHolidays",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbMongoDbApiSource",
+						"additionalColumns": [
+							{
+								"name": "RunId",
+								"value": {
+									"value": "@variables('RunId')",
+									"type": "Expression"
+								}
+							}
+						],
+						"batchSize": 100,
+						"filter": "\n"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.RAA_VacancyReviews\n\n INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t,'ImportRAAVacancyReviewsToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": {
+						"value": "@pipeline().parameters.DIU",
+						"type": "Expression"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['fieldIdentifier']"
+								},
+								"sink": {
+									"name": "ManualQaFieldIndicator",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['isChangeRequested']"
+								},
+								"sink": {
+									"name": "ManualQaFieldChangeRequested",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$binary']"
+								},
+								"sink": {
+									"name": "BinaryId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_id']['$type']"
+								},
+								"sink": {
+									"name": "TypeCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['vacancyReference']"
+								},
+								"sink": {
+									"name": "VacancyReference",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['createdDate']['$date']"
+								},
+								"sink": {
+									"name": "CreatedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['employerAccountId']"
+								},
+								"sink": {
+									"name": "EmployerAccountId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['submittedByUser']['userId']"
+								},
+								"sink": {
+									"name": "UserId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['vacancySnapshot']['submittedDate']['$date']"
+								},
+								"sink": {
+									"name": "SubmittedTimeStamp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manualOutcome']"
+								},
+								"sink": {
+									"name": "ManualOutcome",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manualQaComment']"
+								},
+								"sink": {
+									"name": "ManualQaComment",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
+								}
+							}
+						],
+						"collectionReference": "$['manualQaFieldIndicators']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcRAACosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "vacancyReviews"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "RAA_VacancyReviews",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			},
+			{
+				"name": "LogSuccessfulExecutionOfVacancyReviews",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAVacancyReviews",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DELETE FROM Stg.RAA_VacancyReviews Where ManualQaFieldChangeRequested='false'\n\nDECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportRAAVacancyReviewsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Vacancies"
+						}
+					}
+				}
+			},
+			{
+				"name": "LogRAAVacancyReviewsErrorMessage",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportRAAVacancyReviews",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+					"storedProcedureParameters": {
+						"ErrorMessage": {
+							"value": {
+								"value": "@{activity('ImportRAAVacancyReviews').Error.message}",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"TaskType": {
+							"value": "ImportRAAVacancyReviewsToDM",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
@@ -2242,13 +2594,13 @@
 			},
 			"RunId": {
 				"type": "string",
-				"defaultValue": "\"1\""
+				"defaultValue": "150"
 			}
 		},
 		"variables": {
 			"RunId": {
 				"type": "String",
-				"defaultValue": "\"1\""
+				"defaultValue": "150"
 			}
 		},
 		"annotations": []
