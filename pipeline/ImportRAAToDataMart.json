@@ -2237,6 +2237,24 @@
 						"mappings": [
 							{
 								"source": {
+									"path": "['fieldIdentifier']"
+								},
+								"sink": {
+									"name": "ManualQaFieldIndicator",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['isChangeRequested']"
+								},
+								"sink": {
+									"name": "ManualQaFieldChangeRequested",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
 									"path": "$['_id']['$binary']"
 								},
 								"sink": {
@@ -2309,29 +2327,20 @@
 							},
 							{
 								"source": {
-									"path": "['fieldIdentifier']"
-								},
-								"sink": {
-									"name": "ManualQaFieldIndicator",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['isChangeRequested']"
-								},
-								"sink": {
-									"name": "ManualQaFieldChangeRequested",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['manualQaComment']"
 								},
 								"sink": {
 									"name": "ManualQaComment",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['RunId']"
+								},
+								"sink": {
+									"name": "RunId",
+									"type": "Int64"
 								}
 							}
 						],
