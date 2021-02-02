@@ -4542,6 +4542,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "\n"
 							},
@@ -6680,6 +6689,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100
 							},
 							"sink": {
@@ -7169,6 +7187,14 @@
 											"name": "EmployerAccountId",
 											"type": "String"
 										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
+										}
 									}
 								],
 								"collectionReference": "",
@@ -7264,6 +7290,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100
 							},
 							"sink": {
@@ -7603,6 +7638,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "{\"_id\":\"CandidateSkills\"}"
 							},
@@ -7653,6 +7697,14 @@
 											"name": "Skills",
 											"type": "String"
 										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
+										}
 									}
 								],
 								"collectionReference": "",
@@ -7701,6 +7753,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "{\"_id\":\"ApprenticeshipProgrammes\"}\n"
 							},
@@ -7801,6 +7862,14 @@
 											"name": "LastUpdatedDateTimeStamp",
 											"type": "String"
 										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
+										}
 									}
 								],
 								"collectionReference": "$['data']",
@@ -7849,6 +7918,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "{\"_id\":\"QualificationTypes\"}"
 							},
@@ -7894,6 +7972,14 @@
 										"sink": {
 											"name": "QualificationTypes",
 											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
 										}
 									}
 								],
@@ -7943,6 +8029,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "{\"_id\":\"Profanities\"}"
 							},
@@ -7988,6 +8083,14 @@
 										"sink": {
 											"name": "Profanities",
 											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
 										}
 									}
 								],
@@ -8037,6 +8140,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "{\"_id\":\"BannedPhrases\"}"
 							},
@@ -8082,6 +8194,14 @@
 										"sink": {
 											"name": "BannedPhrases",
 											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
 										}
 									}
 								],
@@ -8272,6 +8392,15 @@
 						"typeProperties": {
 							"source": {
 								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
 								"batchSize": 100,
 								"filter": "{\"_id\":\"BankHolidays\"}"
 							},
@@ -8335,6 +8464,14 @@
 										"sink": {
 											"name": "NortherIrelandEvents",
 											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId"
 										}
 									}
 								],
@@ -8599,6 +8736,24 @@
 								"mappings": [
 									{
 										"source": {
+											"path": "[['fieldIdentifier']"
+										},
+										"sink": {
+											"name": "ManualQaFieldIndicator",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isChangeRequested']"
+										},
+										"sink": {
+											"name": "ManualQaFieldChangeRequested",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
 											"path": "$['_id']['$binary']"
 										},
 										"sink": {
@@ -8671,29 +8826,20 @@
 									},
 									{
 										"source": {
-											"path": "[['fieldIdentifier']"
-										},
-										"sink": {
-											"name": "ManualQaFieldIndicator",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isChangeRequested']"
-										},
-										"sink": {
-											"name": "ManualQaFieldChangeRequested",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
 											"path": "$['manualQaComment']"
 										},
 										"sink": {
 											"name": "ManualQaComment",
 											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
 										}
 									}
 								],

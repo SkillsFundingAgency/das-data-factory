@@ -5795,7 +5795,7 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ExecuteImportFAACandidateToDataMart",
+								"activity": "ExecuteImportFAAToDataMart",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -5858,6 +5858,32 @@
 						"dependsOn": [
 							{
 								"activity": "ExecuteImportAvmsCandidateToDataMart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ImportFAACandidateToDataMart",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"RunId": {
+									"value": "@activity('GetRunId').output.firstRow.RunId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ExecuteImportFAAToDataMart",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExecuteImportFAACandidateToDataMart",
 								"dependencyConditions": [
 									"Succeeded"
 								]
