@@ -2277,7 +2277,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n/* Apply Transformations */\nSET @collist= \nREPLACE(\nREPLACE(\nREPLACE(\nREPLACE(\n@COLLIST\n,'[DATEOFBIRTH]',\n'(DATEDIFF(YEAR,[DateOfBirth],GETDATE())-(CASE WHEN DATEADD(YY,DATEDIFF(YEAR,[DateOfBirth],GETDATE()),[DateOfBirth]) > GETDATE() THEN 1 ELSE 0 END)) as [Age]'\n)\n,'[Postcode]'\n,'(LEFT([postcode], CASE WHEN CHARINDEX('' '', [postcode]) = 0 THEN LEN([postcode]) ELSE CHARINDEX('' '', [postcode])-1 END)) as [PostCode]'\n)\n,'[EthnicOrigin]'\n,'(@{pipeline().parameters.RunId}+EthnicOrigin) as EID'\n)\n,'[CandidateEthnicOriginId]'\n,'(@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID'\n)\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery",
+												"value": "Declare @cols varchar(max)\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}'\n\t) AS SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\t\t\t\t\t  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n/* Apply Transformations */\nSET @collist= \nREPLACE(\nREPLACE(\nREPLACE(\n@COLLIST\n,'[DATEOFBIRTH]',\n'(DATEDIFF(YEAR,[DateOfBirth],GETDATE())-(CASE WHEN DATEADD(YY,DATEDIFF(YEAR,[DateOfBirth],GETDATE()),[DateOfBirth]) > GETDATE() THEN 1 ELSE 0 END)) as [Age]'\n)\n,'[EthnicOrigin]'\n,'(@{pipeline().parameters.RunId}+EthnicOrigin) as EID'\n)\n,'[CandidateEthnicOriginId]'\n,'(@{pipeline().parameters.RunId}+CandidateEthnicOriginId) as EID'\n)\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -12697,6 +12697,69 @@
 										"sink": {
 											"name": "RunId"
 										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['postcode']"
+										},
+										"sink": {
+											"name": "EmployerPostCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine1']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine1",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine2']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine3']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine3",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['addressLine4']"
+										},
+										"sink": {
+											"name": "EmployerAddressLine4",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['latitude']"
+										},
+										"sink": {
+											"name": "EmployerLatitude",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['employerLocation']['longitude']"
+										},
+										"sink": {
+											"name": "EmployerLongitude",
+											"type": "String"
+										}
 									}
 								],
 								"collectionReference": "",
@@ -17065,11 +17128,13 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "ImportFAACandidateToDataMart",
+								"referenceName": "ImportFAAToDataMart",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
 							"parameters": {
+								"MaxConcurrentConnections": "4",
+								"DIU": "4",
 								"RunId": {
 									"value": "@activity('GetRunId').output.firstRow.RunId",
 									"type": "Expression"
@@ -17092,7 +17157,8 @@
 				"[concat(variables('factoryId'), '/pipelines/ImportRAAToDataMart')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportAvmsToDataMart')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportAvmsCandidateToDataMart')]",
-				"[concat(variables('factoryId'), '/pipelines/ImportFAACandidateToDataMart')]"
+				"[concat(variables('factoryId'), '/pipelines/ImportFAACandidateToDataMart')]",
+				"[concat(variables('factoryId'), '/pipelines/ImportFAAToDataMart')]"
 			]
 		},
 		{

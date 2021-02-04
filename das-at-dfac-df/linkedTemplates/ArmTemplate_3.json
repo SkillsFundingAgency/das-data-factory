@@ -5892,11 +5892,13 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "ImportFAACandidateToDataMart",
+								"referenceName": "ImportFAAToDataMart",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
 							"parameters": {
+								"MaxConcurrentConnections": "4",
+								"DIU": "4",
 								"RunId": {
 									"value": "@activity('GetRunId').output.firstRow.RunId",
 									"type": "Expression"
