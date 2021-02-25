@@ -1932,7 +1932,7 @@
 					{
 						"activity": "ImportFAACandidates",
 						"dependencyConditions": [
-							"Failed"
+							"Succeeded"
 						]
 					}
 				],
@@ -1971,7 +1971,7 @@
 					{
 						"activity": "ImportFAACandidates",
 						"dependencyConditions": [
-							"Succeeded"
+							"Failed"
 						]
 					}
 				],
