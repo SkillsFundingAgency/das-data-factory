@@ -1896,7 +1896,8 @@
 									"path": "$['RunId']"
 								},
 								"sink": {
-									"name": "RunId"
+									"name": "RunID",
+									"type": "Int64"
 								}
 							}
 						],
