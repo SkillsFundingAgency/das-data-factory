@@ -1,0 +1,3171 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "das-at-dfac-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ImportAvmsToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetRAAv1TableList",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "LogStartOfImport",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='AVMSPlus' and IsEnabled=1 and IsQueryBasedImport=0",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachSourceTable",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetRAAv1TableList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetRAAv1TableList').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "GetSourceColumnList",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "SrcAvmsPlus",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Vacancy",
+												"SchemaName": "dbo"
+											}
+										}
+									}
+								},
+								{
+									"name": "GetImportSelectQuery",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "SetVariableAK2",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AK1')}'),'K2','0x'+'@{variables('AK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+SUBSTRING(ConfigList,len(ConfigList)/2,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                   from STRING_SPLIT(@cols, ',') Cols \n\t     \t      where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\n \n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "CopyAvmsTablesToStagingArea",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'avms_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[avms_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": {
+											"value": "@pipeline().parameters.DIU",
+											"type": "Expression"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcAvmsPlus",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Vacancy",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Avms_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
+								},
+								{
+									"name": "GetSourceColumnListToVariable",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "GetSourceColumnList",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourceColumnList",
+										"value": {
+											"value": "@{activity('GetSourceColumnList').output.firstRow.Columns}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DetectAndLogSourceDbChanges",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "GetSourceColumnListToVariable",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[DetectAndLogSourceDbChanges]",
+										"storedProcedureParameters": {
+											"Cols": {
+												"value": {
+													"value": "@{variables('SourceColumnList')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SourceDatabaseName": {
+												"value": "AvmsPlus",
+												"type": "String"
+											},
+											"SourceSchemaName": {
+												"value": {
+													"value": "@{item().SCHEMA_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SourceTableName": {
+												"value": {
+													"value": "@{item().TABLE_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "LogError",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "CopyAvmsTablesToStagingArea",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+										"storedProcedureParameters": {
+											"ErrorMessage": {
+												"value": {
+													"value": "@{activity('CopyAvmsTablesToStagingArea').Error.message}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"RunId": {
+												"value": {
+													"value": "@{pipeline().parameters.RunId}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"TaskType": {
+												"value": "ImportAvmsToDM",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "GenerateAK1",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "DetectAndLogSourceDbChanges",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @k1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1\n",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "GenerateAK2",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "GenerateAK1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K2 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K2=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 nvarchar(max) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2\n",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "SetVariableAK1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "GenerateAK2",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AK1",
+										"value": {
+											"value": "@{activity('GenerateAK1').output.firstRow.K1}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SetVariableAK2",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "SetVariableAK1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AK2",
+										"value": {
+											"value": "@{activity('GenerateAK2').output.firstRow.K2}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "PresentationLayerFullRefresh",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "CopyAvmsTablesToStagingArea",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.01:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[PresentationLayerFullRefresh]",
+										"storedProcedureParameters": {
+											"ColumnList": {
+												"value": null,
+												"type": "String"
+											},
+											"ConfigSchema": {
+												"value": {
+													"value": "@{item().SCHEMA_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ConfigTable": {
+												"value": {
+													"value": "@{item().TABLE_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"K1": {
+												"value": {
+													"value": "@{variables('AK1')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"K2": {
+												"value": {
+													"value": "@{variables('AK2')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"KeyBased": {
+												"value": "1",
+												"type": "Int32"
+											},
+											"PLTableName": {
+												"value": null,
+												"type": "String"
+											},
+											"RunId": {
+												"value": {
+													"value": "@{pipeline().parameters.RunId}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"SourceDatabaseName": {
+												"value": "AvmsPlus",
+												"type": "String"
+											},
+											"StgTableName": {
+												"value": {
+													"value": "Stg.Avms_@{item().TABLE_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "LogStartOfImport",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAvmsToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogSuccessfulExecution",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ForEachSourceTable",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAvmsToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "GetRAAv1QueryList",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "LogStartOfQueryBasedImport",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT  SourceTableName as Table_Name, SourceSchemaName as Schema_Name,SourceQuery as SourceQuery, StagingTableName as StagingTableName FROM [Mtd].[SourceConfigForImport] Where SourceDatabaseName='AVMSPlus' and IsEnabled=1 and IsQueryBasedImport=1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachQuery",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetRAAv1QueryList",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetRAAv1QueryList').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "GetImportQuery",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "SetVariableAQK2",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "DECLARE @SQLCode nvarchar(max)\nDECLARE @MtdSourceQuery nvarchar(max)\n\nSELECT @MtdSourceQuery= REPLACE( REPLACE('@{item().SourceQuery}','[',''),']','')\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND StagingTableName='@{item().StagingTableName}'\n        ) SourceConfigInDM\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AQK1')}'),'K2','0x'+'@{variables('AQK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+SUBSTRING(ConfigList,len(ConfigList)/2,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='AvmsPlus'\n    AND StagingTableName='@{item().StagingTableName}'\n      ) SourceConfigInDM\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n \n\nSET @SourceQuery='select ' + @collist + ' from ( '+@MtdSourceQuery+' ) a'; \n\nSELECT @SourceQuery SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "CopyAvmsQueryBasedTablesToStagingArea",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@{activity('GetImportQuery').output.firstRow.SourceQuery}",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'@{item().StagingTableName}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[@{item().StagingTableName}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": {
+											"value": "@pipeline().parameters.DIU",
+											"type": "Expression"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcAvmsPlus",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Vacancy",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "@{item().StagingTableName}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
+								},
+								{
+									"name": "LogErrorQB",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "CopyAvmsQueryBasedTablesToStagingArea",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:30:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+										"storedProcedureParameters": {
+											"ErrorMessage": {
+												"value": {
+													"value": "@{activity('CopyAvmsQueryBasedTablesToStagingArea').Error.message}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"RunId": {
+												"value": {
+													"value": "@{pipeline().parameters.RunId}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"TaskType": {
+												"value": "ImportAvmsToDM",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "GenerateAQK1",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K1 nvarchar(max)\n\nSELECT @SQLCode='SELECT @k1=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K1 nvarchar(max) OUTPUT',@K1=@K1 OUTPUT\n\nSELECT @K1 as K1\n",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "GenerateAQK2",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "GenerateAQK1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "DECLARE @SQLCode Nvarchar(255)\ndeclare @K2 nvarchar(max)\n\nSELECT @SQLCode='SELECT @K2=convert(nvarchar(max),'+SQLCode+',2)' From Stg.SQLCode Where [Type]='CRG'\n\nEXEC SP_EXECUTESQL @SQLCode, N'@K2 nvarchar(max) OUTPUT',@K2=@K2 OUTPUT\n\nSELECT @K2 as K2\n",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "Stg"
+											}
+										}
+									}
+								},
+								{
+									"name": "SetVariableAQK1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "GenerateAQK2",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AQK1",
+										"value": {
+											"value": "@{activity('GenerateAQK1').output.firstRow.K1}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SetVariableAQK2",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "SetVariableAQK1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AQK2",
+										"value": {
+											"value": "@{activity('GenerateAQK2').output.firstRow.K2}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "PresentationLayerFullRefreshQB",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "CopyAvmsQueryBasedTablesToStagingArea",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.01:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[PresentationLayerFullRefresh]",
+										"storedProcedureParameters": {
+											"ColumnList": {
+												"value": null,
+												"type": "String"
+											},
+											"ConfigSchema": {
+												"value": {
+													"value": "@{item().SCHEMA_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ConfigTable": {
+												"value": {
+													"value": "@{item().TABLE_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"K1": {
+												"value": {
+													"value": "@{variables('AQK1')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"K2": {
+												"value": {
+													"value": "@{variables('AQK2')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"KeyBased": {
+												"value": "1",
+												"type": "Int32"
+											},
+											"PLTableName": {
+												"value": null,
+												"type": "String"
+											},
+											"RunId": {
+												"value": {
+													"value": "@{pipeline().parameters.RunId}",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"SourceDatabaseName": {
+												"value": "AvmsPlus",
+												"type": "String"
+											},
+											"StgTableName": {
+												"value": {
+													"value": "Stg.@{item().StagingTableName}",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "datamgmt_staging_dbconnectionstring",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "LogStartOfQueryBasedImport",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{pipeline().parameters.RunId}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportAvmsQueryBasedToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfQueryBasedImport",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ForEachQuery",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAvmsQueryBasedToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"RunId": {
+						"type": "string",
+						"defaultValue": "\"1\""
+					},
+					"MaxConcurrentConnections": {
+						"type": "int",
+						"defaultValue": 4
+					},
+					"DIU": {
+						"type": "int",
+						"defaultValue": 4
+					}
+				},
+				"variables": {
+					"SourceColumnList": {
+						"type": "String"
+					},
+					"AK1": {
+						"type": "String"
+					},
+					"AK2": {
+						"type": "String"
+					},
+					"AQK1": {
+						"type": "String"
+					},
+					"AQK2": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ImportFAAToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ImportFAAUsers",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SetRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_Users\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAUsersToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$binary']"
+										},
+										"sink": {
+											"name": "EntityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$type']"
+										},
+										"sink": {
+											"name": "EntityTypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateCreated']['$date']"
+										},
+										"sink": {
+											"name": "DateCreatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateUpdated']['$date']"
+										},
+										"sink": {
+											"name": "DateUpdatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Status']"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Roles']"
+										},
+										"sink": {
+											"name": "Roles",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['ActivationDate']['$date']"
+										},
+										"sink": {
+											"name": "ActivationTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LastLogin']['$date']"
+										},
+										"sink": {
+											"name": "LastLogInTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LastActivity']['$date']"
+										},
+										"sink": {
+											"name": "LastActivityTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "users"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_Users",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "SetRunId",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RunId",
+							"value": {
+								"value": "@pipeline().parameters.RunId",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "LogFAAUserImportErrorDetails",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAUsers",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAAUsers').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAAUsersToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogSuccessfulExecution",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAUsers",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAAUsersToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Users"
+								}
+							}
+						}
+					},
+					{
+						"name": "ImportFAACandidateDob",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAUsers",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_CandidateDob\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAACandidateDobToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LegacyCandidateId']"
+										},
+										"sink": {
+											"name": "LegacyCandidateId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RegistrationDetails']['DateOfBirth']['$date']"
+										},
+										"sink": {
+											"name": "DateOfBirth",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunID",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "candidates"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_CandidateDob",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogFAACandidateDobImportErrorDetails",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidateDob",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAACandidateDob').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAACandidateDobToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportFAACandidatePostCode",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidateDob",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_CandidatePostCode\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAACandidatePostcodeToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LegacyCandidateId']"
+										},
+										"sink": {
+											"name": "LegacyCandidateId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RegistrationDetails']['Address']['Postcode']"
+										},
+										"sink": {
+											"name": "PostCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunID",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "candidates"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_CandidatePostcode",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogFAACandidatePostCodeImportErrorDetails",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidatePostCode",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAACandidatePostCode').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAACandidatePostCodeToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfFAACandidateDob",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidateDob",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAACandidateDobToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfCandidatePostcode",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidatePostCode",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAACandidatePostcodeToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "ImportFAAContactMessages",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidatePostCode",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100,
+								"filter": ""
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_ContactMessages\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportFAAContactMessagesToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$binary']"
+										},
+										"sink": {
+											"name": "EntityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$type']"
+										},
+										"sink": {
+											"name": "EntityTypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateCreated']['$date']"
+										},
+										"sink": {
+											"name": "DateCreatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateUpdated']['$date']"
+										},
+										"sink": {
+											"name": "DateUpdatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['UserId']"
+										},
+										"sink": {
+											"name": "UserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Enquiry']"
+										},
+										"sink": {
+											"name": "Enquiry",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "contactmessages"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_ContactMessages",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "ImportFAASavedSearches",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAContactMessages",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100,
+								"filter": "\n"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_SavedSearches\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t  \n           ,'ImportFAASavedSearchesToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$binary']"
+										},
+										"sink": {
+											"name": "EntityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$type']"
+										},
+										"sink": {
+											"name": "EntityTypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateCreated']['$date']"
+										},
+										"sink": {
+											"name": "DateCreatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateUpdated']['$date']"
+										},
+										"sink": {
+											"name": "DateUpdatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['CandidateId']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Location']"
+										},
+										"sink": {
+											"name": "Location",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['WithinDistance']"
+										},
+										"sink": {
+											"name": "WithinDistance",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['ApprenticeshipLevel']"
+										},
+										"sink": {
+											"name": "ApprenticeshipLevel",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Keywords']"
+										},
+										"sink": {
+											"name": "Keywords",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "savedsearches"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_SavedSearches",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogFAAContactMessageError",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAContactMessages",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAAContactMessages').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAAContactMessagesToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfContactMessages",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAContactMessages",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAAContactMessagesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogSuccessfulExecutionOfSavedSearches",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAASavedSearches",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAASavedSearchesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogFAASavedSearchesError",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAASavedSearches",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAASavedSearches').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAASavedSearchesToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportFAATraineeships",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAASavedSearches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100,
+								"filter": "\n"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_Traineeships\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   \n           ,'ImportFAATraineeshipsToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$binary']"
+										},
+										"sink": {
+											"name": "EntityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$type']"
+										},
+										"sink": {
+											"name": "EntityTypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateCreated']['$date']"
+										},
+										"sink": {
+											"name": "DateCreatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateUpdated']['$date']"
+										},
+										"sink": {
+											"name": "DateUpdatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateApplied']['$date']"
+										},
+										"sink": {
+											"name": "DateAppliedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['CandidateId']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LegacyApplicationId']"
+										},
+										"sink": {
+											"name": "LegacyApplicationId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['_id']"
+										},
+										"sink": {
+											"name": "VacancyId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['VacancyReference']"
+										},
+										"sink": {
+											"name": "VacancyReference",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['ApplyViaEmployerWebsite']"
+										},
+										"sink": {
+											"name": "ApplyViaEmployerWebsite",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "traineeships"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_Traineeships",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogSuccessfulExecutionOfTraineeships",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAATraineeships",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAATraineeshipsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogFAATraineeshipsError",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAATraineeships",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAATraineeships').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAATraineeshipsToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportFAAApprenticeships",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAATraineeships",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100,
+								"filter": "\n"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_Apprenticeships\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   \n           ,'ImportFAAApprenticeshipsToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "BinaryId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['_id']['$type']"
+										},
+										"sink": {
+											"name": "TypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$binary']"
+										},
+										"sink": {
+											"name": "EntityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['EntityId']['$type']"
+										},
+										"sink": {
+											"name": "EntityTypeCode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateCreated']['$date']"
+										},
+										"sink": {
+											"name": "DateCreatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateUpdated']['$date']"
+										},
+										"sink": {
+											"name": "DateUpdatedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['DateApplied']['$date']"
+										},
+										"sink": {
+											"name": "DateAppliedTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['CandidateId']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LegacyApplicationId']"
+										},
+										"sink": {
+											"name": "LegacyApplicationId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['_id']"
+										},
+										"sink": {
+											"name": "VacancyId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['VacancyReference']"
+										},
+										"sink": {
+											"name": "VacancyReference",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['ApplyViaEmployerWebsite']"
+										},
+										"sink": {
+											"name": "ApplyViaEmployerWebsite",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Vacancy']['IsRecruitVacancy']"
+										},
+										"sink": {
+											"name": "IsRecruitVacancy",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['SuccessfulDateTime']"
+										},
+										"sink": {
+											"name": "SuccessfulTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['UnsuccessfulDateTime']"
+										},
+										"sink": {
+											"name": "UnsuccessfulTimeStamp",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['WithdrawnOrDeclinedReason']"
+										},
+										"sink": {
+											"name": "WithdrawnOrDeclinedReason",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['UnsuccessfulReason']"
+										},
+										"sink": {
+											"name": "UnsuccessfulReason",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "apprenticeships"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_Apprenticeships",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogSuccessfulExecutionOfApprenticeships",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAApprenticeships",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAAApprenticeshipsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogFAAApprenticeshipsError",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAApprenticeships",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAAApprenticeships').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAAApprenticeshipsToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ImportFAACandidates",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ImportFAAApprenticeships",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbMongoDbApiSource",
+								"additionalColumns": [
+									{
+										"name": "RunId",
+										"value": {
+											"value": "@variables('RunId')",
+											"type": "Expression"
+										}
+									}
+								],
+								"batchSize": 100,
+								"filter": "\n"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "DELETE FROM Stg.FAA_Candidates\n\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\t   \n           ,'ImportFAACandidatesToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": {
+								"value": "@pipeline().parameters.DIU",
+								"type": "Expression"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['_id']['$binary']"
+										},
+										"sink": {
+											"name": "CandidateId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['LegacyCandidateId']"
+										},
+										"sink": {
+											"name": "LegacyCandidateId",
+											"type": "Int64"
+										}
+									},
+									{
+										"source": {
+											"path": "$['RunId']"
+										},
+										"sink": {
+											"name": "RunID",
+											"type": "Int64"
+										}
+									}
+								],
+								"collectionReference": "",
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcFAACosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "candidates"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "FAA_Candidates",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogSuccessfulExecutionOfCandidates",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidates",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportFAACandidatesToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Stg",
+									"SchemaName": "Vacancies"
+								}
+							}
+						}
+					},
+					{
+						"name": "LogFAACandidatesError",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportFAACandidates",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportFAACandidates').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportFAACandidatesToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"MaxConcurrentConnections": {
+						"type": "int",
+						"defaultValue": 4
+					},
+					"DIU": {
+						"type": "int",
+						"defaultValue": 4
+					},
+					"RunId": {
+						"type": "string",
+						"defaultValue": "150"
+					}
+				},
+				"variables": {
+					"RunId": {
+						"type": "String",
+						"defaultValue": "\"1\""
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
