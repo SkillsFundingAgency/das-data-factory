@@ -150,11 +150,11 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "SrcAvmsPlus",
+									"referenceName": "SrcApply",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "Vacancy",
-										"SchemaName": "dbo"
+										"SchemaName": "dbo",
+										"TableName": "Apply"
 									}
 								}
 							],
