@@ -246,9 +246,9 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportCRSToDM",
+						"activity": "ExecuteImportApplyToDM",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -348,6 +348,34 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "ImportFAT2CRSToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportApplyToDM",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportCRSToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportApplyToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
