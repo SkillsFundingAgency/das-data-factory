@@ -7,6 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "das-at-dfac-df"
 		},
+		"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
+			"type": "object",
+			"defaultValue": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tpr-strconnection"
+			}
+		},
 		"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "users-dbconnectionstring"
@@ -16,6 +27,24 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/tpr_strconnection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "AzureBlobStorage",
+				"annotations": [],
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "Storage"
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/users_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -221,6 +250,39 @@
 					"TableName": {
 						"type": "string",
 						"defaultValue": "Employer"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SchemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SrcApply')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "apply_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SchemaName": {
+						"type": "string"
+					},
+					"TableName": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -829,242 +891,8 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcUsers')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "users_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Users"
-					},
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "dbo"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/users_dbconnectionstring')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AppsCampaignGenerateKey')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Apprenticeship Campaign Key",
-				"activities": [
-					{
-						"name": "GenerateRunID",
-						"description": "Generate Run ID\n",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[GenerateRunId]"
-						},
-						"linkedServiceName": {
-							"referenceName": "datamgmt_staging_dbconnectionstring",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "CampaignGenerateKey",
-						"description": "Generate Key",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "GetRunId",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[SaltKeyLogging]",
-							"storedProcedureParameters": {
-								"RunId": {
-									"value": {
-										"value": "@{activity('GetRunId').output.firstRow.RunId}",
-										"type": "Expression"
-									},
-									"type": "Int64"
-								},
-								"SourceType": {
-									"value": "CampaignDashboard",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "datamgmt_staging_dbconnectionstring",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "GetRunId",
-						"description": "Get Run ID",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "GenerateRunID",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference",
-								"parameters": {
-									"TableName": "Users",
-									"SchemaName": "Stg"
-								}
-							}
-						}
-					},
-					{
-						"name": "CompleteLogging",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "EmployerReferenceGenerateKey",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{activity('GetRunId').output.firstRow.RunId})\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{activity('GetRunId').output.firstRow.RunId}\n\nSELECT 'na'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference",
-								"parameters": {
-									"TableName": "Users",
-									"SchemaName": "Stg"
-								}
-							}
-						}
-					},
-					{
-						"name": "EmployerReferenceGenerateKey",
-						"description": "Employer Reference Generate Key",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "CampaignGenerateKey",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[SaltKeyLogging]",
-							"storedProcedureParameters": {
-								"RunId": {
-									"value": {
-										"value": "@{activity('GetRunId').output.firstRow.RunId}",
-										"type": "Expression"
-									},
-									"type": "Int64"
-								},
-								"SourceType": {
-									"value": "EmployerReference",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "datamgmt_staging_dbconnectionstring",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"RunId": {
-						"type": "string",
-						"defaultValue": "\"1\""
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
+				"[concat(variables('factoryId'), '/linkedServices/tpr_strconnection')]"
 			]
 		}
 	]

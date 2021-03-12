@@ -11,6 +11,10 @@
 			"type": "string",
 			"defaultValue": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"apply_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "apply-dbconnectionstring"
+		},
 		"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "appred-dbconnectionstring"
@@ -159,6 +163,9 @@
 					"AzureKeyVault1_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
 					},
+					"apply_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('apply_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('appred_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
@@ -215,9 +222,6 @@
 					},
 					"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
-					},
-					"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
-						"value": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]"
 					}
 				}
 			},
@@ -236,6 +240,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]"
 					},
 					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"

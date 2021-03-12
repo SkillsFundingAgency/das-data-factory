@@ -8,6 +8,9 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://das-at-dfac-kv.vault.azure.net/"
 		},
+		"apply_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "apply-dbconnectionstring"
+		},
 		"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "appred-dbconnectionstring"
 		},
