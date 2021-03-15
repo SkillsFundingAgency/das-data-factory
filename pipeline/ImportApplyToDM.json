@@ -84,7 +84,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @SQLCode nvarchar(max)\nDECLARE @MtdSourceQuery nvarchar(max)\n\nSELECT @MtdSourceQuery= REPLACE( REPLACE('@{item().SourceQuery}','[',''),']','')\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Apply'\n    AND StagingTableName='@{item().StagingTableName}'\n        ) SourceConfigInDM\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AQK1')}'),'K2','0x'+'@{variables('AQK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+SUBSTRING(ConfigList,len(ConfigList)/2,2) as ConfigList\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Apply'\n    AND StagingTableName='@{item().StagingTableName}'\n      ) SourceConfigInDM\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n \n\nSET @SourceQuery='select ' + @collist + ' from ( '+@MtdSourceQuery+' ) a'; \n\nSELECT @SourceQuery SourceQuery",
+										"value": "DECLARE @SQLCode nvarchar(max)\nDECLARE @MtdSourceQuery nvarchar(max)\n\nSELECT @MtdSourceQuery='@{item().SourceQuery}'\n-- REPLACE( REPLACE('@{item().SourceQuery}','[',''),']','')\n\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\n\n\nDeclare @SourceQuery Varchar(max)\n\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Apply'\n    AND StagingTableName='@{item().StagingTableName}'\n        ) SourceConfigInDM\n  UNION\nSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AQK1')}'),'K2','0x'+'@{variables('AQK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+CASE WHEN len(Replace(Replace(ConfigList,'[',''),']',''))>4 then SUBSTRING(ConfigList,len(ConfigList)/2,4) else SUBSTRING(ConfigList,len(ConfigList)/2,2) end\n   from (SELECT value as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToMask,',')\n  WHERE SourceDatabaseName='Apply'\n    AND StagingTableName='@{item().StagingTableName}'\n      ) SourceConfigInDM\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n \n\nSET @SourceQuery='select ' + @collist + ' from ( '+@MtdSourceQuery+' ) a'; \n\nSELECT @SourceQuery SourceQuery",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -123,7 +123,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "SELECT Id,ApplicationId,OrganisationId,UKPRN,JSON_VALUE(ApplyData,'$.ApplyDetails.ReferenceNumber') ReferenceNumber,JSON_VALUE(ApplyData,'$.ApplyDetails.OrganisationName') OrganisationName,JSON_VALUE(ApplyData,'$.ApplyDetails.TradingName') TradingName,JSON_VALUE(ApplyData,'$.ApplyDetails.ProviderRoute') ProviderRoute  ,JSON_VALUE(ApplyData,'$.ApplyDetails.ApplicationSubmittedBy') ApplicationSubmittedBy,JSON_VALUE(ApplyData,'$.ApplyDetails.ApplicationSubmittedOn') ApplicattionSubmittedOn,JSON_VALUE(ApplyData,'$.ApplyDetails.ProviderRouteName') ProviderRouteName  ,ApplicationStatus,JSON_VALUE(ApplyData,'$.GatewayReviewDetails.OutcomeDateTime') OutcomeDateTime,GatewayReviewStatus,AssessorReviewStatus,ModerationStatus,JSON_VALUE(ApplyData,'$.ModeratorReviewDetails.ClarificationRequestedOn') ModeratorClarificationRequestedOn,Assessor1Name,Assessor2Name,FinancialReviewStatus,JSON_VALUE(ApplyData,'$.FinancialReviewDetails.ClarificationRequestedBy') FinancialClarificationRequestedBy,JSON_VALUE(ApplyData,'$.FinancialReviewDetails.ClarificationRequestedOn') FinancialClarificationRequestedOn,JSON_VALUE(ApplyData,'$.FinancialReviewDetails.GradedBy') AssessorName ,CreatedAt,CreatedBy,UpdatedAt,UpdatedBy,DeletedAt,DeletedBy from dbo.Apply \n    ",
+										"value": "@{activity('GetImportQuery').output.firstRow.SourceQuery}",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -380,7 +380,10 @@
 										"type": "Int32"
 									},
 									"PLTableName": {
-										"value": null,
+										"value": {
+											"value": "AsData_PL.@{item().StagingTableName}",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"RunId": {
