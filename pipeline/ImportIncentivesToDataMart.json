@@ -250,7 +250,7 @@
 										"type": "Int32"
 									},
 									"TaskType": {
-										"value": "ImportAvmsToDM",
+										"value": "ImportIncentivesToDM",
 										"type": "String"
 									}
 								}
