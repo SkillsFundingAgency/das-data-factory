@@ -63,65 +63,62 @@
 							{
 								"source": {
 									"path": "$['id']"
+								},
+								"sink": {
+									"name": "id"
 								}
 							},
 							{
 								"source": {
 									"path": "$['ukprn']"
+								},
+								"sink": {
+									"name": "Ukprn",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "$['accountId']"
+								},
+								"sink": {
+									"name": "AccountId"
 								}
 							},
 							{
 								"source": {
 									"path": "$['dateTimeCompleted']"
+								},
+								"sink": {
+									"name": "DatetimeCompleted"
 								}
 							},
 							{
 								"source": {
-									"path": "['name']"
+									"path": "$['providerAttributes'][0]['name']"
+								},
+								"sink": {
+									"name": "ProviderName"
 								}
 							},
 							{
 								"source": {
-									"path": "['value']"
+									"path": "$['providerAttributes'][0]['value']"
+								},
+								"sink": {
+									"name": "providerValue"
 								}
 							},
 							{
 								"source": {
 									"path": "$['providerRating']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_rid']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_self']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_etag']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_attachments']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['_ts']"
+								},
+								"sink": {
+									"name": "ProviderRating"
 								}
 							}
 						],
-						"collectionReference": "$['providerAttributes']"
+						"collectionReference": ""
 					}
 				},
 				"inputs": [
