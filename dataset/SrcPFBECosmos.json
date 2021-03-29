@@ -6,6 +6,12 @@
 			"referenceName": "pfbe_cdbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"CollectionName": {
+				"type": "string",
+				"defaultValue": "employer-feedback"
+			}
+		},
 		"annotations": [],
 		"type": "CosmosDbSqlApiCollection",
 		"schema": {
@@ -40,7 +46,10 @@
 			}
 		},
 		"typeProperties": {
-			"collectionName": "employer-feedback"
+			"collectionName": {
+				"value": "@dataset().CollectionName",
+				"type": "Expression"
+			}
 		}
 	}
 }
