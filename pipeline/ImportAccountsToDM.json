@@ -545,6 +545,15 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
 								"sink": {
 									"type": "AzureSqlSink",
 									"preCopyScript": {
@@ -560,6 +569,16 @@
 								},
 								"enableStaging": false
 							},
+							"inputs": [
+								{
+									"referenceName": "SrcAccounts",
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": "Employer_Account",
+										"TableName": "EmployerAgreement"
+									}
+								}
+							],
 							"outputs": [
 								{
 									"referenceName": "DestDataMart",
