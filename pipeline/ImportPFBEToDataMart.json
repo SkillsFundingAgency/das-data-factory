@@ -2,6 +2,41 @@
 	"name": "ImportPFBEToDataMart",
 	"properties": {
 		"description": "Import Provide Feedback Employer Cosmos DB",
+		"activities": [
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@pipeline().parameters.RunId",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"MaxConcurrentConnections": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"DIU": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"RunId": {
+				"type": "string",
+				"defaultValue": "150"
+			}
+		},
+		"variables": {
+			"RunId": {
+				"type": "String",
+				"defaultValue": "\"1\""
+			}
+		},
 		"annotations": []
 	}
 }
