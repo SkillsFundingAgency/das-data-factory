@@ -5,6 +5,15 @@
 			"referenceName": "eas_acc_dbconnectionstring",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "Employer_Account"
+			},
+			"TableName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": []
