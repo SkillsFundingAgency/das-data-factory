@@ -1,0 +1,12 @@
+{
+	"name": "SrcAccounts",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "eas_acc_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
