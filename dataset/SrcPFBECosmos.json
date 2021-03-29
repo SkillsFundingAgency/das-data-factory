@@ -1,0 +1,46 @@
+{
+	"name": "SrcPFBECosmos",
+	"properties": {
+		"description": "Provide Feedback Employer",
+		"linkedServiceName": {
+			"referenceName": "pfbe_cdbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {
+			"type": "object",
+			"properties": {
+				"ukprn": {
+					"type": "integer"
+				},
+				"accountId": {
+					"type": "integer"
+				},
+				"dateTimeCompleted": {
+					"type": "string"
+				},
+				"providerAttributes": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"value": {
+								"type": "integer"
+							}
+						}
+					}
+				},
+				"providerRating": {
+					"type": "string"
+				}
+			}
+		},
+		"typeProperties": {
+			"collectionName": "employer-feedback"
+		}
+	}
+}
