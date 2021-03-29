@@ -15,6 +15,134 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "ImportEmployerFeedback",
+				"description": "Import Employer Feedback Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "SetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "CosmosDbSqlApiSource",
+						"preferredRegions": [],
+						"pageSize": 100,
+						"detectDatetime": true
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "DELETE FROM Stg.PFBE_EmployerFeedback\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportPFBEEmployerFeedbackToDM'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"maxConcurrentConnections": {
+							"value": "@pipeline().parameters.MaxConcurrentConnections",
+							"type": "Expression"
+						},
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['id']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['ukprn']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['accountId']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['dateTimeCompleted']"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								}
+							},
+							{
+								"source": {
+									"path": "['value']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['providerRating']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_rid']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_self']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_etag']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_attachments']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['_ts']"
+								}
+							}
+						],
+						"collectionReference": "$['providerAttributes']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcPFBECosmos",
+						"type": "DatasetReference",
+						"parameters": {
+							"CollectionName": "employer-feedback"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "EmployerFeedback",
+							"SchemaName": "Stg"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
