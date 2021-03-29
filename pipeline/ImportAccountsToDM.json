@@ -89,14 +89,6 @@
 									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "SrcAccounts",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Account",
-										"SchemaName": "Employer_Account"
-									}
 								}
 							}
 						},
@@ -553,18 +545,12 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Acc_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Acc_@{item().TABLE_NAME}]",
+									"preCopyScript": {
+										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Acc_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Acc_@{item().TABLE_NAME}]",
+										"type": "Expression"
+									},
 									"maxConcurrentConnections": {
 										"value": "@pipeline().parameters.MaxConcurrentConnections",
 										"type": "Expression"
@@ -572,26 +558,8 @@
 									"tableOption": "autoCreate",
 									"disableMetricsCollection": false
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
+								"enableStaging": false
 							},
-							"inputs": [
-								{
-									"referenceName": "SrcAccounts",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "EmployerAgreement",
-										"SchemaName": "Employer_Account"
-									}
-								}
-							],
 							"outputs": [
 								{
 									"referenceName": "DestDataMart",
