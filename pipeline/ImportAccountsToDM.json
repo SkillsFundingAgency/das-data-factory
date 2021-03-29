@@ -261,57 +261,6 @@
 							}
 						},
 						{
-							"name": "CopyData",
-							"type": "ExecuteDataFlow",
-							"dependsOn": [
-								{
-									"activity": "GetImportSelectQuery",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.01:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": true
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataflow": {
-									"referenceName": "DataFlowAccounts",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"source1": {
-											"TableName": "Users",
-											"SchemaName": "dbo"
-										},
-										"sink1": {
-											"TableName": "Acc_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
-								"integrationRuntime": {
-									"referenceName": "AzureIntegrationRunTime",
-									"type": "IntegrationRuntimeReference"
-								},
-								"traceLevel": "Fine"
-							}
-						},
-						{
 							"name": "PresentationLayerFullRefresh",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
@@ -583,6 +532,79 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "CopyData",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GetImportSelectQuery",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.03:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Acc_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Acc_@{item().TABLE_NAME}]",
+									"maxConcurrentConnections": {
+										"value": "@pipeline().parameters.MaxConcurrentConnections",
+										"type": "Expression"
+									},
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SrcAccounts",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "EmployerAgreement",
+										"SchemaName": "Employer_Account"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": {
+											"value": "Acc_@{item().TABLE_NAME}",
+											"type": "Expression"
+										},
+										"SchemaName": "Stg"
+									}
+								}
+							]
 						}
 					]
 				}
