@@ -600,7 +600,7 @@
 									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "Users",
+										"TableName": "AR_@{item().TABLE_NAME}",
 										"SchemaName": "Stg"
 									}
 								}
