@@ -338,7 +338,7 @@
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "CopyCommitData",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -377,7 +377,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyCommitData",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -623,7 +623,7 @@
 							}
 						},
 						{
-							"name": "CopyCommitData",
+							"name": "CopyData",
 							"type": "Copy",
 							"dependsOn": [
 								{
