@@ -46,7 +46,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "--DELETE FROM Stg.PFBE_EmployerFeedback\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportPFBEEmployerFeedbackToDM'\n\t   ,getdate()\n\t   ,0",
+							"value": "DELETE FROM Stg.PFBE_EmployerFeedback\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportPFBEEmployerFeedbackToDM'\n\t   ,getdate()\n\t   ,0",
 							"type": "Expression"
 						},
 						"maxConcurrentConnections": {
@@ -95,7 +95,7 @@
 							},
 							{
 								"source": {
-									"path": "$['providerAttributes'][0]['name']"
+									"path": "['name']"
 								},
 								"sink": {
 									"name": "ProviderName"
@@ -103,7 +103,7 @@
 							},
 							{
 								"source": {
-									"path": "$['providerAttributes'][0]['value']"
+									"path": "['value']"
 								},
 								"sink": {
 									"name": "providerValue"
@@ -118,7 +118,7 @@
 								}
 							}
 						],
-						"collectionReference": ""
+						"collectionReference": "$['providerAttributes']"
 					}
 				},
 				"inputs": [
