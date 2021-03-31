@@ -179,6 +179,40 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "ImportPFBEEmployerFeedbackStgToLive",
+				"description": "Import Employer Feedback  Staging to LIVE",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LogSuccessfulExecution",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[ImportEmployerFeedbackStgToLive]",
+					"storedProcedureParameters": {
+						"RunId": {
+							"value": "@variables('RunId')",
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
