@@ -252,7 +252,7 @@
 							"type": "Int32"
 						},
 						"TaskType": {
-							"value": "ImportEmployerFeedbackToDM",
+							"value": "ImportProvideEmployerFeedbackToDM",
 							"type": "String"
 						}
 					}
