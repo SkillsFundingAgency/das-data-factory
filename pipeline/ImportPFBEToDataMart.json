@@ -213,6 +213,54 @@
 					"referenceName": "datamgmt_staging_dbconnectionstring",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "LogEmployerFeedbackImportErrorDetails",
+				"description": "Log Employer Feedback Import Error Details ",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ImportEmployerFeedback",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[InsertLogErrorDetails]",
+					"storedProcedureParameters": {
+						"ErrorMessage": {
+							"value": {
+								"value": "@{activity('ImportEmployerFeedback').Error.message}",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunId": {
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"TaskType": {
+							"value": "ImportEmployerFeedbackToDM",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
