@@ -62,6 +62,22 @@
 						"mappings": [
 							{
 								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "FeedbackName"
+								}
+							},
+							{
+								"source": {
+									"path": "['value']"
+								},
+								"sink": {
+									"name": "FeedbackValue"
+								}
+							},
+							{
+								"source": {
 									"path": "$['id']"
 								},
 								"sink": {
@@ -91,22 +107,6 @@
 								},
 								"sink": {
 									"name": "DatetimeCompleted"
-								}
-							},
-							{
-								"source": {
-									"path": "['name']"
-								},
-								"sink": {
-									"name": "ProviderName"
-								}
-							},
-							{
-								"source": {
-									"path": "['value']"
-								},
-								"sink": {
-									"name": "providerValue"
 								}
 							},
 							{
