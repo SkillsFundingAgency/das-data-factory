@@ -143,6 +143,7 @@
 			},
 			{
 				"name": "LogSuccessfulExecution",
+				"description": "Log Successful Task",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -204,7 +205,10 @@
 					"storedProcedureName": "[dbo].[ImportEmployerFeedbackStgToLive]",
 					"storedProcedureParameters": {
 						"RunId": {
-							"value": "@variables('RunId')",
+							"value": {
+								"value": "@variables('RunId')",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						}
 					}
