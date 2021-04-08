@@ -78,6 +78,10 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().MarketoBaseUrl}"
 		},
+		"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "pfbe-cdbconnectionstring"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rcrt-cdbconnectionstring"
@@ -93,10 +97,6 @@
 		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rsrv-dbconnectionstring"
-		},
-		"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "tpr-dbconnectionstring"
 		}
 	},
 	"variables": {
@@ -516,6 +516,33 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pfbe_cdbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/rcrt_cdbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -585,33 +612,6 @@
 							"type": "LinkedServiceReference"
 						},
 						"secretName": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AzureIntegrationRunTime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tpr_dbconnectionstring')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				},
 				"connectVia": {

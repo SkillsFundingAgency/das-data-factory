@@ -78,6 +78,10 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().MarketoBaseUrl}"
 		},
+		"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "pfbe-cdbconnectionstring"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rcrt-cdbconnectionstring"
@@ -208,6 +212,9 @@
 					"marketo_restservice_properties_typeProperties_url": {
 						"value": "[parameters('marketo_restservice_properties_typeProperties_url')]"
 					},
+					"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
@@ -219,9 +226,6 @@
 					},
 					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
-					},
-					"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -240,6 +244,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('tpr_strconnection_properties_typeProperties_serviceEndpoint')]"
@@ -289,6 +296,26 @@
 					},
 					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
 						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_2')]"
+			]
+		},
+		{
+			"name": "das-at-dfac-df_ArmTemplate_4",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
 					},
 					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
@@ -305,7 +332,7 @@
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_2')]"
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_3')]"
 			]
 		}
 	]

@@ -78,6 +78,10 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().MarketoBaseUrl}"
 		},
+		"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "pfbe-cdbconnectionstring"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rcrt-cdbconnectionstring"
@@ -13418,6 +13422,305 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ImportPFBEToDataMart')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Import Provide Feedback Employer Cosmos DB",
+				"activities": [
+					{
+						"name": "SetRunId",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "RunId",
+							"value": {
+								"value": "@pipeline().parameters.RunId",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ImportEmployerFeedback",
+						"description": "Import Employer Feedback Data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SetRunId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbSqlApiSource",
+								"preferredRegions": [],
+								"pageSize": 100,
+								"detectDatetime": true
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[Stg].[PFBE_EmployerFeedback]') AND type in (N'U'))\nDELETE FROM [Stg].[PFBE_EmployerFeedback]\n\n\n  INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportProvideEmployerFeedbackToDM'\n\t   ,getdate()\n\t   ,0",
+									"type": "Expression"
+								},
+								"maxConcurrentConnections": {
+									"value": "@pipeline().parameters.MaxConcurrentConnections",
+									"type": "Expression"
+								},
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"name": "FeedbackName"
+										}
+									},
+									{
+										"source": {
+											"path": "[['value']"
+										},
+										"sink": {
+											"name": "FeedbackValue"
+										}
+									},
+									{
+										"source": {
+											"path": "$['id']"
+										},
+										"sink": {
+											"name": "id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['ukprn']"
+										},
+										"sink": {
+											"name": "Ukprn",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['accountId']"
+										},
+										"sink": {
+											"name": "AccountId"
+										}
+									},
+									{
+										"source": {
+											"path": "$['dateTimeCompleted']"
+										},
+										"sink": {
+											"name": "DatetimeCompleted"
+										}
+									},
+									{
+										"source": {
+											"path": "$['providerRating']"
+										},
+										"sink": {
+											"name": "ProviderRating"
+										}
+									}
+								],
+								"collectionReference": "$['providerAttributes']"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SrcPFBECosmos",
+								"type": "DatasetReference",
+								"parameters": {
+									"CollectionName": "employer-feedback"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "PFBE_EmployerFeedback",
+									"SchemaName": "Stg"
+								}
+							}
+						]
+					},
+					{
+						"name": "LogSuccessfulExecution",
+						"description": "Log Successful Task",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ImportEmployerFeedback",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportProvideEmployerFeedbackToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": "Users",
+									"SchemaName": "Stg"
+								}
+							}
+						}
+					},
+					{
+						"name": "ImportPFBEEmployerFeedbackStgToLive",
+						"description": "Import Employer Feedback  Staging to LIVE",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "LogSuccessfulExecution",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[ImportEmployerFeedbackStgToLive]",
+							"storedProcedureParameters": {
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "LogEmployerFeedbackImportErrorDetails",
+						"description": "Log Employer Feedback Import Error Details ",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ImportEmployerFeedback",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[InsertLogErrorDetails]",
+							"storedProcedureParameters": {
+								"ErrorMessage": {
+									"value": {
+										"value": "@{activity('ImportEmployerFeedback').Error.message}",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunId": {
+									"value": {
+										"value": "@variables('RunId')",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"TaskType": {
+									"value": "ImportProvideEmployerFeedbackToDM",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "datamgmt_staging_dbconnectionstring",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"MaxConcurrentConnections": {
+						"type": "int",
+						"defaultValue": 4
+					},
+					"DIU": {
+						"type": "int",
+						"defaultValue": 4
+					},
+					"RunId": {
+						"type": "string",
+						"defaultValue": "150"
+					}
+				},
+				"variables": {
+					"RunId": {
+						"type": "String",
+						"defaultValue": "\"1\""
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SrcPFBECosmos')]",
+				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ImportRAAToDataMart')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -20812,6 +21115,66 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SrcPFBECosmos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Provide Feedback Employer",
+				"linkedServiceName": {
+					"referenceName": "pfbe_cdbconnectionstring",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"CollectionName": {
+						"type": "string",
+						"defaultValue": "employer-feedback"
+					}
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {
+					"type": "object",
+					"properties": {
+						"ukprn": {
+							"type": "integer"
+						},
+						"accountId": {
+							"type": "integer"
+						},
+						"dateTimeCompleted": {
+							"type": "string"
+						},
+						"providerAttributes": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"value": {
+										"type": "integer"
+									}
+								}
+							}
+						},
+						"providerRating": {
+							"type": "string"
+						}
+					}
+				},
+				"typeProperties": {
+					"collectionName": {
+						"value": "@dataset().CollectionName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/pfbe_cdbconnectionstring')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -21403,6 +21766,33 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pfbe_cdbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/rcrt_cdbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -21604,6 +21994,52 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/Master-ImportVacanciesToDataMart')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Trigger-EmployerFeedback')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Trigger Employer Feedback",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ImportPFBEToDataMart",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 1,
+						"startTime": "2021-04-06T11:12:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								23
+							],
+							"weekDays": [
+								"Monday",
+								"Tuesday",
+								"Wednesday",
+								"Thursday",
+								"Friday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/ImportPFBEToDataMart')]"
 			]
 		},
 		{
@@ -21919,7 +22355,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -21953,7 +22389,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -21988,7 +22424,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> CommitSource\nCommitSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> CommitSink"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> CommitSource\nCommitSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> CommitSink"
 				}
 			},
 			"dependsOn": [
@@ -22023,7 +22459,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -22058,7 +22494,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -22093,7 +22529,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> Financesource\nFinancesource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> FinanceSink"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> Financesource\nFinancesource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> FinanceSink"
 				}
 			},
 			"dependsOn": [
@@ -22127,7 +22563,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -22162,7 +22598,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> ReservationSource\nReservationSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> ReservationSink"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> ReservationSource\nReservationSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> ReservationSink"
 				}
 			},
 			"dependsOn": [
@@ -22196,7 +22632,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [

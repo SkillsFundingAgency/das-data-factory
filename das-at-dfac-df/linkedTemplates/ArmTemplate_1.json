@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "das-at-dfac-df"
 		},
+		"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "tpr-dbconnectionstring"
+		},
 		"tpr_strconnection_properties_typeProperties_serviceEndpoint": {
 			"type": "object",
 			"defaultValue": {
@@ -27,6 +31,30 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/tpr_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/tpr_strconnection')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -196,7 +224,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/tpr_dbconnectionstring')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SrcAccounts')]",
@@ -741,6 +771,64 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SrcPFBECosmos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Provide Feedback Employer",
+				"linkedServiceName": {
+					"referenceName": "pfbe_cdbconnectionstring",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"CollectionName": {
+						"type": "string",
+						"defaultValue": "employer-feedback"
+					}
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {
+					"type": "object",
+					"properties": {
+						"ukprn": {
+							"type": "integer"
+						},
+						"accountId": {
+							"type": "integer"
+						},
+						"dateTimeCompleted": {
+							"type": "string"
+						},
+						"providerAttributes": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"value": {
+										"type": "integer"
+									}
+								}
+							}
+						},
+						"providerRating": {
+							"type": "string"
+						}
+					}
+				},
+				"typeProperties": {
+					"collectionName": {
+						"value": "@dataset().CollectionName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -802,98 +890,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcRestMarketo')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "marketo_restservice",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"MarketoBaseUrl": {
-							"value": "@dataset().MarketoBaseUrl",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"RelativePath": {
-						"type": "string",
-						"defaultValue": "/rest/v1/leads.json"
-					},
-					"MarketoBaseUrl": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": {
-						"value": "@dataset().RelativePath",
-						"type": "Expression"
-					}
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcTprBlobStorage')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "tpr_strconnection",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"ColumnDelimiter": {
-						"type": "string",
-						"defaultValue": "\t"
-					},
-					"EscapeCharacter": {
-						"type": "string",
-						"defaultValue": "\\"
-					},
-					"SubFolder": {
-						"type": "string"
-					},
-					"RootFolder": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": {
-							"value": "@dataset().SubFolder",
-							"type": "Expression"
-						},
-						"container": {
-							"value": "@dataset().RootFolder",
-							"type": "Expression"
-						}
-					},
-					"columnDelimiter": {
-						"value": "@dataset().ColumnDelimiter",
-						"type": "Expression"
-					},
-					"escapeChar": {
-						"value": "@dataset().EscapeCharacter",
-						"type": "Expression"
-					},
-					"firstRowAsHeader": false,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/tpr_strconnection')]"
-			]
 		}
 	]
 }

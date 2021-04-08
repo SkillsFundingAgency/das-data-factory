@@ -10,28 +10,107 @@
 		"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
 			"type": "string",
 			"defaultValue": "1"
-		},
-		"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
-			"type": "string",
-			"defaultValue": "\"1\""
-		},
-		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
-			"type": "string",
-			"defaultValue": "1"
-		},
-		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
-			"type": "int",
-			"defaultValue": 4
-		},
-		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
-			"type": "int",
-			"defaultValue": 4
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowFinance')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dataflow Finance",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SrcFinance",
+								"type": "DatasetReference"
+							},
+							"name": "Financesource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference"
+							},
+							"name": "FinanceSink"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> Financesource\nFinancesource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> FinanceSink"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowIncentives')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SrcEmpIncentive",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowReservation')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Reservation Dataflow",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SrcReservation",
+								"type": "DatasetReference"
+							},
+							"name": "ReservationSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DestDataMart",
+								"type": "DatasetReference"
+							},
+							"name": "ReservationSink"
+						}
+					],
+					"transformations": [],
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> ReservationSource\nReservationSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> ReservationSink"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DataFlowUser')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
@@ -58,7 +137,7 @@
 						}
 					],
 					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": []
@@ -4351,7 +4430,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlowFinance')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportIncentivesToDataMart')]",
@@ -5170,7 +5251,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlowIncentives')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportReservationToDM')]",
@@ -5879,7 +5962,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlowReservation')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ImportUsersToDM')]",
@@ -7383,6 +7468,50 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Trigger-EmployerFeedback')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Trigger Employer Feedback",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ImportPFBEToDataMart",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 1,
+						"startTime": "2021-04-06T11:12:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								23
+							],
+							"weekDays": [
+								"Monday",
+								"Tuesday",
+								"Wednesday",
+								"Thursday",
+								"Friday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Trigger-GenerateKey')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -7917,185 +8046,6 @@
 				"[concat(variables('factoryId'), '/pipelines/ImportAppRedundancyToDM')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportFAT2CRSDeliveryToDM')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportFAT2CRSToDM')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger-BuildDataMart')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Master-ImportVacanciesToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"RunId": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 1,
-						"startTime": "2020-04-14T10:08:00Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								0
-							],
-							"weekDays": [
-								"Monday",
-								"Tuesday",
-								"Wednesday",
-								"Thursday",
-								"Friday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Master-ImportVacanciesToDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger-ImportIncentives')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "ImportIncentivesToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"RunId": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]",
-							"MaxConcurrentConnections": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]",
-							"DIU": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 1,
-						"startTime": "2020-08-25T15:24:00Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								1
-							],
-							"weekDays": [
-								"Monday",
-								"Tuesday",
-								"Wednesday",
-								"Thursday",
-								"Friday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/ImportIncentivesToDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger-ImportMarketoToDataMart')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Master-ImportCampaignDataToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2020-10-07T21:51:00Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								35
-							],
-							"hours": [
-								5
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Master-ImportCampaignDataToDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Trigger-ImportAccUsersComFinResvToDM')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Master-ImportAccUsersComtFinResvToDataMart",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 1,
-						"startTime": "2020-09-09T23:25:00Z",
-						"timeZone": "UTC",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								2
-							],
-							"weekDays": [
-								"Monday",
-								"Tuesday",
-								"Wednesday",
-								"Thursday",
-								"Friday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Master-ImportAccUsersComtFinResvToDataMart')]"
 			]
 		}
 	]
