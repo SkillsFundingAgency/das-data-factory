@@ -1,0 +1,70 @@
+{
+	"name": "SrcAssessor",
+	"properties": {
+		"description": "Source Assessor Database ",
+		"linkedServiceName": {
+			"referenceName": "ass_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EndPointAssessorOrganisationId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "StandardCode",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EffectiveFrom",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "EffectiveTo",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DateStandardApprovedOnRegister",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Comments",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Status",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ContactId",
+				"type": "uniqueidentifier"
+			},
+			{
+				"name": "OrganisationStandardData",
+				"type": "nvarchar"
+			},
+			{
+				"name": "StandardReference",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Certificates"
+		}
+	}
+}
