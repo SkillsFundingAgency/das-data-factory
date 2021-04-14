@@ -151,12 +151,8 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "SrcApply",
-									"type": "DatasetReference",
-									"parameters": {
-										"SchemaName": "dbo",
-										"TableName": "Apply"
-									}
+									"referenceName": "SrcAssessor",
+									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
