@@ -391,7 +391,7 @@
 										"type": "Int32"
 									},
 									"SourceDatabaseName": {
-										"value": "Apply",
+										"value": "Assessor",
 										"type": "String"
 									},
 									"StgTableName": {
