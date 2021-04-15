@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "das-at-dfac-df"
 		},
+		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "rsrv-dbconnectionstring"
+		},
 		"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "tpr-dbconnectionstring"
@@ -31,6 +35,30 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/rsrv_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/tpr_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -238,13 +266,13 @@
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "EmployerAgreement"
-					},
 					"SchemaName": {
 						"type": "string",
 						"defaultValue": "Employer_Account"
+					},
+					"TableName": {
+						"type": "string",
+						"defaultValue": "EmployerAgreement"
 					}
 				},
 				"annotations": [],
@@ -849,42 +877,6 @@
 				"typeProperties": {
 					"collection": {
 						"value": "@dataset().CollectionName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcReservation')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Reservation DB Connection String",
-				"linkedServiceName": {
-					"referenceName": "rsrv_dbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "Reservation"
-					},
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "dbo"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
 						"type": "Expression"
 					}
 				}

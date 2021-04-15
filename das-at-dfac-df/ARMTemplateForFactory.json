@@ -19,6 +19,10 @@
 			"type": "string",
 			"defaultValue": "appred-dbconnectionstring"
 		},
+		"ass_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "ass-dbconnectionstring"
+		},
 		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "avmsplus-dbconnectionstring"
@@ -440,8 +444,8 @@
 											"referenceName": "SrcAccounts",
 											"type": "DatasetReference",
 											"parameters": {
-												"TableName": "Account",
-												"SchemaName": "Employer_Account"
+												"SchemaName": "Employer_Account",
+												"TableName": "EmployerAgreement"
 											}
 										}
 									}
@@ -604,58 +608,6 @@
 									"linkedServiceName": {
 										"referenceName": "datamgmt_staging_dbconnectionstring",
 										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "CopyData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowAccounts",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"source1": {
-													"TableName": "Users",
-													"SchemaName": "dbo"
-												},
-												"sink1": {
-													"TableName": "Acc_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -930,6 +882,74 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Acc_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Acc_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcAccounts",
+											"type": "DatasetReference",
+											"parameters": {
+												"SchemaName": "Employer_Account",
+												"TableName": "EmployerAgreement"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": {
+													"value": "Acc_@{item().TABLE_NAME}",
+													"type": "Expression"
+												},
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -1059,9 +1079,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcAccounts')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowAccounts')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -1326,58 +1344,6 @@
 									"linkedServiceName": {
 										"referenceName": "datamgmt_staging_dbconnectionstring",
 										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "CopyData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowAppRedundancy",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"source1": {
-													"SchemaName": "dbo",
-													"TableName": "Users"
-												},
-												"sink1": {
-													"TableName": "AR_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -1652,6 +1618,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'AR_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[AR_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcAppRedundancy",
+											"type": "DatasetReference",
+											"parameters": {
+												"SchemaName": "dbo",
+												"TableName": "Employer"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "AR_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -1781,9 +1820,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcAppRedundancy')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowAppRedundancy')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -6631,60 +6668,11 @@
 									}
 								},
 								{
-									"name": "CopyCommitData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportCommitSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowCommitment",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportCommitSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"CommitSource": {},
-												"CommitSink": {
-													"TableName": "Comt_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
 									"name": "LogCommitSuccessfulExecutionToStaging",
 									"type": "Lookup",
 									"dependsOn": [
 										{
-											"activity": "CopyCommitData",
+											"activity": "CopyData",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -6723,7 +6711,7 @@
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
 										{
-											"activity": "CopyCommitData",
+											"activity": "CopyData",
 											"dependencyConditions": [
 												"Failed"
 											]
@@ -6742,7 +6730,7 @@
 										"storedProcedureParameters": {
 											"ErrorMessage": {
 												"value": {
-													"value": "@{activity('CopyCommitData').Error.message}",
+													"value": "@{activity('CopyData').Error.message}",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -6967,6 +6955,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportCommitSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportCommitSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Comt_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Comt_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcComts",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Apprenticeship",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Comt_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -7005,9 +7066,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcComts')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowCommitment')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -9708,58 +9767,6 @@
 									}
 								},
 								{
-									"name": "CopyData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowFAT2CRSDelivery",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"source1": {
-													"TableName": "ProviderRegistration",
-													"SchemaName": "dbo"
-												},
-												"sink1": {
-													"TableName": "FAT2_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
 									"name": "PresentationLayerFullRefresh",
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
@@ -10031,6 +10038,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'FAT2_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[FAT2_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcFAT2CRSDelivery",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "ProviderRegistration",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "FAT2_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -10160,9 +10240,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcFAT2CRSDelivery')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowFAT2CRSDelivery')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -10428,58 +10506,6 @@
 									"linkedServiceName": {
 										"referenceName": "datamgmt_staging_dbconnectionstring",
 										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "CopyData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowFAT2CRS",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"source1": {
-													"TableName": "ApprenticeshipFunding",
-													"SchemaName": "dbo"
-												},
-												"sink1": {
-													"TableName": "FAT2_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -10754,6 +10780,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'FAT2_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[FAT2_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcFAT2CRS",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "ApprenticeshipFunding",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "FAT2_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -10883,9 +10982,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcFAT2CRS')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowFAT2CRS')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -11188,60 +11285,11 @@
 									}
 								},
 								{
-									"name": "CopyFinanceData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportFinanceSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowFinance",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportFinanceSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportFinanceSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"Financesource": {},
-												"FinanceSink": {
-													"TableName": "Fin_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
 									"name": "LogFinanceSuccessfulExecutionToStaging",
 									"type": "Lookup",
 									"dependsOn": [
 										{
-											"activity": "CopyFinanceData",
+											"activity": "CopyData",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -11280,7 +11328,7 @@
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
 										{
-											"activity": "CopyFinanceData",
+											"activity": "CopyData",
 											"dependencyConditions": [
 												"Failed"
 											]
@@ -11299,7 +11347,7 @@
 										"storedProcedureParameters": {
 											"ErrorMessage": {
 												"value": {
-													"value": "@{activity('CopyFinanceData').Error.message}",
+													"value": "@{activity('CopyData').Error.message}",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -11524,6 +11572,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportFinanceSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportFinanceSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Fin_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Fin_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcFinance",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "AccountTransfers",
+												"SchemaName": "employer_financial"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Fin_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -11601,9 +11722,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcFinance')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowFinance')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -12861,58 +12980,6 @@
 									}
 								},
 								{
-									"name": "CopyData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowIncentives",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"source1": {
-													"TableName": "Accounts",
-													"SchemaName": "dbo"
-												},
-												"sink1": {
-													"TableName": "EI_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
 									"name": "PresentationLayerFullRefresh",
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
@@ -13184,6 +13251,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'EI_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[EI_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcEmpIncentive",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Accounts",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "EI_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -13416,9 +13556,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/datasets/SrcEmpIncentive')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowIncentives')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/datasets/SrcEmpIncentive')]"
 			]
 		},
 		{
@@ -16737,60 +16875,11 @@
 									}
 								},
 								{
-									"name": "CopyResvData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportResvSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowReservation",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportResvSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportResvSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"ReservationSource": {},
-												"ReservationSink": {
-													"TableName": "Resv_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
 									"name": "LogResvSuccessfulExecutionToStaging",
 									"type": "Lookup",
 									"dependsOn": [
 										{
-											"activity": "CopyResvData",
+											"activity": "CopyData",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -16829,7 +16918,7 @@
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
 										{
-											"activity": "CopyResvData",
+											"activity": "CopyData",
 											"dependencyConditions": [
 												"Failed"
 											]
@@ -16848,7 +16937,7 @@
 										"storedProcedureParameters": {
 											"ErrorMessage": {
 												"value": {
-													"value": "@{activity('CopyResvData').Error.message}",
+													"value": "@{activity('CopyData').Error.message}",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -17073,6 +17162,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportResvSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportResvSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Resv_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Resv_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcReservation",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Reservation",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "EI_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -17108,9 +17270,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcReservation')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowReservation')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -17375,58 +17535,6 @@
 									"linkedServiceName": {
 										"referenceName": "datamgmt_staging_dbconnectionstring",
 										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "CopyData",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "GetImportSelectQuery",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.01:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": true
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "DataFlowUser",
-											"type": "DataFlowReference",
-											"parameters": {
-												"SourceQuery": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.SourceQuery}'",
-													"type": "Expression"
-												},
-												"ColumnList": {
-													"value": "'@{activity('GetImportSelectQuery').output.firstRow.ColumnList}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"source1": {
-													"TableName": "Users",
-													"SchemaName": "dbo"
-												},
-												"sink1": {
-													"TableName": "EAUser_@{item().TABLE_NAME}",
-													"SchemaName": "Stg"
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "AzureIntegrationRunTime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
 									}
 								},
 								{
@@ -17701,6 +17809,79 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "CopyData",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "GetImportSelectQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.03:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('GetImportSelectQuery').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'EAUser_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[EAUser_@{item().TABLE_NAME}]",
+												"type": "Expression"
+											},
+											"maxConcurrentConnections": {
+												"value": "@pipeline().parameters.MaxConcurrentConnections",
+												"type": "Expression"
+											},
+											"tableOption": "autoCreate",
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SrcUsers",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "Users",
+												"SchemaName": "dbo"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestDataMart",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableName": "EAUser_@{item().TABLE_NAME}",
+												"SchemaName": "Stg"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -17830,9 +18011,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DestDataMart')]",
 				"[concat(variables('factoryId'), '/datasets/SrcUsers')]",
-				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlowUser')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]"
+				"[concat(variables('factoryId'), '/linkedServices/datamgmt_staging_dbconnectionstring')]"
 			]
 		},
 		{
@@ -18918,7 +19097,7 @@
 							}
 						],
 						"policy": {
-							"timeout": "0.03:00:00",
+							"timeout": "0.06:00:00",
 							"retry": 0,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": true,
@@ -20558,13 +20737,13 @@
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"TableName": {
-						"type": "string",
-						"defaultValue": "EmployerAgreement"
-					},
 					"SchemaName": {
 						"type": "string",
 						"defaultValue": "Employer_Account"
+					},
+					"TableName": {
+						"type": "string",
+						"defaultValue": "EmployerAgreement"
 					}
 				},
 				"annotations": [],
@@ -21427,6 +21606,33 @@
 							"type": "LinkedServiceReference"
 						},
 						"secretName": "[parameters('appred_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ass_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('ass_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				},
 				"connectVia": {
@@ -22328,317 +22534,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowAccounts')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcAccounts",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcAccounts')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowAppRedundancy')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcAppRedundancy",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcAppRedundancy')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowCommitment')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Data flow commitment",
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcComts",
-								"type": "DatasetReference"
-							},
-							"name": "CommitSource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "CommitSink"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> CommitSource\nCommitSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> CommitSink"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcComts')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowFAT2CRS')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DataFlow FAT2 CRS",
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcFAT2CRS",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcFAT2CRS')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowFAT2CRSDelivery')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DataFlow FAT2 CRS Delivery",
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcFAT2CRSDelivery",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcFAT2CRSDelivery')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowFinance')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Dataflow Finance",
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcFinance",
-								"type": "DatasetReference"
-							},
-							"name": "Financesource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "FinanceSink"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> Financesource\nFinancesource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> FinanceSink"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcFinance')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowIncentives')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcEmpIncentive",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcEmpIncentive')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowReservation')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Reservation Dataflow",
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcReservation",
-								"type": "DatasetReference"
-							},
-							"name": "ReservationSource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "ReservationSink"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> ReservationSource\nReservationSource sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> ReservationSink"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcReservation')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowUser')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SrcUsers",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DestDataMart",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"script": "parameters{\n\tSourceQuery as string,\n\tColumnList as string\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: ($SourceQuery),\n\tformat: 'query') ~> source1\nsource1 sink(input(\n\t\tSourseSK as integer,\n\t\tBinaryId as string,\n\t\tTypeCode as string,\n\t\tIdamUserId as string,\n\t\tUserType as string,\n\t\tUserName as string,\n\t\tUserEmail as string,\n\t\tUserCreatedTimeStamp as string,\n\t\tLastSignedInTimeStamp as string,\n\t\tEmployerAccountId as string,\n\t\tUkprn as string,\n\t\tRunId as long,\n\t\tAsDm_CreatedDate as timestamp,\n\t\tAsDm_UpdatedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SrcUsers')]",
-				"[concat(variables('factoryId'), '/datasets/DestDataMart')]"
-			]
 		}
 	]
 }

@@ -19,6 +19,10 @@
 			"type": "string",
 			"defaultValue": "appred-dbconnectionstring"
 		},
+		"ass_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "ass-dbconnectionstring"
+		},
 		"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "avmsplus-dbconnectionstring"
@@ -173,6 +177,9 @@
 					"appred_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('appred_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
+					"ass_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('ass_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('avmsplus_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
@@ -223,9 +230,6 @@
 					},
 					"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
-					},
-					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -244,6 +248,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('tpr_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
@@ -296,29 +303,6 @@
 					},
 					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
 						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
-					}
-				}
-			},
-			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_2')]"
-			]
-		},
-		{
-			"name": "das-at-dfac-df_ArmTemplate_4",
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2018-02-01",
-			"properties": {
-				"mode": "incremental",
-				"templateLink": {
-					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"factoryName": {
-						"value": "[parameters('factoryName')]"
-					},
-					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
 					},
 					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
 						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
@@ -328,11 +312,14 @@
 					},
 					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
 						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
+					},
+					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"
 					}
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_3')]"
+				"[resourceId('Microsoft.Resources/deployments', 'das-at-dfac-df_ArmTemplate_2')]"
 			]
 		}
 	]
