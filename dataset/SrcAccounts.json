@@ -6,13 +6,13 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"TableName": {
-				"type": "string",
-				"defaultValue": "EmployerAgreement"
-			},
 			"SchemaName": {
 				"type": "string",
 				"defaultValue": "Employer_Account"
+			},
+			"TableName": {
+				"type": "string",
+				"defaultValue": "EmployerAgreement"
 			}
 		},
 		"annotations": [],
