@@ -396,7 +396,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyResvData').Error.message}",
+											"value": "@{activity('CopyData').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"

@@ -89,6 +89,14 @@
 									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "SrcAccounts",
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": "Employer_Account",
+										"TableName": "EmployerAgreement"
+									}
 								}
 							}
 						},
