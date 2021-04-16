@@ -689,7 +689,7 @@
 									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "EI_@{item().TABLE_NAME}",
+										"TableName": "Resv_@{item().TABLE_NAME}",
 										"SchemaName": "Stg"
 									}
 								}
