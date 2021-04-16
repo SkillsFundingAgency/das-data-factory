@@ -334,58 +334,11 @@
 							}
 						},
 						{
-							"name": "CopyResvData",
-							"type": "ExecuteDataFlow",
-							"dependsOn": [
-								{
-									"activity": "GetImportResvSelectQuery",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.01:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": true
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataflow": {
-									"referenceName": "DataFlowReservation",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportResvSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportResvSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"ReservationSink": {
-											"TableName": "Resv_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
-								"integrationRuntime": {
-									"referenceName": "AzureIntegrationRunTime",
-									"type": "IntegrationRuntimeReference"
-								},
-								"traceLevel": "Fine"
-							}
-						},
-						{
 							"name": "LogResvSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "CopyResvData",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -424,7 +377,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyResvData",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -443,7 +396,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyResvData').Error.message}",
+											"value": "@{activity('CopyData').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -668,6 +621,79 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "CopyData",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GetImportResvSelectQuery",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.03:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@activity('GetImportResvSelectQuery').output.firstRow.SourceQuery",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Resv_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Resv_@{item().TABLE_NAME}]",
+										"type": "Expression"
+									},
+									"maxConcurrentConnections": {
+										"value": "@pipeline().parameters.MaxConcurrentConnections",
+										"type": "Expression"
+									},
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SrcReservation",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Reservation",
+										"SchemaName": "dbo"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Resv_@{item().TABLE_NAME}",
+										"SchemaName": "Stg"
+									}
+								}
+							]
 						}
 					]
 				}

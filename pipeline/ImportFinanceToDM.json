@@ -295,58 +295,11 @@
 							}
 						},
 						{
-							"name": "CopyFinanceData",
-							"type": "ExecuteDataFlow",
-							"dependsOn": [
-								{
-									"activity": "GetImportFinanceSelectQuery",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.01:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": true
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataflow": {
-									"referenceName": "DataFlowFinance",
-									"type": "DataFlowReference",
-									"parameters": {
-										"SourceQuery": {
-											"value": "'@{activity('GetImportFinanceSelectQuery').output.firstRow.SourceQuery}'",
-											"type": "Expression"
-										},
-										"ColumnList": {
-											"value": "'@{activity('GetImportFinanceSelectQuery').output.firstRow.ColumnList}'",
-											"type": "Expression"
-										}
-									},
-									"datasetParameters": {
-										"FinanceSink": {
-											"TableName": "Fin_@{item().TABLE_NAME}",
-											"SchemaName": "Stg"
-										}
-									}
-								},
-								"integrationRuntime": {
-									"referenceName": "AzureIntegrationRunTime",
-									"type": "IntegrationRuntimeReference"
-								},
-								"traceLevel": "Fine"
-							}
-						},
-						{
 							"name": "LogFinanceSuccessfulExecutionToStaging",
 							"type": "Lookup",
 							"dependsOn": [
 								{
-									"activity": "CopyFinanceData",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -385,7 +338,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyFinanceData",
+									"activity": "CopyData",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -404,7 +357,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyFinanceData').Error.message}",
+											"value": "@{activity('CopyData').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -629,6 +582,79 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "CopyData",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GetImportFinanceSelectQuery",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.03:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@activity('GetImportFinanceSelectQuery').output.firstRow.SourceQuery",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Fin_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Fin_@{item().TABLE_NAME}]",
+										"type": "Expression"
+									},
+									"maxConcurrentConnections": {
+										"value": "@pipeline().parameters.MaxConcurrentConnections",
+										"type": "Expression"
+									},
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SrcFinance",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "AccountTransfers",
+										"SchemaName": "employer_financial"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestDataMart",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableName": "Fin_@{item().TABLE_NAME}",
+										"SchemaName": "Stg"
+									}
+								}
+							]
 						}
 					]
 				}
