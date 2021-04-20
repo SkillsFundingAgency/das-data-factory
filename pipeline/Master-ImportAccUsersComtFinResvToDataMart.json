@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteAssessorEPAOToDM",
+						"activity": "ExecuteImportAssessorToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -390,7 +390,7 @@
 				}
 			},
 			{
-				"name": "ExecuteAssessorEPAOToDM",
+				"name": "ExecuteImportAssessorToDM",
 				"description": "Execute Assessor EPAO",
 				"type": "ExecutePipeline",
 				"dependsOn": [
