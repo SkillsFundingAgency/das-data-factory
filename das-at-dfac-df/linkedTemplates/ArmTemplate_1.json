@@ -360,6 +360,124 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SrcAssessor')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Source Assessor",
+				"linkedServiceName": {
+					"referenceName": "ass_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Id",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "CertificateData",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ToBePrinted",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "CreatedAt",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "CreatedBy",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeletedAt",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "DeletedBy",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CertificateReference",
+						"type": "nvarchar"
+					},
+					{
+						"name": "OrganisationId",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "BatchNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UpdatedAt",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "UpdatedBy",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Uln",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "StandardCode",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProviderUkPrn",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CertificateReferenceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "LearnRefNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreateDay",
+						"type": "date"
+					},
+					{
+						"name": "IsPrivatelyFunded",
+						"type": "bit"
+					},
+					{
+						"name": "PrivatelyFundedStatus",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StandardUId",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Certificates"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SrcAvmsPlus')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -849,33 +967,6 @@
 				},
 				"typeProperties": {
 					"collectionName": {
-						"value": "@dataset().CollectionName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcRAACosmos')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "rcrt_cdbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"CollectionName": {
-						"type": "string",
-						"defaultValue": "Users"
-					}
-				},
-				"annotations": [],
-				"type": "CosmosDbMongoDbApiCollection",
-				"schema": [],
-				"typeProperties": {
-					"collection": {
 						"value": "@dataset().CollectionName",
 						"type": "Expression"
 					}
