@@ -246,9 +246,9 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportApplyToDM",
+						"activity": "ExecuteAssessorEPAO",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -386,6 +386,33 @@
 						},
 						"MaxConcurrentConnections": "4",
 						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteAssessorEPAO",
+				"description": "Execute Assessor EPAO",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportApplyToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportAssessorToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						}
 					}
 				}
 			}
