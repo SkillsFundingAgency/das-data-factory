@@ -1,5 +1,5 @@
 {
-	"name": "ImportPublicSectorReportToDM",
+	"name": "ImportPublicSectorToDM",
 	"properties": {
 		"description": "Import Public Sector Report to Mart",
 		"activities": [
