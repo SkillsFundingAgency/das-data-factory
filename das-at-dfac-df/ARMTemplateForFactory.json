@@ -86,6 +86,10 @@
 			"type": "string",
 			"defaultValue": "pfbe-cdbconnectionstring"
 		},
+		"psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "psrep-dbconnectionstring"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rcrt-cdbconnectionstring"
@@ -9492,7 +9496,7 @@
 							}
 						],
 						"policy": {
-							"timeout": "0.01:00:00",
+							"timeout": "0.03:00:00",
 							"retry": 0,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": true,
@@ -10704,7 +10708,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAccountsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportCRSDeliveryToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -11446,7 +11450,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAccountsToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportCRSToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -22676,6 +22680,33 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/psrep_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/rcrt_cdbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -22956,7 +22987,7 @@
 								0
 							],
 							"hours": [
-								7
+								23
 							],
 							"weekDays": [
 								"Monday",

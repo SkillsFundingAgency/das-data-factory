@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "das-at-dfac-df"
 		},
+		"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "roatp-dbconnectionstring"
+		},
 		"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rsrv-dbconnectionstring"
@@ -35,6 +39,30 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/roatp_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/rsrv_dbconnectionstring')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -913,64 +941,6 @@
 					"quoteChar": "{"
 				},
 				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SrcPFBECosmos')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Provide Feedback Employer",
-				"linkedServiceName": {
-					"referenceName": "pfbe_cdbconnectionstring",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"CollectionName": {
-						"type": "string",
-						"defaultValue": "employer-feedback"
-					}
-				},
-				"annotations": [],
-				"type": "CosmosDbSqlApiCollection",
-				"schema": {
-					"type": "object",
-					"properties": {
-						"ukprn": {
-							"type": "integer"
-						},
-						"accountId": {
-							"type": "integer"
-						},
-						"dateTimeCompleted": {
-							"type": "string"
-						},
-						"providerAttributes": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									},
-									"value": {
-										"type": "integer"
-									}
-								}
-							}
-						},
-						"providerRating": {
-							"type": "string"
-						}
-					}
-				},
-				"typeProperties": {
-					"collectionName": {
-						"value": "@dataset().CollectionName",
-						"type": "Expression"
-					}
-				}
 			},
 			"dependsOn": []
 		}

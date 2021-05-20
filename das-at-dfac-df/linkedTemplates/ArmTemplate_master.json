@@ -86,6 +86,10 @@
 			"type": "string",
 			"defaultValue": "pfbe-cdbconnectionstring"
 		},
+		"psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "psrep-dbconnectionstring"
+		},
 		"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "rcrt-cdbconnectionstring"
@@ -222,14 +226,14 @@
 					"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
+					"psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"rcrt_cdbconnectionstring_properties_typeProperties_database": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_database')]"
-					},
-					"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -248,6 +252,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('roatp_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rsrv_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
