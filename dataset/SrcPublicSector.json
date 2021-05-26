@@ -1,0 +1,12 @@
+{
+	"name": "SrcPublicSector",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "psrep_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
