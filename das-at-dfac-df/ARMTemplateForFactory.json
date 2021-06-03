@@ -2827,7 +2827,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportApplyQueryBasedToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
+									"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportAssessorQueryBasedToDM'\n     AND RunId=@{pipeline().parameters.RunId}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{pipeline().parameters.RunId}\n\nSELECT 1",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -19818,7 +19818,7 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ExecuteImportAssessorToDM",
+								"activity": "ExecuteImportPSRToDM",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -19989,6 +19989,35 @@
 								"DIU": "4"
 							}
 						}
+					},
+					{
+						"name": "ExecuteImportPSRToDM",
+						"description": "Execute Import PSR to DM",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExecuteImportAssessorToDM",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ImportPublicSectorToDM",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"RunId": {
+									"value": "@{activity('GetRunId').output.firstRow.RunId}",
+									"type": "Expression"
+								},
+								"MaxConcurrentConnections": "4",
+								"DIU": "4"
+							}
+						}
 					}
 				],
 				"annotations": []
@@ -20005,7 +20034,8 @@
 				"[concat(variables('factoryId'), '/pipelines/ImportFAT2CRSDeliveryToDM')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportFAT2CRSToDM')]",
 				"[concat(variables('factoryId'), '/pipelines/ImportApplyToDM')]",
-				"[concat(variables('factoryId'), '/pipelines/ImportAssessorToDM')]"
+				"[concat(variables('factoryId'), '/pipelines/ImportAssessorToDM')]",
+				"[concat(variables('factoryId'), '/pipelines/ImportPublicSectorToDM')]"
 			]
 		},
 		{
