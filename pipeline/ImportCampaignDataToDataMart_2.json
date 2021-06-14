@@ -15,8 +15,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -46,8 +46,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -87,8 +87,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -213,8 +213,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -244,8 +244,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -285,8 +285,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -411,8 +411,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -452,8 +452,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -691,8 +691,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -746,8 +746,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
@@ -1102,8 +1102,8 @@
 				],
 				"policy": {
 					"timeout": "0.00:10:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
+					"retry": 3,
+					"retryIntervalInSeconds": 60,
 					"secureOutput": true,
 					"secureInput": true
 				},
