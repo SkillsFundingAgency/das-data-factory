@@ -593,7 +593,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetComtTableList').output.value",
+						"value": "@activity('GetEmpDemandTableList').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
