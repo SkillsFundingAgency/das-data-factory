@@ -190,7 +190,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('EmployerDemandQueryBasedTablesToStagingArea').Error.message}",
+											"value": "@{activity('EmpDemandQueryBasedTablesToStagingArea').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
