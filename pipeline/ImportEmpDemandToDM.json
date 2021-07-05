@@ -654,7 +654,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columnsvariables('SourceColumnList')",
+										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
