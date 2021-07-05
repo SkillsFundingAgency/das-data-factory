@@ -1,0 +1,12 @@
+{
+	"name": "srcEmployerDemand",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "empd_dbconnectionstring",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

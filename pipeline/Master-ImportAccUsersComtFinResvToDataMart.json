@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportPSRToDM",
+						"activity": "ExecuteImportEmployerDemandToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -434,6 +434,35 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "ImportPublicSectorToDM",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
+				}
+			},
+			{
+				"name": "ExecuteImportEmployerDemandToDM",
+				"description": "Execute Import Employer Demand ",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportPSRToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportEmpDemandToDM",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
