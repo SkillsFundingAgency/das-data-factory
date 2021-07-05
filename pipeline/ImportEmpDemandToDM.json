@@ -542,7 +542,7 @@
 				}
 			},
 			{
-				"name": "GetComtTableList",
+				"name": "GetEmpDemandTableList",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -584,7 +584,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "GetComtTableList",
+						"activity": "GetEmpDemandTableList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
