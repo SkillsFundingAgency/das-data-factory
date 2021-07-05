@@ -461,6 +461,10 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ImportEmpDemandToDM",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			}
