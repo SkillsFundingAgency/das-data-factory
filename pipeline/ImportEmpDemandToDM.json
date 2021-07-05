@@ -102,7 +102,7 @@
 							}
 						},
 						{
-							"name": "CopyApplyQueryBasedTablesToStagingArea",
+							"name": "EmpDemandQueryBasedTablesToStagingArea",
 							"type": "Copy",
 							"dependsOn": [
 								{
@@ -171,7 +171,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyApplyQueryBasedTablesToStagingArea",
+									"activity": "EmpDemandQueryBasedTablesToStagingArea",
 									"dependencyConditions": [
 										"Failed"
 									]
@@ -190,7 +190,7 @@
 								"storedProcedureParameters": {
 									"ErrorMessage": {
 										"value": {
-											"value": "@{activity('CopyApplyQueryBasedTablesToStagingArea').Error.message}",
+											"value": "@{activity('EmployerDemandQueryBasedTablesToStagingArea').Error.message}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -323,7 +323,7 @@
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "CopyApplyQueryBasedTablesToStagingArea",
+									"activity": "EmpDemandQueryBasedTablesToStagingArea",
 									"dependencyConditions": [
 										"Succeeded"
 									]
