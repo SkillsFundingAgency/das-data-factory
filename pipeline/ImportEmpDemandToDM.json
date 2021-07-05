@@ -654,7 +654,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columns",
+										"value": "declare @cols varchar(max)\n\nSELECT  @cols = STUFF\n    (\n        ( \n            SELECT DISTINCT '], [' + column_name\n            FROM INFORMATION_SCHEMA.COLUMNS\n            where table_name='@{item().TABLE_NAME}'\n                 and table_schema='@{item().SCHEMA_NAME}'\n            FOR XML PATH('')\n        ), 1, 2, ''\n    ) + ']';\n\nSELECT @cols Columnsvariables('SourceColumnList')",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -686,7 +686,7 @@
 							"typeProperties": {
 								"variableName": "SourceColumnList",
 								"value": {
-									"value": "@{activity('GetCommitSourceColumnList').output.firstRow.Columns}",
+									"value": "@{activity('GetEmpDemandSourceColumnList').output.firstRow.Columns}",
 									"type": "Expression"
 								}
 							}
@@ -768,7 +768,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='Commitments'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\tUNION\n\tSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('CK1')}'),'K2','0x'+'@{variables('CK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+CASE WHEN len(Replace(Replace(ConfigList,'[',''),']',''))>4 then SUBSTRING(ConfigList,len(ConfigList)/2,4) else SUBSTRING(ConfigList,len(ConfigList)/2,2) end as ConfigList\n\t   from (SELECT value as ConfigList\n\t   FROM Mtd.SourceConfigForImport SCFI\n\t  CROSS APPLY string_split(ColumnNamesToMask,',')\n\t  WHERE SourceDatabaseName='Commitments'\n\t\tAND SourceTableName='@{item().TABLE_NAME}'\n\t\tAND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n\t  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n\t\t\t\t\t   from STRING_SPLIT(@cols, ',') Cols \n\t     \t\t\t  where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value))\t\n\t\t\t\t\t  )\n\tUNION \n\tSELECT ConfigList\n\t   from (   \n\t\t   SELECT '(DATEDIFF(hour,DateOfBirth,GETDATE())/8766) [Age]'  ConfigList\n\t\t   FROM Mtd.SourceConfigForImport SCFI\n\t\t  CROSS APPLY string_split(ColumnNamesToMask,',')\n\t\t  WHERE SourceDatabaseName='Commitments'\n\t\t\tAND SourceTableName='@{item().TABLE_NAME}'\n\t\t\tAND SourceSchemaName='@{item().Schema_NAME}'\n\t\t\tAND CHARINDEX('DateOfBirth', lower(ltrim(rtrim(value)))) > 0 \n\t\t) SourceConfigInDM\n\t  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n\t\t\t\t\t  from STRING_SPLIT(@cols, ',') Cols \t\t\t\t  \t\t\t\t \t\t\t\t  \n\t\t\t\t  )\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
+										"value": "Declare @cols varchar(max)\nDECLARE @SQLCode nvarchar(max)\n\nSELECT @SQLCode=SQLCode from stg.SQLCode WHERE TYPE='EBPP'\nSET @Cols= '@{variables('SourceColumnList')}'\n\nDeclare @SourceQuery Varchar(max)\nDeclare @collist VARCHAR(MAX)\n\nSET @collist=\n STUFF\n    (\n        ( \nSELECT ','+LTRIM(RTRIM(ConfigList))\nFROM\n(SELECT SourceConfigInDM.ConfigList\n   FROM (SELECT VALUE as ConfigList\n   FROM Mtd.SourceConfigForImport SCFI\n  CROSS APPLY string_split(ColumnNamesToInclude,',')\n  WHERE SourceDatabaseName='EmployerDemand'\n    AND SourceTableName='@{item().TABLE_NAME}'\n    AND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n                      from STRING_SPLIT(@cols, ',') Cols \n\t\t\t\t     where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value)))\n\tUNION\n\tSELECT replace(replace(replace(@SQLCode,'T1','CONVERT(NVARCHAR(512),'+ConfigList+')'),'K1','0x'+'@{variables('AK1')}'),'K2','0x'+'@{variables('AK2')}') + ' as ' + SUBSTRING(REPLACE(ConfigList,'[',''),1,2)+SUBSTRING(REVERSE(REPLACE(ConfigList,']','')),1,2)+CASE WHEN len(Replace(Replace(ConfigList,'[',''),']',''))>4 then SUBSTRING(ConfigList,len(ConfigList)/2,4) else SUBSTRING(ConfigList,len(ConfigList)/2,2) end as ConfigList\n\t   from (SELECT value as ConfigList\n\t   FROM Mtd.SourceConfigForImport SCFI\n\t  CROSS APPLY string_split(ColumnNamesToMask,',')\n\t  WHERE SourceDatabaseName='EmployerDemand'\n\t\tAND SourceTableName='@{item().TABLE_NAME}'\n\t\tAND SourceSchemaName='@{item().Schema_NAME}') SourceConfigInDM\n\t  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n\t\t\t\t\t   from STRING_SPLIT(@cols, ',') Cols \n\t     \t\t\t  where LTRIM(RTRIM(SourceConfigInDM.ConfigList))=LTRIM(RTRIM(Cols.value))\t\n\t\t\t\t\t  )\n\tUNION \n\tSELECT ConfigList\n\t   from (   \n\t\t   SELECT '(DATEDIFF(hour,DateOfBirth,GETDATE())/8766) [Age]'  ConfigList\n\t\t   FROM Mtd.SourceConfigForImport SCFI\n\t\t  CROSS APPLY string_split(ColumnNamesToMask,',')\n\t\t  WHERE SourceDatabaseName='EmployerDemand'\n\t\t\tAND SourceTableName='@{item().TABLE_NAME}'\n\t\t\tAND SourceSchemaName='@{item().Schema_NAME}'\n\t\t\tAND CHARINDEX('DateOfBirth', lower(ltrim(rtrim(value)))) > 0 \n\t\t) SourceConfigInDM\n\t  WHERE  exists (select LTRIM(RTRIM(value)) as ExistingList\n\t\t\t\t\t  from STRING_SPLIT(@cols, ',') Cols \t\t\t\t  \t\t\t\t \t\t\t\t  \n\t\t\t\t  )\n\t) AS SourceConfigInDM\n  FOR XML PATH('')\n        ), 1, 1, ''\n    ) ;\n\nSET @SourceQuery='select ' + @collist + ' from [@{item().SCHEMA_NAME}].[@{item().TABLE_NAME}]'; \n\nSELECT @SourceQuery SourceQuery, @ColList as ColumnList",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -807,7 +807,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportCommitmentToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
+										"value": "DECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportEmployerDemandToDMStaging-'+'@{item().TABLE_NAME}'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\nSELECT 1",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -860,7 +860,7 @@
 										"type": "Int32"
 									},
 									"TaskType": {
-										"value": "ImportCommitmentToDatamart",
+										"value": "ImportEmployerDemandToDatamart",
 										"type": "String"
 									}
 								}
@@ -913,14 +913,14 @@
 									},
 									"K1": {
 										"value": {
-											"value": "@{variables('CK1')}",
+											"value": "@{variables('AK1')}",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
 									"K2": {
 										"value": {
-											"value": "@{variables('CK2')}",
+											"value": "@{variables('AK2')}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -944,12 +944,12 @@
 										"type": "Int32"
 									},
 									"SourceDatabaseName": {
-										"value": "Commitments",
+										"value": "EmployerDemand",
 										"type": "String"
 									},
 									"StgTableName": {
 										"value": {
-											"value": "Stg.Comt_@{item().TABLE_NAME}",
+											"value": "Stg.AED_@{item().TABLE_NAME}",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -1046,9 +1046,9 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "CK1",
+								"variableName": "AK1",
 								"value": {
-									"value": "@{activity('Generate_ComtKeys_1').output.firstRow.K1}",
+									"value": "@{activity('Generate_EDKeys_1').output.firstRow.K1}",
 									"type": "Expression"
 								}
 							}
@@ -1066,9 +1066,9 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "CK2",
+								"variableName": "AK2",
 								"value": {
-									"value": "@{activity('Generate_ComtKeys_2').output.firstRow.K2}",
+									"value": "@{activity('Generate_EDKeys_2').output.firstRow.K2}",
 									"type": "Expression"
 								}
 							}
@@ -1096,7 +1096,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@activity('GetImportCommitSelectQuery').output.firstRow.SourceQuery",
+										"value": "@activity('GetImportEDSelectQuery').output.firstRow.SourceQuery",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -1105,7 +1105,7 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"preCopyScript": {
-										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Comt_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Comt_@{item().TABLE_NAME}]",
+										"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'AED_@{item().TABLE_NAME}' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Comt_@{item().TABLE_NAME}]",
 										"type": "Expression"
 									},
 									"maxConcurrentConnections": {
@@ -1140,7 +1140,7 @@
 									"referenceName": "DestDataMart",
 									"type": "DatasetReference",
 									"parameters": {
-										"TableName": "Comt_@{item().TABLE_NAME}",
+										"TableName": "AED_@{item().TABLE_NAME}",
 										"SchemaName": "Stg"
 									}
 								}
