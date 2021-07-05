@@ -1123,12 +1123,8 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "SrcComts",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": "Apprenticeship",
-										"SchemaName": "dbo"
-									}
+									"referenceName": "srcEmployerDemand",
+									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
