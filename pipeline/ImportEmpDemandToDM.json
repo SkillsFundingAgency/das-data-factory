@@ -4,7 +4,7 @@
 		"description": "Import Employer Demand Data to Mart",
 		"activities": [
 			{
-				"name": "GetAssessorQueryList",
+				"name": "GetEmpDemandQueryList",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -44,11 +44,11 @@
 				}
 			},
 			{
-				"name": "ForEachQuery",
+				"name": "ForEachEmpDemandQuery",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "GetAssessorQueryList",
+						"activity": "GetEmpDemandQueryList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -455,7 +455,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ForEachQuery",
+						"activity": "ForEachEmpDemandQuery",
 						"dependencyConditions": [
 							"Succeeded"
 						]
