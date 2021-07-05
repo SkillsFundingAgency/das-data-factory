@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportPSRToDM",
+						"activity": "ExecuteImportEmployerDemand",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -445,6 +445,23 @@
 						"MaxConcurrentConnections": "4",
 						"DIU": "4"
 					}
+				}
+			},
+			{
+				"name": "ExecuteImportEmployerDemand",
+				"description": "Execute Import Employer Demand ",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExecuteImportPSRToDM",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
 				}
 			}
 		],
