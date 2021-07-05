@@ -246,7 +246,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "ExecuteImportEmployerDemand",
+						"activity": "ExecuteImportEmployerDemandToDM",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -448,7 +448,7 @@
 				}
 			},
 			{
-				"name": "ExecuteImportEmployerDemand",
+				"name": "ExecuteImportEmployerDemandToDM",
 				"description": "Execute Import Employer Demand ",
 				"type": "ExecutePipeline",
 				"dependsOn": [
@@ -465,7 +465,15 @@
 						"referenceName": "ImportEmpDemandToDM",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"RunId": {
+							"value": "@{activity('GetRunId').output.firstRow.RunId}",
+							"type": "Expression"
+						},
+						"MaxConcurrentConnections": "4",
+						"DIU": "4"
+					}
 				}
 			}
 		],
