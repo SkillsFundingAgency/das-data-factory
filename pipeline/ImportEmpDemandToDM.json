@@ -44,7 +44,7 @@
 				}
 			},
 			{
-				"name": "ForEachEmpDemandQuery",
+				"name": "For Each Employer Demand Query",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -455,7 +455,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "ForEachEmpDemandQuery",
+						"activity": "For Each Employer Demand Query",
 						"dependencyConditions": [
 							"Succeeded"
 						]
