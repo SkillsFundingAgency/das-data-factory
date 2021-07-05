@@ -57,7 +57,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetAssessorQueryList').output.value",
+						"value": "@activity('GetEmpDemandQueryList').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
