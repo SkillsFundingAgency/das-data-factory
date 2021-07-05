@@ -38,6 +38,9 @@
 		"eas_fin_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "eas-fin-dbconnectionstring"
 		},
+		"empd_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "empd-dbconnectionstring"
+		},
 		"empinc_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "empinc-dbconnectionstring"
 		},
