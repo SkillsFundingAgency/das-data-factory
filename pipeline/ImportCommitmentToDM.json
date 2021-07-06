@@ -1208,7 +1208,8 @@
 				"type": "String"
 			},
 			"RunId": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "-1"
 			},
 			"CK1": {
 				"type": "String"
