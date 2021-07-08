@@ -148,6 +148,10 @@
 		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
 			"type": "int",
 			"defaultValue": 4
+		},
+		"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "pas-dbconnectionstring"
 		}
 	},
 	"variables": {
@@ -8077,7 +8081,8 @@
 						"type": "String"
 					},
 					"RunId": {
-						"type": "String"
+						"type": "String",
+						"defaultValue": "-1"
 					},
 					"CK1": {
 						"type": "String"
@@ -25622,6 +25627,33 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pas_dbconnectionstring')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('pas_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzureIntegrationRunTime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzureIntegrationRunTime')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
 		}
 	]
 }

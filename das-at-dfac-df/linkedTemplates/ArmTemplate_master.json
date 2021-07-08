@@ -149,6 +149,10 @@
 			"type": "int",
 			"defaultValue": 4
 		},
+		"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "pas-dbconnectionstring"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -274,6 +278,9 @@
 					},
 					"users_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('users_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
+					"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('pas_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -317,15 +324,6 @@
 					},
 					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
 						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
 					}
 				}
 			},
@@ -346,6 +344,15 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
 					},
 					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"

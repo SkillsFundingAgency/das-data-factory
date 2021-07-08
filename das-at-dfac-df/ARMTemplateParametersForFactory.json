@@ -114,6 +114,9 @@
 		},
 		"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
 			"value": 4
+		},
+		"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "pas-dbconnectionstring"
 		}
 	}
 }
