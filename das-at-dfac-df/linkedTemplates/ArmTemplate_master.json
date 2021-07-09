@@ -86,6 +86,10 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().MarketoBaseUrl}"
 		},
+		"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "pas-dbconnectionstring"
+		},
 		"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "pfbe-cdbconnectionstring"
@@ -230,11 +234,11 @@
 					"marketo_restservice_properties_typeProperties_url": {
 						"value": "[parameters('marketo_restservice_properties_typeProperties_url')]"
 					},
+					"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('pas_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
+					},
 					"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
-					},
-					"psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
@@ -253,6 +257,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('psrep_dbconnectionstring_properties_typeProperties_connectionString_secretName')]"
 					},
 					"rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('rcrt_cdbconnectionstring_properties_typeProperties_connectionString_secretName')]"
@@ -314,18 +321,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
-						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
-					},
-					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
-						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
 					}
 				}
 			},
@@ -346,6 +341,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId": {
+						"value": "[parameters('Trigger-GenerateKey_properties_AppsCampaignGenerateKey_parameters_RunId')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_RunId')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_MaxConcurrentConnections')]"
+					},
+					"Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU": {
+						"value": "[parameters('Trigger-ImportIncentives_properties_ImportIncentivesToDataMart_parameters_DIU')]"
 					},
 					"Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId": {
 						"value": "[parameters('Trigger-BuildDataMart_properties_Master-ImportVacanciesToDataMart_parameters_RunId')]"

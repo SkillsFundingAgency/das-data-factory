@@ -66,6 +66,9 @@
 		"marketo_restservice_properties_typeProperties_url": {
 			"value": "@{linkedService().MarketoBaseUrl}"
 		},
+		"pas_dbconnectionstring_properties_typeProperties_connectionString_secretName": {
+			"value": "pas-dbconnectionstring"
+		},
 		"pfbe_cdbconnectionstring_properties_typeProperties_connectionString_secretName": {
 			"value": "pfbe-cdbconnectionstring"
 		},
