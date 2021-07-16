@@ -1,5 +1,5 @@
 {
-	"name": "DynamicsCrmEntity1",
+	"name": "SrcDynamicsECrm",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ecrm_dynamics",
