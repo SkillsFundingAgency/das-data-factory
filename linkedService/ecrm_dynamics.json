@@ -1,8 +1,8 @@
 {
 	"name": "ecrm_dynamics",
 	"properties": {
-		"annotations": [],
 		"type": "DynamicsCrm",
+		"annotations": [],
 		"typeProperties": {
 			"deploymentType": "Online",
 			"serviceUri": {
