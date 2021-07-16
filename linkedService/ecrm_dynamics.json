@@ -5,10 +5,24 @@
 		"type": "DynamicsCrm",
 		"typeProperties": {
 			"deploymentType": "Online",
-			"serviceUri": "abc",
+			"serviceUri": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "ecrm-serviceuri"
+			},
 			"authenticationType": "AADServicePrincipal",
 			"servicePrincipalCredentialType": "ServicePrincipalKey",
-			"servicePrincipalId": "abc",
+			"servicePrincipalId": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "ecrm-serviceprincipalid"
+			},
 			"servicePrincipalCredential": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
