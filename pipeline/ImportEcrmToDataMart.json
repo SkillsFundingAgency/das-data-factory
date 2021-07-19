@@ -1,6 +1,749 @@
 {
 	"name": "ImportEcrmToDataMart",
 	"properties": {
+		"activities": [
+			{
+				"name": "LogStartOfImport",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportEcrmToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Users",
+							"SchemaName": "Stg"
+						}
+					}
+				}
+			},
+			{
+				"name": "GetRunId",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "GenerateRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT CAST(MAX(RunId) AS VARCHAR(256)) as RunId FROM Mgmt.Log_RunId",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Stg",
+							"SchemaName": "Users"
+						}
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "GenerateRunId",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[GenerateRunId]"
+				},
+				"linkedServiceName": {
+					"referenceName": "datamgmt_staging_dbconnectionstring",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SetRunId",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetRunId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunId",
+					"value": {
+						"value": "@activity('GetRunId').output.firstRow.RunId",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "CopyEcrmAccountToStaging",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "LogStartOfImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DynamicsCrmSource"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Ecrm_Contact' AND TABLE_SCHEMA=N'Stg') DROP TABLE [Stg].[Ecrm_Contact]\n\n\n/* Start Logging */\nINSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'  ,'ImportEcrmAccountToDMStaging'\n\t   ,getdate()\n\t   ,0",
+							"type": "Expression"
+						},
+						"writeBehavior": "insert",
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "accountid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "accountid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "accountnumber",
+									"type": "String"
+								},
+								"sink": {
+									"name": "accountnumber",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "accountratingcode",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "accountratingcode",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "businesstypecode",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "businesstypecode",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "createdon",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "createdon",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "customersizecode",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "customersizecode",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "customertypecode",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "customertypecode",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "donotbulkemail",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotbulkemail",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "donotbulkpostalmail",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotbulkpostalmail",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "donotemail",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotemail",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "donotfax",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotfax",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "donotphone",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotphone",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "donotpostalmail",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotpostalmail",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "donotsendmm",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "donotsendmm",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "emailaddress1",
+									"type": "String"
+								},
+								"sink": {
+									"name": "emailaddress1",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "emailaddress2",
+									"type": "String"
+								},
+								"sink": {
+									"name": "emailaddress2",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "emailaddress3",
+									"type": "String"
+								},
+								"sink": {
+									"name": "emailaddress3",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "followemail",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "followemail",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "importsequencenumber",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "importsequencenumber",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "industrycode",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "industrycode",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "isprivate",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "isprivate",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "lastonholdtime",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "lastonholdtime",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "lastusedincampaign",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "lastusedincampaign",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_business_intelligence",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_business_intelligence",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_divisionid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "lsc_divisionid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_divisionidname",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_divisionidname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_learningproviderstatus",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "lsc_learningproviderstatus",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_managingproviderid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "lsc_managingproviderid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_managingprovideridname",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_managingprovideridname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_managingprovideridyominame",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_managingprovideridyominame",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_navmsregistered",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "lsc_navmsregistered",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_noofemployees",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "lsc_noofemployees",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_potentiallyeligibleforsewir2012",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "lsc_potentiallyeligibleforsewir2012",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_providerrelationships",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "lsc_providerrelationships",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_traininghistory",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_traininghistory",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_uniquelearnerprovidernumber",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_uniquelearnerprovidernumber",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_urn",
+									"type": "String"
+								},
+								"sink": {
+									"name": "lsc_urn",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "lsc_urnstatus",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "lsc_urnstatus",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "marketingonly",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "marketingonly",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "masteraccountidname",
+									"type": "String"
+								},
+								"sink": {
+									"name": "masteraccountidname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "masteraccountidyominame",
+									"type": "String"
+								},
+								"sink": {
+									"name": "masteraccountidyominame",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "masterid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "masterid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "merged",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "merged",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "modifiedon",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "modifiedon",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "numberofemployees",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "numberofemployees",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "onholdtime",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "onholdtime",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "originatingleadid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "originatingleadid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "originatingleadidname",
+									"type": "String"
+								},
+								"sink": {
+									"name": "originatingleadidname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ownerid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "ownerid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "parentaccountid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "parentaccountid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "parentaccountidname",
+									"type": "String"
+								},
+								"sink": {
+									"name": "parentaccountidname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "primarycontactid",
+									"type": "Guid"
+								},
+								"sink": {
+									"name": "primarycontactid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "primarycontactidname",
+									"type": "String"
+								},
+								"sink": {
+									"name": "primarycontactidname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "primarytwitterid",
+									"type": "String"
+								},
+								"sink": {
+									"name": "primarytwitterid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "sfa_automatedmarketingconsent",
+									"type": "Boolean"
+								},
+								"sink": {
+									"name": "sfa_automatedmarketingconsent",
+									"type": "Boolean"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SrcDynamicsECrm",
+						"type": "DatasetReference",
+						"parameters": {
+							"EntityName": "account"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestDataMart",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "Ecrm_Account",
+							"SchemaName": "Stg"
+						}
+					}
+				]
+			}
+		],
+		"variables": {
+			"RunId": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
