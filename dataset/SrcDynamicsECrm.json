@@ -1,0 +1,23 @@
+{
+	"name": "SrcDynamicsECrm",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecrm_dynamics",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"EntityName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DynamicsCrmEntity",
+		"schema": [],
+		"typeProperties": {
+			"entityName": {
+				"value": "@dataset().EntityName",
+				"type": "Expression"
+			}
+		}
+	}
+}
