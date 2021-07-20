@@ -308,7 +308,7 @@
 				}
 			},
 			{
-				"name": "LogSuccessfulImport",
+				"name": "Finish Logging- LogSuccessfulImport",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -330,7 +330,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "INSERT INTO Mgmt.Log_Execution_Results\n\t  (\n\t    RunId\n\t   ,StepNo\n\t   ,StoredProcedureName\n\t   ,ADFTaskType\n\t   ,StartDateTime\n\t   ,Execution_Status\n\t  )\n  SELECT \n        @{variables('RunId')}\n\t   ,'Step-5'\n\t   ,'NA'\n\t   ,'ImportEcrmToDM'\n\t   ,getdate()\n\t   ,0\n\nSELECT 'N/A'",
+							"value": "/* update log record as success */\nDECLARE @LogID int\n\n   SELECT @LogID=MAX(LogId) FROM Mgmt.Log_Execution_Results\n   WHERE ADFTaskType='ImportCommitmentsQueryBasedToDM'\n     AND RunId=@{variables('RunId')}\n\nUPDATE Mgmt.Log_Execution_Results\n   SET Execution_Status=1\n      ,EndDateTime=getdate()\n\t  ,FullJobStatus='Pending'\n WHERE LogId=@LogID\n   AND RunID=@{variables('RunId')}\n\n/*  Log The Status as Finish in Execution Results */\nUPDATE MGMT\n     SET FullJobStatus='Finish'\n\tfrom Mgmt.Log_Execution_Results Mgmt\n   WHERE LogId=(SELECT MAX(LogId)\n                  FROM Mgmt.Log_Execution_Results\n\t\t\t\t WHERE RunId=@{variables('RunId')}\n/* Log the End Time on Run Id */\n  UPDATE MGMT\n      SET EndDateTime=getdate()\n\t FROM Mgmt.Log_RunId Mgmt\n\tWHERE RunId=@{variables('RunId')}\n\nSELECT 'na'\n\n\n\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
